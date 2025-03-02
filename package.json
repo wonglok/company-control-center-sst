@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "npm run sst",
     "build": "next build",
-    "devnext": "next dev --port 3000 --turbopack",
+    "devnext": "next dev --port 3001 --turbopack",
     "lint": "next lint",
     "start": "next start",
     "unlock": "npx sst unlock --stage development",
