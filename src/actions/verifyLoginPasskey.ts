@@ -60,7 +60,7 @@ export async function verifyLoginPasskey({ username, challenge, origin, pubKeyCr
 
             let jwt = await data2jwt({
                 payload: {
-                    role: 'admin',
+                    role: user.role,
                     userID: user.itemID,
                     username: user.username,
                 },

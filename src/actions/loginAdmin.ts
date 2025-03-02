@@ -73,7 +73,7 @@ export async function loginAdmin(prevState: any, formData: FormData) {
                     //
                     userID: found.itemID,
                     username: found.username,
-                    role: 'admin',
+                    role: found.role,
                     //
                 },
                 secretKey: Resource.SESSION_SECRET.value,

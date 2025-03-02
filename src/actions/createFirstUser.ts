@@ -113,8 +113,7 @@ export async function createFirstUser(prevState: any, formData: FormData) {
             //
             userID: obj.itemID,
             username: data.username,
-            role: 'admin',
-            //
+            role: obj.role,
         },
         secretKey: Resource.SESSION_SECRET.value,
     })
