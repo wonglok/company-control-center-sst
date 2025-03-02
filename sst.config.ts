@@ -83,15 +83,15 @@ export default $config({
             SocketAPI: wss.url,
         }
 
-        // let domain = {
-        //     name: 'company-control-center.loklok.land',
-        // }
+        let domain = {
+            name: 'company-control-center.loklok.land',
+        }
 
-        // if ($app.stage === 'preview') {
-        //     domain = {
-        //         name: 'company-control-center-preview.loklok.land',
-        //     }
-        // }
+        if ($app.stage === 'preview') {
+            domain = {
+                name: 'company-control-center-preview.loklok.land',
+            }
+        }
 
         const getCommonLinks = () => [
             ConnectionsTable,
@@ -122,7 +122,7 @@ export default $config({
         let nextjs = new sst.aws.Nextjs('MyWeb', {
             environment: environment,
             link: [...getCommonLinks()],
-            // domain: domain,
+            domain: domain,
             dev: {
                 autostart: false,
                 command: '',
