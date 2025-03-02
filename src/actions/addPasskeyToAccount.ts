@@ -20,6 +20,7 @@ export const addPasskeyToAccount = async ({
     origin: string
     challenge: string
 }) => {
+    //
     let originalChallenge: string = new TextDecoder().decode(base64url.decode(challenge))
 
     let data = await jwt2data({ payload: originalChallenge, secretKey: Resource.SESSION_SECRET.value })
@@ -38,7 +39,7 @@ export const addPasskeyToAccount = async ({
             new PutItemCommand({
                 TableName: Resource.CredentialTable.name,
                 Item: marshall({
-                    itemID: `v4()`,
+                    itemID: `${v4()}`,
                     userID: user.userID,
                     credential: credential,
                 }),

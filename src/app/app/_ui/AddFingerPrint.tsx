@@ -32,7 +32,9 @@ export function AddFingerPrint({ user, jwt }: { user: any; jwt: string }) {
                 <div
                     className='inline-block bg-white p-3 cursor-pointer'
                     onClick={() => {
-                        makePasskey()
+                        makePasskey().catch((r) => {
+                            console.log(r)
+                        })
                     }}
                 >
                     <div className='mb-3 text-center'>Add Passkey</div>
