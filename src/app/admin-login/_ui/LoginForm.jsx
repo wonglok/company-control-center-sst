@@ -132,8 +132,8 @@ function LoginPasskey({ credIDs, username, onUsePassword }) {
     }, [credIDs])
 
     return <>
-        <button
 
+        <button
             className='bg-green-500 mb-3 hover:bg-green-600 text-white cursor-pointer disabled:bg-gray-500 font-semibold rounded-md py-2 px-4 w-full'
         >Scanning Passkey</button>
         <button
