@@ -1,7 +1,7 @@
 'use client'
 import { useActionState, useEffect, useState } from 'react'
 import { SubmitButton } from './SubmitButton'
-import { redirect } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
 import { loginAdmin } from '@/actions/loginAdmin'
 import { loginUsername } from '@/actions/loginUsername'
 import { supported } from '@github/webauthn-json'
@@ -51,7 +51,9 @@ export function LoginForm() {
 
     if (status === 'passkey') {
         return <>
-            <LoginPasskey username={username} credIDs={credIDs}></LoginPasskey>
+            <LoginPasskey username={username} credIDs={credIDs} onUsePassword={() => {
+                setStatus('password')
+            }}></LoginPasskey>
         </>
     }
 }
@@ -92,6 +94,7 @@ function LoginWithPassword({ username }) {
                     type="password"
                     id="password"
                     name="password"
+                    autoFocus
                     className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                     autoComplete="off"
                 />
@@ -105,7 +108,8 @@ function LoginWithPassword({ username }) {
     </>
 }
 
-function LoginPasskey({ credIDs, username }) {
+function LoginPasskey({ credIDs, username, onUsePassword }) {
+    let router = useRouter()
     useEffect(() => {
         let run = async () => {
             let challenge = await getChallenge()
@@ -119,14 +123,26 @@ function LoginPasskey({ credIDs, username }) {
 
             let result = await verifyLoginPasskey({ username, challenge, pubKeyCred, origin: location.origin })
             if (result.ok === true) {
-                redirect('/app')
+                router.push('/app')
             }
         }
-        run()
+        run().catch(r => {
+            console.log(r)
+        })
     }, [credIDs])
 
     return <>
-        <h1>Scanning Passkey</h1>
+        <button
+
+            className='bg-green-500 mb-3 hover:bg-green-600 text-white cursor-pointer disabled:bg-gray-500 font-semibold rounded-md py-2 px-4 w-full'
+        >Scanning Passkey</button>
+        <button
+            onClick={() => {
+                onUsePassword()
+            }}
+            className='bg-purple-500 mb-3 hover:bg-purple-600 text-white cursor-pointer disabled:bg-gray-500 font-semibold rounded-md py-2 px-4 w-full'
+        >Login with Password</button>
+
     </>
 }
 
