@@ -14,7 +14,7 @@ export default async function Page() {
 
     //
     if (!session) {
-        redirect('/admin-login')
+        redirect('/login')
     } else {
         try {
             let userInfo = await jwt2data({ payload: session, secretKey: Resource.SESSION_SECRET.value })

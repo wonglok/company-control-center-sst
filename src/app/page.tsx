@@ -5,9 +5,12 @@ export default async function Page() {
     let appMode = await getAppMode()
 
     if (appMode === 'oobe') {
-        redirect('/oobe')
+        return redirect('/oobe')
     }
+
     if (appMode === 'app') {
-        redirect('/app')
+        return redirect('/app')
     }
 }
+
+//
