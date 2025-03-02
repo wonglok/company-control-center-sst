@@ -3,6 +3,8 @@
 import { redirect } from 'next/navigation'
 import { logout } from '@/actions/logout'
 import { AddFingerPrint } from './AddFingerPrint'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBars, faDoorOpen, faDotCircle, faHamburger, faMobileButton } from '@fortawesome/free-solid-svg-icons'
 
 export function AppPage({ user, jwt }: { user: any; jwt: string }) {
     return (
@@ -144,7 +146,7 @@ export function AppPage({ user, jwt }: { user: any; jwt: string }) {
                         </a>
                     </div>
                     <div className='flex flex-col w-56 border-r border-gray-300'>
-                        <button className='relative text-sm focus:outline-none group'>
+                        <div className='relative text-sm focus:outline-none group'>
                             <div className='flex items-center justify-between w-full h-16 px-4 border-b border-gray-300 hover:bg-gray-300'>
                                 <span className='font-medium'>Dropdown</span>
                                 <svg
@@ -171,7 +173,7 @@ export function AppPage({ user, jwt }: { user: any; jwt: string }) {
                                     Menu Item 1
                                 </a>
                             </div>
-                        </button>
+                        </div>
                         <div className='flex flex-col flex-grow p-4 overflow-auto'>
                             <a
                                 className='flex items-center flex-shrink-0 h-10 mb-2 px-3 text-sm font-medium bg-gray-200 rounded hover:bg-gray-300'
@@ -233,18 +235,18 @@ export function AppPage({ user, jwt }: { user: any; jwt: string }) {
                         </div>
                     </div>
                     <div className='flex flex-col flex-grow'>
-                        <div className='flex items-center flex-shrink-0 h-16 px-8 border-b border-gray-300'>
+                        <div className='flex items-center justify-between flex-shrink-0 h-16 px-8 border-b border-gray-300'>
                             <h1 className='text-lg font-medium'>Dashboard</h1>
-                            <button className='flex items-center justify-center h-10 px-4 ml-auto text-sm font-medium rounded hover:bg-gray-300'>
+                            {/* <button className='flex items-center justify-center h-10 px-4 ml-auto text-sm font-medium rounded hover:bg-gray-300'>
                                 Action 1
                             </button>
                             <button className='flex items-center justify-center h-10 px-4 ml-2 text-sm font-medium bg-gray-200 rounded hover:bg-gray-300'>
                                 Action 2
-                            </button>
+                            </button> */}
 
                             <button className='relative ml-2 text-sm focus:outline-none group'>
-                                <div className='flex items-center justify-between w-10 h-10 rounded hover:bg-gray-300'>
-                                    <svg
+                                <div className='flex items-center justify-center w-10 h-10 rounded hover:bg-gray-300'>
+                                    {/* <svg
                                         className='w-5 h-5 mx-auto'
                                         xmlns='http://www.w3.org/2000/svg'
                                         fill='none'
@@ -257,7 +259,8 @@ export function AppPage({ user, jwt }: { user: any; jwt: string }) {
                                             strokeWidth={2}
                                             d='M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z'
                                         />
-                                    </svg>
+                                    </svg> */}
+                                    <FontAwesomeIcon className='size-5' icon={faBars}></FontAwesomeIcon>
                                 </div>
                                 <div className='absolute right-0 flex-col items-start hidden w-40 bg-white border border-gray-300 shadow-lg group-focus:flex'>
                                     <div
