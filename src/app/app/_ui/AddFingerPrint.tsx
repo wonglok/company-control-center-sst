@@ -18,7 +18,10 @@ export function AddFingerPrint({ user, jwt }: { user: any; jwt: string }) {
 
         let result = await addPasskeyToAccount({ info, jwt, challenge, origin: location.origin })
 
+        //
+
         console.log(result)
+
         //
 
         toast('Successfully added passkey to your account.')
