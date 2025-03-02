@@ -1,7 +1,7 @@
 import { addPasskeyToAccount } from '@/actions/addPasskeyToAccount'
 import { getChallenge } from '@/actions/getChallenge'
 import { client } from '@passwordless-id/webauthn'
-import base64url from 'base64url'
+import { toast } from 'sonner'
 
 export function AddFingerPrint({ user, jwt }: { user: any; jwt: string }) {
     let makePasskey = async () => {
@@ -21,6 +21,8 @@ export function AddFingerPrint({ user, jwt }: { user: any; jwt: string }) {
         console.log(result)
         //
 
+        toast('Successfully added passkey to your account.')
+
         //
     }
 
@@ -28,11 +30,9 @@ export function AddFingerPrint({ user, jwt }: { user: any; jwt: string }) {
         <>
             <>
                 <div
-                    className='inline-block bg-gray-200 p-3 cursor-pointer'
+                    className='inline-block bg-white p-3 cursor-pointer'
                     onClick={() => {
-                        //
                         makePasskey()
-                        //
                     }}
                 >
                     <div className='mb-3 text-center'>Add Passkey</div>

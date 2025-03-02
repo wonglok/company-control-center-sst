@@ -19,6 +19,7 @@ export default async function Page() {
         try {
             let userInfo = await jwt2data({ payload: session, secretKey: Resource.SESSION_SECRET.value })
             let jwt = session
+
             return <>
                 <AppPage user={userInfo} jwt={jwt}></AppPage>
             </>
