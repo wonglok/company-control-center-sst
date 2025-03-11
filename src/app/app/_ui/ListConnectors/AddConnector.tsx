@@ -8,6 +8,7 @@ import { putConnectionToken } from '@/actions/connectionTokens/putConnectionToke
 import { v4 } from 'uuid'
 import { listConnectionToken } from '@/actions/connectionTokens/listConnectionToken'
 import { useConnectorTokens } from './useConnectorTokens'
+import { toast } from 'sonner'
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export function AddConnector() {
@@ -46,10 +47,12 @@ export function AddConnector() {
                             },
                         }).then(() => {
                             //
+
                             listConnectionToken().then((data) => {
                                 useConnectorTokens.setState({ tokens: data })
                             })
-                            //
+
+                            toast('Successfully added new connector to the account')
                         })
                     }}
                 >

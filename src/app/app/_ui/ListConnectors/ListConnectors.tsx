@@ -12,12 +12,20 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { useEffect } from 'react'
+
 import { useConnectorTokens } from './useConnectorTokens'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Terminal } from 'lucide-react'
 import copy from 'copy-to-clipboard'
 import { Input } from '@/components/ui/input'
 import { putConnectionToken } from '@/actions/connectionTokens/putConnectionToken'
+
+// Declare putConnectionTokenTimer on the window object
+declare global {
+    interface Window {
+        putConnectionTokenTimer: any
+    }
+}
 
 export function ListConnectors() {
     useEffect(() => {
@@ -29,7 +37,7 @@ export function ListConnectors() {
     return (
         <Card className='size-full'>
             <CardHeader>
-                <CardTitle>AI Serach Engine Connection </CardTitle>
+                <CardTitle>Connections Database</CardTitle>
                 <CardDescription>Recent 3 Connection Link</CardDescription>
             </CardHeader>
             <CardContent>
@@ -62,7 +70,10 @@ export function ListConnectors() {
                                                     return { ...r, tokens: [...r.tokens] }
                                                 })
 
-                                                await putConnectionToken({ item: token })
+                                                clearTimeout(window.putConnectionTokenTimer)
+                                                window.putConnectionTokenTimer = setTimeout(() => {
+                                                    putConnectionToken({ item: token })
+                                                }, 1000)
                                             }}
                                         ></Input>
                                     </TableCell>
