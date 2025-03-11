@@ -10,7 +10,7 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 
-export function Dashboard({ children }: any) {
+export function Dashboard({ children, title = 'Dashboard' }: any) {
     return (
         <SidebarProvider>
             <AppSidebar />
@@ -22,11 +22,11 @@ export function Dashboard({ children }: any) {
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem className='hidden md:block'>
-                                    <BreadcrumbLink href='#'>Building Your Application</BreadcrumbLink>
+                                    <BreadcrumbLink href='#'>App</BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator className='hidden md:block' />
                                 <BreadcrumbItem>
-                                    <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                                    <BreadcrumbPage>{title}</BreadcrumbPage>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
