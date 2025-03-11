@@ -5,8 +5,18 @@ import { logout } from '@/actions/logout'
 import { AddFingerPrint } from './AddFingerPrint'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faDoorOpen, faDotCircle, faHamburger, faMobileButton } from '@fortawesome/free-solid-svg-icons'
+import { ConnectedSockets } from '@/app/_ui/ConnectedSockets/ConnectedSockets'
+import { Suspense } from 'react'
 
-export function AppPage({ user, jwt }: { user: any; jwt: string }) {
+export function AppPage({
+    config,
+    user,
+    jwt,
+}: {
+    config: { socketURL: string; restURL: string }
+    user: any
+    jwt: string
+}) {
     return (
         <>
             {/*  */}
@@ -262,6 +272,12 @@ export function AppPage({ user, jwt }: { user: any; jwt: string }) {
                                 <div className='bg-white border border-gray-300'>
                                     <AddFingerPrint user={user} jwt={jwt}></AddFingerPrint>
                                 </div>
+                                <div className='bg-white border border-gray-300'>
+                                    <Suspense>
+                                        <ConnectedSockets config={config}></ConnectedSockets>
+                                    </Suspense>
+                                </div>
+                                {/*  */}
                             </div>
                         </div>
                     </div>

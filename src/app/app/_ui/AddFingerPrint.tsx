@@ -27,6 +27,7 @@ export function AddFingerPrint({ user, jwt }: { user: any; jwt: string }) {
         toast('Successfully added passkey to your account.')
 
         //
+        //
     }
 
     return (

@@ -106,6 +106,7 @@ export async function createFirstUser(prevState: any, formData: FormData) {
             Item: marshall(obj),
         }),
     )
+    //
 
     //
     let jwt = await data2jwt({

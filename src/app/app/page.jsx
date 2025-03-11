@@ -21,7 +21,10 @@ export default async function Page() {
             let jwt = session
 
             return <>
-                <AppPage user={userInfo} jwt={jwt}></AppPage>
+                <AppPage config={{
+                    restURL: Resource.RestAPI.url,
+                    socketURL: Resource.SocketAPI.url
+                }} user={userInfo} jwt={jwt}></AppPage >
             </>
         } catch (e) {
             console.log(e)

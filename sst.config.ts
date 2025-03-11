@@ -1,14 +1,15 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./.sst/platform/config.d.ts" />
 
-const SST_AWS_REGION = 'us-west-2'
+const SST_AWS_REGION = 'us-west-1'
 
 export default $config({
     app(input) {
         return {
-            name: 'company-control-center-sst',
+            name: 'cloud-data-hub-sst',
             removal: input?.stage === 'production' ? 'retain' : 'remove',
             protect: ['production'].includes(input?.stage),
+            // removal: 'remove',
             home: 'aws',
             providers: {
                 aws: {
@@ -102,6 +103,12 @@ export default $config({
             CredentialTable,
             GlobalVarsTable,
         ]
+
+        api.route('POST /api/connections/connections/getOnlineClients', {
+            link: [appDataBucket, appDataCDN, api],
+            environment: environment,
+            handler: '/src/sst/http/connections/connections.getOnlineClients',
+        })
 
         api.route('POST /api/files/signGenericFile', {
             link: [appDataBucket, appDataCDN, api],
