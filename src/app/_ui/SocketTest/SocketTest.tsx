@@ -70,14 +70,14 @@ export function SocketTest({ socketURL = '', clientID = '' }) {
             {status === 'loading' && (
                 <>
                     <div className='mb-3'>
-                        <BlueBlock value={connectionURL} text='Loading...' color='blue'></BlueBlock>
+                        {/* <BlueBlock value={connectionURL} text='Loading...' color='blue'></BlueBlock> */}
                     </div>
                 </>
             )}
             {status === 'open' && (
                 <>
                     <div className='mb-3'>
-                        <GreenBlock value={connectionURL} text='Ready!' color='blue'></GreenBlock>
+                        {/* <GreenBlock value={connectionURL} text='Ready!' color='blue'></GreenBlock> */}
                     </div>
 
                     <div className='mb-3'>
