@@ -21,7 +21,7 @@ export async function loginUsername(prevState: any, formData: FormData) {
     })
 
     const validatedFields = schema.safeParse({
-        username: formData.get('username'),
+        username: formData.get('username')?.toString()?.toLowerCase(),
     })
 
     if (!validatedFields.success) {
