@@ -13,6 +13,10 @@ declare module "sst" {
       "type": "sst.aws.Router"
       "url": string
     }
+    "ConnectionTokensTable": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
     "ConnectionsTable": {
       "name": string
       "type": "sst.aws.Dynamo"

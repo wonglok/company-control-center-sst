@@ -1,6 +1,2 @@
 'use server'
-export async function loggedInCheck() {
-
-    
-        
-}
+export async function loggedInCheck() {}

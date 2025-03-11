@@ -56,7 +56,7 @@ export const OPTIONS = async (request: NextRequest) => {
 export async function GET(req: NextRequest, ctx: any) {
     return new Response(
         JSON.stringify({
-            socketURL: Resource.SocketAPI.url,
+            socketURL: `${Resource.SocketAPI.url}`,
         }),
         {
             headers: getCorsHeaders(req.headers.get('origin') || '*'),

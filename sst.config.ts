@@ -47,6 +47,13 @@ export default $config({
             primaryIndex: { hashKey: 'itemID' },
         })
 
+        const ConnectionTokensTable = new sst.aws.Dynamo('ConnectionTokensTable', {
+            fields: {
+                itemID: 'string',
+            },
+            primaryIndex: { hashKey: 'itemID' },
+        })
+
         const appDataBucket = new sst.aws.Bucket('AppDataBucket', {
             access: 'public',
             cors: {
@@ -102,6 +109,7 @@ export default $config({
             UserTable,
             CredentialTable,
             GlobalVarsTable,
+            ConnectionTokensTable,
         ]
 
         // api.route('POST /api/connections/connections/getOnlineClients', {

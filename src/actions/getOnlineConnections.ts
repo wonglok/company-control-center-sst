@@ -6,11 +6,12 @@ import { dyna } from './dyna'
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk/client-apigatewaymanagementapi'
 
-let wss = new ApiGatewayManagementApiClient({
-    region: process.env.SST_AWS_REGION,
-    endpoint: Resource.SocketAPI.managementEndpoint,
-})
 export async function getOnlineConnections() {
+    let wss = new ApiGatewayManagementApiClient({
+        region: process.env.SST_AWS_REGION,
+        endpoint: Resource.SocketAPI.managementEndpoint,
+    })
+
     //
     let results: any[] = await dyna
         .send(
@@ -63,6 +64,9 @@ export async function getOnlineConnections() {
         .catch((err) => {
             console.log(err)
             return []
+        })
+        .finally(() => {
+            wss.destroy()
         })
 
     return {
