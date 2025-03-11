@@ -32,8 +32,8 @@ export function AddFingerPrint({ user, jwt }: { user: any; jwt: string }) {
         <>
             <Card className='size-full'>
                 <CardHeader>
-                    <CardTitle>Passkey</CardTitle>
-                    <CardDescription>Use face ID or Touch ID</CardDescription>
+                    <CardTitle>Passkey / WebAuthn</CardTitle>
+                    <CardDescription>Use Face ID or Touch ID for Login</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div
