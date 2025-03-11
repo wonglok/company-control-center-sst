@@ -36,7 +36,7 @@ const dataDefault = {
         name: 'shadcn',
         email: 'm@example.com',
         role: 'admin',
-        avatar: '/avatars/shadcn.jpg',
+        avatar: '/avatar.svg',
     },
     navMain: [
         {
@@ -174,7 +174,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         name: data.username,
                         role: data.role,
                         email: 'm@example.com',
-                        avatar: '/avatars/admin.svg',
+                        avatar: '/admin.svg',
                     },
                 }
             })
