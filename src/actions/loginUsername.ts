@@ -38,7 +38,7 @@ export async function loginUsername(prevState: any, formData: FormData) {
                 TableName: Resource.UserTable.name,
                 FilterExpression: 'username = :username',
                 ExpressionAttributeValues: {
-                    ':username': { S: `${data.username}` },
+                    ':username': { S: `${data.username?.toString()?.toLowerCase()}` },
                 },
             }),
         )

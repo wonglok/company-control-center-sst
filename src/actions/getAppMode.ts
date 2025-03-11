@@ -18,7 +18,7 @@ export async function getAppMode() {
                 Select: 'COUNT',
             }),
         )
-        .then((r: any) => r.Count)
+        .then((r) => r.Count)
         .catch((r) => {
             console.log(r)
             return 'unknown'

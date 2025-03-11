@@ -27,7 +27,7 @@ export async function loginAdmin(prevState: any, formData: FormData) {
     })
 
     const validatedFields = schema.safeParse({
-        username: formData.get('username'),
+        username: formData.get('username')?.toString()?.toLowerCase(),
         password: formData.get('password'),
     })
 
