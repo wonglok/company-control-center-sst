@@ -5,11 +5,12 @@ import { Resource } from 'sst'
 let dyna = new DynamoDBClient()
 export async function handler(event: any) {
     const clientID = event?.queryStringParameters?.clientID || 'none'
+    const clientType = event?.queryStringParameters?.clientType || 'none'
 
     const connectionId = event['requestContext']['connectionId']
 
     console.log('connected>>>')
-    console.log('clinetID', clientID, 'connectionID', connectionId)
+    console.log('clinetID', clientID, 'clientType', clientType, 'connectionID', connectionId)
     console.log('<<<connected')
 
     let newItem = await dyna
@@ -19,6 +20,7 @@ export async function handler(event: any) {
                 Item: marshall({
                     itemID: connectionId,
                     clientID: clientID,
+                    clientType: clientType,
                 }),
             }),
         )

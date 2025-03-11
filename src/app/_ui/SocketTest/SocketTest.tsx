@@ -13,7 +13,6 @@ export function SocketTest({ socketURL = '', clientID = '' }) {
     let [wss, setWss] = useState<any>(false)
     let [images, setImages] = useState([])
 
-    let connectionURL = `${socketURL}?clientID=${clientID}`
     useEffect(() => {
         if (!socketURL) {
             return
@@ -25,7 +24,7 @@ export function SocketTest({ socketURL = '', clientID = '' }) {
         console.log('clientID', clientID)
 
         let clean = () => {}
-
+        let connectionURL = `${socketURL}?clientID=${clientID}&clientType=${'datahub'}`
         let wss = new WebSocket(connectionURL)
 
         wss.onopen = () => {
@@ -62,7 +61,7 @@ export function SocketTest({ socketURL = '', clientID = '' }) {
         return () => {
             clean()
         }
-    }, [connectionURL, clientID])
+    }, [socketURL, clientID])
 
     //
 

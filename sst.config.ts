@@ -104,11 +104,11 @@ export default $config({
             GlobalVarsTable,
         ]
 
-        api.route('POST /api/connections/connections/getOnlineClients', {
-            link: [appDataBucket, appDataCDN, api],
-            environment: environment,
-            handler: '/src/sst/http/connections/connections.getOnlineClients',
-        })
+        // api.route('POST /api/connections/connections/getOnlineClients', {
+        //     link: [appDataBucket, appDataCDN, api],
+        //     environment: environment,
+        //     handler: '/src/sst/http/connections/connections.getOnlineClients',
+        // })
 
         api.route('POST /api/files/signGenericFile', {
             link: [appDataBucket, appDataCDN, api],
