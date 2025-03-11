@@ -92,12 +92,12 @@ export default $config({
         }
 
         let domain = {
-            name: 'company-control-center.loklok.land',
+            name: 'gateway.loklok.land',
         }
 
         if ($app.stage === 'preview') {
             domain = {
-                name: 'company-control-center-preview.loklok.land',
+                name: 'gateway-preview.loklok.land',
             }
         }
 
