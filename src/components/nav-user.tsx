@@ -91,9 +91,8 @@ export function NavUser({
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                             onClick={() => {
-                                logout().then(() => {
-                                    redirect('/')
-                                })
+                                logout()
+                                redirect('/login')
                             }}
                         >
                             <LogOut />

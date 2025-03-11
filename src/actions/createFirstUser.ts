@@ -27,8 +27,6 @@ export async function createFirstUser(prevState: any, formData: FormData) {
         }),
     })
 
-    //
-
     const validatedFields = schema.safeParse({
         username: formData.get('username'),
         password: formData.get('password'),

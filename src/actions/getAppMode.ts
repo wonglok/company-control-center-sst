@@ -14,6 +14,7 @@ export async function getAppMode() {
                 // ExpressionAttributeValues: {
                 //     // ':username': { S: `${data.username}` },
                 // },
+                ScanFilter: {},
                 Select: 'COUNT',
             }),
         )
