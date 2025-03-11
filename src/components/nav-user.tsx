@@ -22,6 +22,7 @@ export function NavUser({
     user: {
         name: string
         email: string
+        role: string
         avatar: string
     }
 }) {
@@ -42,7 +43,7 @@ export function NavUser({
                             </Avatar>
                             <div className='grid flex-1 text-left text-sm leading-tight'>
                                 <span className='truncate font-semibold'>{user.name}</span>
-                                <span className='truncate text-xs'>{user.email}</span>
+                                <span className='truncate text-xs'>{user.role}</span>
                             </div>
                             <ChevronsUpDown className='ml-auto size-4' />
                         </SidebarMenuButton>
@@ -61,7 +62,7 @@ export function NavUser({
                                 </Avatar>
                                 <div className='grid flex-1 text-left text-sm leading-tight'>
                                     <span className='truncate font-semibold'>{user.name}</span>
-                                    <span className='truncate text-xs'>{user.email}</span>
+                                    <span className='truncate text-xs'>{user.role}</span>
                                 </div>
                             </div>
                         </DropdownMenuLabel>
@@ -69,7 +70,7 @@ export function NavUser({
                         <DropdownMenuGroup>
                             <DropdownMenuItem>
                                 <Sparkles />
-                                Upgrade to Pro
+                                Gratitude Notes
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />

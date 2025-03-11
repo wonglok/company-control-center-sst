@@ -17,7 +17,7 @@ export function CreateFirstUserForm() {
 
     useEffect(() => {
         if (state.ok === true) {
-            redirect('/app')
+            redirect('/admin')
         }
     }, [state])
 

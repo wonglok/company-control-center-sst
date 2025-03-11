@@ -19,6 +19,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import copy from 'copy-to-clipboard'
 import { Input } from '@/components/ui/input'
 import { putConnectionToken } from '@/actions/connectionTokens/putConnectionToken'
+import Link from 'next/link'
 
 // Declare putConnectionTokenTimer on the window object
 declare global {
@@ -106,6 +107,13 @@ export function ListConnectors() {
                     </Table>
                 )}
             </CardContent>
+            <CardFooter className='flex justify-end'>
+                <Link href={'/app/clients'}>
+                    <Button variant={'outline'} className=''>
+                        Manage All Connections
+                    </Button>
+                </Link>
+            </CardFooter>
         </Card>
     )
 }

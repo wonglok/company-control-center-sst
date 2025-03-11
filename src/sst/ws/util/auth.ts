@@ -55,7 +55,22 @@ export async function jwt2jwtRefreshed({ jwt, secretKey }: { jwt: string; secret
     const payload = await decrypt(jwt, secretKey)
 
     const jwt2 = await encrypt(payload, secretKey)
+
+    const cookieStore = await cookies()
+    cookieStore.set('session', jwt2, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/',
+    })
+
     return jwt2
+}
+
+export async function getSessionJWT() {
+    const cookieStore = await cookies()
+
+    return cookieStore.get('session')?.value || ''
 }
 
 export async function createSessionByJWT({ jwt }: { jwt: string }) {

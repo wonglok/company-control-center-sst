@@ -62,7 +62,7 @@ function LoginWithPassword({ username }) {
     const [state, formAction, pending] = useActionState(loginAdmin, initialStatePW)
 
     if (state.ok === true) {
-        redirect('/app')
+        redirect('/admin')
     }
 
     return <>
@@ -123,7 +123,7 @@ function LoginPasskey({ credIDs, username, onUsePassword }) {
 
             let result = await verifyLoginPasskey({ username, challenge, pubKeyCred, origin: location.origin })
             if (result.ok === true) {
-                router.push('/app')
+                router.push('/admin')
             }
         }
         run().catch(r => {

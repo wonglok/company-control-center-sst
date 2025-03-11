@@ -30,7 +30,7 @@
         "**/*.js",
         ".next/types/**/*.ts",
         "next.config.js",
-        "src/app/app/_ui/ConnectedSockets/useConnected.ts"
+        "src/app/admin/_ui/ConnectedSockets/useConnected.ts"
     ],
     "exclude": ["node_modules", "sst.config.ts"]
 }

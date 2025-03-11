@@ -6,6 +6,7 @@ import {
     Bot,
     Command,
     Frame,
+    LayoutDashboardIcon,
     LifeBuoy,
     Map,
     PieChart,
@@ -28,27 +29,29 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { getMySelf } from '@/actions/getMySelf'
 
-const data = {
+const dataDefault = {
     user: {
         name: 'shadcn',
         email: 'm@example.com',
+        role: 'admin',
         avatar: '/avatars/shadcn.jpg',
     },
     navMain: [
         {
-            title: 'Playground',
-            url: '#',
-            icon: SquareTerminal,
+            title: 'Dashboard',
+            url: '/admin',
+            icon: LayoutDashboardIcon,
             isActive: true,
             items: [
                 {
-                    title: 'History',
-                    url: '#',
+                    title: 'Clients',
+                    url: '/admin/clients',
                 },
                 {
-                    title: 'Starred',
-                    url: '#',
+                    title: 'Users',
+                    url: '/admin/users',
                 },
                 {
                     title: 'Settings',
@@ -154,6 +157,33 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    let [data, setData] = React.useState(dataDefault)
+    React.useEffect(() => {
+        //
+
+        getMySelf().then((data) => {
+            console.log(data)
+
+            setData((r) => {
+                //
+
+                //
+                return {
+                    ...dataDefault,
+                    user: {
+                        name: data.username,
+                        role: data.role,
+                        email: 'm@example.com',
+                        avatar: '/avatars/admin.svg',
+                    },
+                }
+            })
+        })
+
+        //
+    }, [])
+
+    //
     return (
         <Sidebar variant='inset' {...props}>
             <SidebarHeader>

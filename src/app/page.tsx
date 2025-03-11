@@ -9,7 +9,7 @@ export default async function Page() {
     }
 
     if (appMode === 'app') {
-        return redirect('/app')
+        return redirect('/admin')
     }
 }
 

@@ -93,7 +93,6 @@ export function CreateNewUser() {
                         {/* <SubmitButton></SubmitButton> */}
                     </form>
                 </CardContent>
-                <CardFooter className='flex justify-end'></CardFooter>
             </Card>
         </>
     )
