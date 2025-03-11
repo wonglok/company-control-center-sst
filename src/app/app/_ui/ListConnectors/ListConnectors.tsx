@@ -5,8 +5,8 @@ import {
     Table,
     TableBody,
     TableCaption,
-    TableCell,
     TableFooter,
+    TableCell,
     TableHead,
     TableHeader,
     TableRow,
@@ -15,7 +15,7 @@ import { useEffect } from 'react'
 
 import { useConnectorTokens } from './useConnectorTokens'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Terminal } from 'lucide-react'
+// import { Terminal } from 'lucide-react'
 import copy from 'copy-to-clipboard'
 import { Input } from '@/components/ui/input'
 import { putConnectionToken } from '@/actions/connectionTokens/putConnectionToken'
@@ -34,6 +34,7 @@ export function ListConnectors() {
         })
     }, [])
     let tokens = useConnectorTokens((r) => r.tokens)
+
     return (
         <Card className='size-full'>
             <CardHeader>

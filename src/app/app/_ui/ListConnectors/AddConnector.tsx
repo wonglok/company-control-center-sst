@@ -16,7 +16,7 @@ export function AddConnector() {
     return (
         <Card className='size-full'>
             <CardHeader>
-                <CardTitle>AI Serach Engine Connection </CardTitle>
+                <CardTitle>Add AI Serach Engine</CardTitle>
                 <CardDescription>Create Connection Link</CardDescription>
             </CardHeader>
             <CardContent>
