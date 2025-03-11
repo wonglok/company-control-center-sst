@@ -25,8 +25,6 @@ export function CreateNewUser() {
         }
     }, [state])
 
-    //
-
     return (
         <>
             <Card className='size-full'>
