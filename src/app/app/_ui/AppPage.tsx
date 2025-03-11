@@ -11,6 +11,7 @@ import { ListConnectors } from './ListConnectors/ListConnectors'
 // import { Skeleton } from '@/components/ui/skeleton'
 import { AddConnector } from './ListConnectors/AddConnector'
 import { Dashboard } from './Dashboard/Dashboard'
+import { CreateNewUser } from './CreateNewUser/CreateNewUser'
 
 export function AppPage({
     config,
@@ -25,9 +26,12 @@ export function AppPage({
     return (
         <>
             <Dashboard>
-                <div className='grid auto-rows-min gap-4 md:grid-cols-3'>
+                <div className='grid gap-4 md:grid-cols-2 auto-rows-min'>
                     <div className='rounded-xl bg-muted/50'>
                         <AddFingerPrint user={user} jwt={jwt}></AddFingerPrint>
+                    </div>
+                    <div className='rounded-xl bg-muted/50'>
+                        <CreateNewUser />
                     </div>
                     <div className='rounded-xl bg-muted/50'>
                         <AddConnector />
