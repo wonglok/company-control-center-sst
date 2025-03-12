@@ -36,7 +36,7 @@ const dataDefault = {
         name: 'shadcn',
         email: 'm@example.com',
         role: 'admin',
-        avatar: '/avatar.svg',
+        avatar: '/admin.svg',
     },
     navMain: [
         {

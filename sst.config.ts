@@ -82,6 +82,11 @@ export default $config({
 
         const SESSION_SECRET = new sst.Secret('SESSION_SECRET')
 
+        const TELEGRAM_BOT_TOKEN = new sst.Secret('TELEGRAM_BOT_TOKEN')
+        const TELEGRAM_CHAT_ID = new sst.Secret('TELEGRAM_CHAT_ID')
+
+        const TELEGRAM_WEBHOOK_TOKEN = new sst.Secret('TELEGRAM_WEBHOOK_TOKEN')
+
         const api = new sst.aws.ApiGatewayV2('RestAPI')
 
         const environment = {
@@ -89,6 +94,9 @@ export default $config({
             CURRENT_STAGE: $app.stage,
             SESSION_SECRET: SESSION_SECRET.value,
             SocketAPI: wss.url,
+            TELEGRAM_BOT_TOKEN: TELEGRAM_BOT_TOKEN.value,
+            TELEGRAM_CHAT_ID: TELEGRAM_CHAT_ID.value,
+            TELEGRAM_WEBHOOK_TOKEN: TELEGRAM_WEBHOOK_TOKEN.value,
         }
 
         let domain = {
@@ -102,6 +110,9 @@ export default $config({
         }
 
         const getCommonLinks = () => [
+            TELEGRAM_BOT_TOKEN,
+            TELEGRAM_CHAT_ID,
+            TELEGRAM_WEBHOOK_TOKEN,
             ConnectionsTable,
             wss,
             api,
@@ -112,11 +123,18 @@ export default $config({
             ConnectionTokensTable,
         ]
 
-        // api.route('POST /api/connections/connections/getOnlineClients', {
-        //     link: [appDataBucket, appDataCDN, api],
-        //     environment: environment,
-        //     handler: '/src/sst/http/connections/connections.getOnlineClients',
-        // })
+        api.route('POST /api/telegram/telegram/telegraf', {
+            link: [...getCommonLinks()],
+            environment: environment,
+            handler: 'src/sst/http/telegram/telegram.telegraf',
+        })
+        api.route('POST /api/telegram/telegram/seutpHook', {
+            link: [...getCommonLinks()],
+            environment: environment,
+            handler: 'src/sst/http/telegram/telegram.seutpHook',
+        })
+
+        /////
 
         api.route('POST /api/files/signGenericFile', {
             link: [appDataBucket, appDataCDN, api],
