@@ -25,7 +25,9 @@ export function AllUsers() {
 
     useEffect(() => {
         // 
+
         useUsers.setState({ loading: true })
+
         listUsers({}).then((data) => {
             console.log(data)
             useUsers.setState({ loading: false, users: data })
@@ -33,7 +35,6 @@ export function AllUsers() {
 
         getMySelf().then((myself) => {
             useUsers.setState({ myself: myself })
-
         })
 
         //
