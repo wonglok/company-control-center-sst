@@ -2,10 +2,17 @@
 
 import { Resource } from 'sst'
 import { dyna } from '../dyna'
-import { PutItemCommand, ScanCommand } from '@aws-sdk/client-dynamodb'
+import { ScanCommand } from '@aws-sdk/client-dynamodb'
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
+import { getMySelf } from '../getMySelf'
 
 export const listConnectionToken = async () => {
+    let user = await getMySelf()
+
+    if (!['admin'].includes(user.role)) {
+        throw new Error('not admin')
+    }
+
     return await dyna
         .send(
             new ScanCommand({

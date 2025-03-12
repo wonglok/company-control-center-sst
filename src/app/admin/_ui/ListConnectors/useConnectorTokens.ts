@@ -7,6 +7,8 @@ export const useConnectorTokens = create<
       }
 >(() => {
     return {
+        online: [],
+        loading: true,
         tokens: [],
     }
 })

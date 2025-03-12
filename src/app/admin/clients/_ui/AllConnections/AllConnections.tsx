@@ -13,42 +13,45 @@ import {
 } from '@/components/ui/table'
 import { useEffect } from 'react'
 
-import { useConnectorTokens } from './useConnectorTokens'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 // import { Terminal } from 'lucide-react'
 import copy from 'copy-to-clipboard'
 import { Input } from '@/components/ui/input'
 import { putConnectionToken } from '@/actions/connectionTokens/putConnectionToken'
 import Link from 'next/link'
-import { getOnlineConnections } from '@/actions/getOnlineConnections'
+import { useConnectors } from './useConnectors'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCloudBolt } from '@fortawesome/free-solid-svg-icons'
 import { ConnectionStatus } from './ConnectionStatus'
+import { getOnlineConnections } from '@/actions/getOnlineConnections'
+import { RemoveDialogue } from './RemoveDialogue'
+import { deleteConnectionToken } from '@/actions/connectionTokens/deleteConnectionToken'
 
 // Declare putConnectionTokenTimer on the window object
 declare global {
     interface Window {
-        putConnectionTokenTimer: any
+        putConnectionTimer: any
     }
 }
 
-export function ListConnectors() {
+export function AllConnections() {
     useEffect(() => {
         listConnectionToken().then((data) => {
-            useConnectorTokens.setState({ tokens: data })
+            useConnectors.setState({ clients: data })
         })
     }, [])
-    let tokens = useConnectorTokens((r) => r.tokens)
 
     useEffect(() => {
         let hh = () => {
             getOnlineConnections().then((data) => {
-                useConnectorTokens.setState({
+                useConnectors.setState({
                     socketURL: data.socketURL,
                     online: (data as any)?.online || [],
                 })
-                useConnectorTokens.setState({ loading: false })
+                useConnectors.setState({ loading: false })
             })
         }
-        useConnectorTokens.setState({ loading: true })
+        useConnectors.setState({ loading: true })
         hh()
         let tt = setInterval(hh, 15000)
 
@@ -57,14 +60,16 @@ export function ListConnectors() {
         }
     }, [])
 
+    let clients = useConnectors((r) => r.clients)
+
     return (
         <Card className='size-full'>
             <CardHeader>
-                <CardTitle>Connections Database</CardTitle>
-                <CardDescription>Recent 3 Connection Link</CardDescription>
+                <CardTitle>Connections to DataHub</CardTitle>
+                <CardDescription>All Connection Links</CardDescription>
             </CardHeader>
             <CardContent>
-                {tokens && tokens.length === 0 && (
+                {clients && clients.length === 0 && (
                     <>
                         <Alert>
                             <AlertTitle>Heads up!</AlertTitle>
@@ -73,44 +78,60 @@ export function ListConnectors() {
                     </>
                 )}
 
-                {tokens && tokens.length > 0 && (
+                {clients && clients.length > 0 && (
                     <Table>
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Name</TableHead>
+                                <TableHead className='text-center'>Remove</TableHead>
                                 <TableHead className='text-center'>Copy</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {tokens.slice(0, 3).map((token: { itemID: string; name: string }) => (
-                                <TableRow key={token.itemID}>
+                            {clients.map((client: { itemID: string; name: string }) => (
+                                <TableRow key={client.itemID}>
                                     <TableCell className='flex justify-center items-center flex-col'>
                                         <div className='h-2 w-full'></div>
-                                        <ConnectionStatus client={token}></ConnectionStatus>
+                                        <ConnectionStatus client={client}></ConnectionStatus>
                                     </TableCell>
                                     <TableCell className='w-full'>
                                         <Input
-                                            value={token.name}
+                                            value={client.name}
                                             onChange={async (ev) => {
-                                                token.name = ev.target.value
-                                                useConnectorTokens.setState((r: any) => {
-                                                    return { ...r, tokens: [...r.tokens] }
+                                                client.name = ev.target.value
+                                                useConnectors.setState((r: any) => {
+                                                    return { ...r, clients: [...r.clients] }
                                                 })
 
-                                                clearTimeout(window.putConnectionTokenTimer)
-                                                window.putConnectionTokenTimer = setTimeout(() => {
-                                                    putConnectionToken({ item: token })
+                                                clearTimeout(window.putConnectionTimer)
+                                                window.putConnectionTimer = setTimeout(() => {
+                                                    putConnectionToken({ item: client })
                                                 }, 1000)
                                             }}
                                         ></Input>
                                     </TableCell>
+                                    <TableHead>
+                                        <RemoveDialogue
+                                            onConfirm={() => {
+                                                //
+                                                deleteConnectionToken({
+                                                    item: client,
+                                                }).then(() => {
+                                                    listConnectionToken().then((data) => {
+                                                        useConnectors.setState({ clients: data })
+                                                    })
+                                                })
+                                                //
+                                            }}
+                                        ></RemoveDialogue>
+                                    </TableHead>
                                     <TableCell className='text-center w-36'>
                                         <Button
                                             onClick={(ev: any) => {
                                                 //
                                                 let url = `${location.origin}?clientID=${encodeURIComponent(
-                                                    `${token.itemID}`,
+                                                    `${client.itemID}`,
                                                 )}`
 
                                                 copy(url)
@@ -133,13 +154,7 @@ export function ListConnectors() {
                     </Table>
                 )}
             </CardContent>
-            <CardFooter className='flex justify-end'>
-                <Link href={'/admin/clients'}>
-                    <Button variant={'outline'} className=''>
-                        Manage All Connections
-                    </Button>
-                </Link>
-            </CardFooter>
+            <CardFooter className='flex justify-end'></CardFooter>
         </Card>
     )
 }
