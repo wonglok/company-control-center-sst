@@ -18,7 +18,7 @@ export function AppPage({
     //
     return (
         <>
-            <Dashboard title={`Client Connections`}>
+            <Dashboard title={`Users`}>
                 <div className='grid gap-4 md:grid-cols-1 auto-rows-min'>
                     <div className='rounded-xl bg-muted/50'>
                         <AllUsers></AllUsers>
