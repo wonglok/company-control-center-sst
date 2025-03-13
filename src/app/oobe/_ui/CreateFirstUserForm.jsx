@@ -3,7 +3,7 @@ import { useActionState, useEffect } from 'react'
 import { createFirstUser } from '../../../actions/createFirstUser'
 import { SubmitButton } from './SubmitButton'
 import { redirect } from 'next/navigation'
-import { getMySelf } from '@/actions/getMySelf'
+// import { getMySelf } from '@/actions/getMySelf'
 
 const initialState = {
     errors: {
