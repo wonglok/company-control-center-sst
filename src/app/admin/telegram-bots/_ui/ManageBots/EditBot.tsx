@@ -1,77 +1,51 @@
-'use client'
-
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-
 import { Button } from '@/components/ui/button'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { toast } from 'sonner'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { putTelegramBot } from '@/actions/telegram/putTelegramBot'
-import { v4 } from 'uuid'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
+import { BotType } from './ManageBots'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { FormSchema } from '../CreateBot/CreateBot'
+import { z } from 'zod'
 import { useEffect, useState } from 'react'
 import { listConnectionToken } from '@/actions/connectionTokens/listConnectionToken'
+import { putTelegramBot } from '@/actions/telegram/putTelegramBot'
+import { toast } from 'sonner'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { listTelegramBot } from '@/actions/telegram/listTelegramBot'
+import { useBots } from '../useBots'
 
-export const FormSchema = z.object({
-    displayName: z.string({
-        required_error: 'Display Name is required.',
-    }),
-    botUserName: z.string().min(2, {
-        message: 'botUserName must be at least 2 characters.',
-    }),
-    botToken: z.string({
-        required_error: 'Bot Token is required.',
-    }),
-    webhookToken: z.string({
-        required_error: 'Webhook Token is required.',
-    }),
-    chatID: z.string({
-        required_error: 'Your Chat Number ID is required.',
-    }),
-    aiDevice: z.string(),
-})
-
-export function CreateBot() {
+export function EditBot({ bot, aiDevices }: { bot: BotType; aiDevices: any[] }) {
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            displayName: '',
-            botUserName: '',
-            botToken: '',
-            webhookToken: '',
-            chatID: '',
-            aiDevice: '',
+            ...bot,
         },
     })
-
-    let [aiDevices, setDevices] = useState([])
-    useEffect(() => {
-        listConnectionToken().then((data: any) => {
-            setDevices(data)
-        })
-    }, [])
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
         console.log(data)
 
         putTelegramBot({
             item: {
-                itemID: `${v4()}`,
+                itemID: bot.itemID,
                 ...data,
             },
         })
             .then(() => {
-                toast.success('Record Successfully Created')
-                //
-                form.reset({
-                    displayName: '',
-                    botUserName: '',
-                    botToken: '',
-                    webhookToken: '',
-                    chatID: '',
+                toast.success('Successfully Updated')
+
+                listTelegramBot().then((data: any) => {
+                    useBots.setState({ bots: data })
                 })
                 //
             })
@@ -83,7 +57,7 @@ export function CreateBot() {
 
     let formUI = (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2'>
                 <FormField
                     control={form.control}
                     name='displayName'
@@ -155,10 +129,8 @@ export function CreateBot() {
                 />
 
                 {/*
-
-                console.log(aiDevices)
-
-                */}
+            console.log(aiDevices)
+            */}
 
                 <FormField
                     control={form.control}
@@ -202,18 +174,28 @@ export function CreateBot() {
                     }}
                 />
 
-                <Button type='submit'>Submit</Button>
+                <DialogFooter className=''>
+                    <div className='h-3'></div>
+                    <Button type='submit'>Save changes</Button>
+                </DialogFooter>
             </form>
         </Form>
     )
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Add Bot Record</CardTitle>
-                <CardDescription>Telegram Bot</CardDescription>
-            </CardHeader>
-            <CardContent>{formUI}</CardContent>
-        </Card>
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button>Edit Bot</Button>
+            </DialogTrigger>
+            <DialogContent className='sm:max-w-[425px]'>
+                <DialogHeader>
+                    <DialogTitle>Edit Bot</DialogTitle>
+                    {/* <DialogDescription>
+                        Make changes to your profile here. Click save when you're done.
+                    </DialogDescription> */}
+                </DialogHeader>
+                {formUI}
+            </DialogContent>
+        </Dialog>
     )
 }

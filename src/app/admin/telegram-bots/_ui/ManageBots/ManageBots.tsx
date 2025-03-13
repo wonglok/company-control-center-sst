@@ -10,11 +10,14 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { useBots } from '../useBots'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { listTelegramBot } from '@/actions/telegram/listTelegramBot'
-import { Button } from '@/components/ui/button'
+import { EditBot } from './EditBot'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { listConnectionToken } from '@/actions/connectionTokens/listConnectionToken'
+import { putTelegramBot } from '@/actions/telegram/putTelegramBot'
 
-export type Bot = {
+export type BotType = {
     itemID: string
     displayName: string
     botUserName: string
@@ -31,6 +34,13 @@ export function ManageBots() {
     useEffect(() => {
         listTelegramBot().then((data: any) => {
             useBots.setState({ bots: data })
+        })
+    }, [])
+
+    let [aiDevices, setDevices] = useState([])
+    useEffect(() => {
+        listConnectionToken().then((data: any) => {
+            setDevices(data)
         })
     }, [])
 
@@ -52,21 +62,36 @@ export function ManageBots() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {bots.map((bot: Bot) => (
+                        {bots.map((bot: BotType) => (
                             <TableRow key={bot.itemID}>
                                 <TableCell className='text-left'>
-                                    <Button
-                                        onClick={() => {
-                                            //
-                                            //
-                                        }}
-                                    >
-                                        Edit
-                                    </Button>
+                                    <EditBot bot={bot} aiDevices={aiDevices} />
                                 </TableCell>
                                 <TableCell className='font-medium'>{bot.displayName}</TableCell>
                                 <TableCell className='font-medium'>{bot.botUserName}</TableCell>
-                                <TableCell className='text-right'>{bot.aiDevice}</TableCell>
+                                <TableCell className='text-right'>
+                                    <Select
+                                        //
+                                        value={bot.aiDevice}
+                                        onValueChange={(value) => {
+                                            bot.aiDevice = value
+                                            putTelegramBot({ item: bot })
+                                        }}
+                                    >
+                                        <SelectTrigger className='w-[250px]'>
+                                            <SelectValue placeholder={'Please choose a device.'} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {aiDevices.map((ai: any) => {
+                                                return (
+                                                    <SelectItem key={ai.itemID} value={ai.itemID}>
+                                                        {ai.name}
+                                                    </SelectItem>
+                                                )
+                                            })}
+                                        </SelectContent>
+                                    </Select>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
