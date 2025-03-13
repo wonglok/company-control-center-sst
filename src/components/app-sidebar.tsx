@@ -46,16 +46,17 @@ const dataDefault = {
             isActive: true,
             items: [
                 {
-                    title: 'Clients',
-                    url: '/admin/clients',
-                },
-                {
                     title: 'Users',
                     url: '/admin/users',
                 },
                 {
-                    title: 'Settings',
-                    url: '#',
+                    title: 'AI Devices',
+                    url: '/admin/clients',
+                },
+
+                {
+                    title: 'Telegram Bots',
+                    url: '/admin/telegram-bots',
                 },
             ],
         },

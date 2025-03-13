@@ -26,6 +26,7 @@ import { ConnectionStatus } from './ConnectionStatus'
 import { getOnlineConnections } from '@/actions/getOnlineConnections'
 import { RemoveDialogue } from './RemoveDialogue'
 import { deleteConnectionToken } from '@/actions/connectionTokens/deleteConnectionToken'
+import md5 from 'md5'
 
 // Declare putConnectionTokenTimer on the window object
 declare global {
@@ -69,8 +70,8 @@ export function AllConnections() {
     return (
         <Card className='size-full'>
             <CardHeader>
-                <CardTitle>Bot Connections to DataHub</CardTitle>
-                <CardDescription>All Connection Links</CardDescription>
+                <CardTitle>AI Devices</CardTitle>
+                <CardDescription>Connected AI Devices to Cloud</CardDescription>
             </CardHeader>
             <CardContent>
                 {clients && clients.length === 0 && (
@@ -93,7 +94,7 @@ export function AllConnections() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {clients.map((client: { itemID: string; name: string }) => (
+                            {clients.map((client: { itemID: string; name: string; secret: string }) => (
                                 <TableRow key={client.itemID}>
                                     <TableCell className='flex justify-center items-center flex-col'>
                                         <div className='h-2 w-full'></div>
@@ -136,7 +137,7 @@ export function AllConnections() {
                                                 //
                                                 let url = `${location.origin}?clientID=${encodeURIComponent(
                                                     `${client.itemID}`,
-                                                )}`
+                                                )}&verify=${md5(client.secret)}`
 
                                                 copy(url)
 

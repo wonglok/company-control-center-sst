@@ -54,6 +54,13 @@ export default $config({
             primaryIndex: { hashKey: 'itemID' },
         })
 
+        const TelegramBotTable = new sst.aws.Dynamo('TelegramBotTable', {
+            fields: {
+                itemID: 'string',
+            },
+            primaryIndex: { hashKey: 'itemID' },
+        })
+
         const appDataBucket = new sst.aws.Bucket('AppDataBucket', {
             access: 'public',
             cors: {
@@ -110,6 +117,7 @@ export default $config({
         }
 
         const getCommonLinks = () => [
+            TelegramBotTable,
             TELEGRAM_BOT_TOKEN,
             TELEGRAM_CHAT_ID,
             TELEGRAM_WEBHOOK_TOKEN,
@@ -123,11 +131,19 @@ export default $config({
             ConnectionTokensTable,
         ]
 
-        // api.route('POST /api/telegram/telegram/platformHook/{botID}', {
-        //     link: [...getCommonLinks()],
-        //     environment: environment,
-        //     handler: 'src/sst/http/telegram/telegram.platformHook',
-        // })
+        //setupBotHook
+
+        api.route('POST /api/telegram/telegram/setupBotHook/{botID}', {
+            link: [...getCommonLinks()],
+            environment: environment,
+            handler: 'src/sst/http/telegram/telegram.setupBotHook',
+        })
+
+        api.route('POST /api/telegram/telegram/platformHook/{botID}', {
+            link: [...getCommonLinks()],
+            environment: environment,
+            handler: 'src/sst/http/telegram/telegram.platformHook',
+        })
 
         api.route('POST /api/telegram/telegram/telegraf', {
             link: [...getCommonLinks()],

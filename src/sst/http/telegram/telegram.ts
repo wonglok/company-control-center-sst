@@ -23,10 +23,143 @@ let getBot = (BOT_TOKEN: string) => {
     return bot
 }
 
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+
+export const setupBotHook = async (event: LambdaFunctionURLEvent, context: any) => {
+    let botID = event?.pathParameters?.botID || ''
+
+    let data = JSON.parse((event.body as string) || '{}')
+
+    if (data.itemID === botID) {
+        let bot = await getBot(data.botToken)
+
+        bot.createWebhook({
+            domain: url.hostname,
+            path: `/api/telegram/telegram/platformHook/${data.itemID}`,
+            secret_token: data.webhookToken,
+        })
+
+        return {
+            data: { success: true },
+        }
+    } else {
+        return {
+            data: { success: false },
+        }
+    }
+}
+
+// setup webhook
+export const platformHook = async (event: LambdaFunctionURLEvent, context: any) => {
+    let secretToken = event.headers['x-telegram-bot-api-secret-token']
+
+    let botID = event?.pathParameters?.botID || ''
+
+    console.log('secretToken', secretToken)
+
+    //
+    let bot = await getBot(Resource.TELEGRAM_BOT_TOKEN.value)
+
+    bot.on(message('text'), async (ctx) => {
+        //
+
+        let results: any[] = await dyna
+            .send(
+                new ScanCommand({
+                    TableName: Resource.ConnectionsTable.name,
+                    ScanFilter: {},
+                }),
+            )
+            .then((r) => r.Items?.map((item) => unmarshall(item)))
+            .then(async (data: any) => {
+                let bucket: any[] = []
+                for (let item of data) {
+                    //
+
+                    console.log(item)
+
+                    await wss
+                        .send(
+                            new PostToConnectionCommand({
+                                ConnectionId: item.itemID,
+                                Data: JSON.stringify({
+                                    type: 'telegram_message',
+                                    payload: {
+                                        //
+                                        message: ctx.message,
+                                    },
+                                }),
+                            }),
+                        )
+                        .then(() => {
+                            bucket.push(item)
+                        })
+                        .catch(async (r) => {
+                            //
+
+                            //
+
+                            //
+
+                            await dyna.send(
+                                new DeleteItemCommand({
+                                    TableName: Resource.ConnectionsTable.name,
+                                    Key: marshall({
+                                        itemID: item.itemID,
+                                    }),
+                                }),
+                            )
+                        })
+                }
+
+                return bucket
+            })
+            .catch((err) => {
+                console.log(err)
+                return []
+            })
+
+        //
+
+        // await ctx.reply(ctx.message.text)
+    })
+
+    return await http(bot.webhookCallback(`/api/telegram/telegram/telegraf`, { secretToken: secretToken }))(
+        event,
+        context,
+    )
+}
+
+//
+
+//
+
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+//////////////////////// eachbot ////////////////////////
+
+//
+
+//
+
 export const seutpHook = async (ctx: LambdaFunctionURLEvent) => {
     let data = JSON.parse((ctx.body as string) || '{}')
 
-    if (data.token === data.token) {
+    if (data.token) {
         let bot = await getBot(Resource.TELEGRAM_BOT_TOKEN.value)
 
         bot.createWebhook({
@@ -123,11 +256,3 @@ export const telegraf = async (event: any, context: any) => {
         context,
     )
 }
-
-//
-
-//
-
-//
-
-//

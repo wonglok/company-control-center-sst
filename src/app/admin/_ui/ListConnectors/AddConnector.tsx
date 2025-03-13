@@ -16,7 +16,7 @@ export function AddConnector() {
     return (
         <Card className='size-full'>
             <CardHeader>
-                <CardTitle>Add AI Serach Engine</CardTitle>
+                <CardTitle>Add AI Device</CardTitle>
                 <CardDescription>Create Connection Link</CardDescription>
             </CardHeader>
             <CardContent>
@@ -39,10 +39,12 @@ export function AddConnector() {
             <CardFooter className='flex justify-end'>
                 <Button
                     onClick={() => {
-                        let item = `${v4()}`
+                        let itemID = `${v4()}`
+                        let secret = `${v4()}`
                         putConnectionToken({
                             item: {
-                                itemID: item,
+                                itemID: itemID,
+                                secret: secret,
                                 name: name,
                             },
                         }).then(() => {

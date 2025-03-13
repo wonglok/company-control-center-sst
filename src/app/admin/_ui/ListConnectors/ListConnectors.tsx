@@ -60,8 +60,8 @@ export function ListConnectors() {
     return (
         <Card className='size-full'>
             <CardHeader>
-                <CardTitle>Connections Database</CardTitle>
-                <CardDescription>Recent 3 Connection Link</CardDescription>
+                <CardTitle>AI Devices</CardTitle>
+                <CardDescription>Recent Devices</CardDescription>
             </CardHeader>
             <CardContent>
                 {tokens && tokens.length === 0 && (

@@ -58,6 +58,10 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "TelegramBotTable": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
     "UserTable": {
       "name": string
       "type": "sst.aws.Dynamo"
