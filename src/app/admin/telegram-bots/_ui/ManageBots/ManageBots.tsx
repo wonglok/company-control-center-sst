@@ -90,7 +90,7 @@ export function ManageBots({ config, jwt }: any) {
                                                     // console.log(it.result)
 
                                                     if (it.ok) {
-                                                        toast.success('Webhook is Setup')
+                                                        toast.success('Webhook is OK')
                                                     } else {
                                                         toast('Webhook has error')
                                                     }
@@ -117,11 +117,11 @@ export function ManageBots({ config, jwt }: any) {
                                                 .then((r) => r.json())
                                                 .then((it) => {
                                                     console.log(it)
-                                                    toast.success('Webhook is Setuped Successfully')
+                                                    toast.success('Successfully Setup WebHook')
                                                 })
                                                 .catch((r) => {
                                                     console.error(r)
-                                                    toast('Webhook Seutp failed')
+                                                    toast('Webhook Seutp Failed')
                                                 })
 
                                             //
