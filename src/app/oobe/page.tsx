@@ -21,7 +21,7 @@ export default async function Page() {
 
                     {/* Right: Login Form */}
                     <div className='lg:p-36 md:p-52 sm:20 p-8 w-full lg:w-1/2'>
-                        <h1 className='text-2xl font-semibold'>Company Control Center</h1>
+                        <h1 className='text-2xl font-semibold'>Private AI Cloud</h1>
                         <h1 className='text-lg text-gray-600 mb-4'>First time setup</h1>
                         <CreateFirstUserForm></CreateFirstUserForm>
                     </div>

@@ -3,8 +3,8 @@ import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
 
 export const metadata: Metadata = {
-    title: 'Company Control Center',
-    description: 'Company Control Center',
+    title: 'Private AI Cloud',
+    description: 'Private AI Cloud',
 }
 
 export default function RootLayout({

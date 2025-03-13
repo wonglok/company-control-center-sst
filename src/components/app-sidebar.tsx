@@ -196,8 +196,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     <Terminal className='size-4' />
                                 </div>
                                 <div className='grid flex-1 text-left text-sm leading-tight'>
-                                    <span className='truncate font-semibold'>DataHub</span>
-                                    <span className='truncate text-xs'>Private AI</span>
+                                    <span className='truncate font-semibold'>Private AI</span>
+                                    <span className='truncate text-xs'>Cloud</span>
                                 </div>
                             </a>
                         </SidebarMenuButton>
