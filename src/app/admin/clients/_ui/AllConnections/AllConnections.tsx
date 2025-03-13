@@ -35,6 +35,10 @@ declare global {
 }
 
 export function AllConnections() {
+    //
+
+    //
+
     useEffect(() => {
         listConnectionToken().then((data) => {
             useConnectors.setState({ clients: data })
@@ -65,7 +69,7 @@ export function AllConnections() {
     return (
         <Card className='size-full'>
             <CardHeader>
-                <CardTitle>Connections to DataHub</CardTitle>
+                <CardTitle>Bot Connections to DataHub</CardTitle>
                 <CardDescription>All Connection Links</CardDescription>
             </CardHeader>
             <CardContent>

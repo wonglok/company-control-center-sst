@@ -91,6 +91,10 @@ export const telegraf = async (event: any, context: any) => {
                         .catch(async (r) => {
                             //
 
+                            //
+
+                            //
+
                             await dyna.send(
                                 new DeleteItemCommand({
                                     TableName: Resource.ConnectionsTable.name,

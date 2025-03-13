@@ -123,11 +123,18 @@ export default $config({
             ConnectionTokensTable,
         ]
 
+        // api.route('POST /api/telegram/telegram/platformHook/{botID}', {
+        //     link: [...getCommonLinks()],
+        //     environment: environment,
+        //     handler: 'src/sst/http/telegram/telegram.platformHook',
+        // })
+
         api.route('POST /api/telegram/telegram/telegraf', {
             link: [...getCommonLinks()],
             environment: environment,
             handler: 'src/sst/http/telegram/telegram.telegraf',
         })
+
         api.route('POST /api/telegram/telegram/seutpHook', {
             link: [...getCommonLinks()],
             environment: environment,

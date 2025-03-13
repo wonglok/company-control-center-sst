@@ -126,6 +126,7 @@ function LoginPasskey({ credIDs, username, onUsePassword }) {
                 router.push('/admin')
             }
         }
+
         run().catch(r => {
             console.log(r)
         })
@@ -140,7 +141,7 @@ function LoginPasskey({ credIDs, username, onUsePassword }) {
             onClick={() => {
                 onUsePassword()
             }}
-            className='bg-purple-500 mb-3 hover:bg-purple-600 text-white cursor-pointer disabled:bg-gray-500 font-semibold rounded-md py-2 px-4 w-full'
+            className='bg-sky-500 mb-3 hover:bg-sky-600 text-white cursor-pointer disabled:bg-gray-500 font-semibold rounded-md py-2 px-4 w-full'
         >Login with Password</button>
 
     </>
@@ -198,6 +199,15 @@ function CheckLoginType({ onLoginWithPasskey, onLoginWithPassword, onCredIDs, on
         </form>}
 
         {mode === 'choose' && <div>
+            {showPasskey && <button
+                onClick={() => {
+                    onGoWithPasskey()
+                }}
+                className='bg-blue-500 mb-3 hover:bg-blue-600 text-white cursor-pointer disabled:bg-gray-500 font-semibold rounded-md py-2 px-4 w-full'
+            >Passkey
+                (FaceID / TouchID)
+            </button>}
+
             <button
                 onClick={() => {
                     goWithPassword()
@@ -205,14 +215,7 @@ function CheckLoginType({ onLoginWithPasskey, onLoginWithPassword, onCredIDs, on
                 className='bg-blue-500 mb-3 hover:bg-blue-600 text-white cursor-pointer disabled:bg-gray-500 font-semibold rounded-md py-2 px-4 w-full'
             >Password</button>
 
-            {showPasskey && <button
-                onClick={() => {
-                    onGoWithPasskey()
-                }}
-                className='bg-blue-500 mb-3 hover:bg-blue-600 text-white cursor-pointer disabled:bg-gray-500 font-semibold rounded-md py-2 px-4 w-full'
-            >Passkey
-                (FaceID / FingerID)
-            </button>}
+
         </div>}
 
 
