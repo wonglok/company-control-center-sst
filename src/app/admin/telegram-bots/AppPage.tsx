@@ -26,7 +26,7 @@ export function AppPage({
                         <div className='mb-3'>
                             <CreateBot></CreateBot>
                         </div>
-                        <ManageBots></ManageBots>
+                        <ManageBots jwt={jwt} config={config}></ManageBots>
                     </div>
                 </div>
             </Dashboard>

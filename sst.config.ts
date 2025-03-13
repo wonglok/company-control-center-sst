@@ -133,6 +133,12 @@ export default $config({
 
         //setupBotHook
 
+        api.route('POST /api/telegram/telegram/getBotHook/{botID}', {
+            link: [...getCommonLinks()],
+            environment: environment,
+            handler: 'src/sst/http/telegram/telegram.getBotHook',
+        })
+
         api.route('POST /api/telegram/telegram/setupBotHook/{botID}', {
             link: [...getCommonLinks()],
             environment: environment,
@@ -145,17 +151,17 @@ export default $config({
             handler: 'src/sst/http/telegram/telegram.platformHook',
         })
 
-        api.route('POST /api/telegram/telegram/telegraf', {
-            link: [...getCommonLinks()],
-            environment: environment,
-            handler: 'src/sst/http/telegram/telegram.telegraf',
-        })
+        // api.route('POST /api/telegram/telegram/telegraf', {
+        //     link: [...getCommonLinks()],
+        //     environment: environment,
+        //     handler: 'src/sst/http/telegram/telegram.telegraf',
+        // })
 
-        api.route('POST /api/telegram/telegram/seutpHook', {
-            link: [...getCommonLinks()],
-            environment: environment,
-            handler: 'src/sst/http/telegram/telegram.seutpHook',
-        })
+        // api.route('POST /api/telegram/telegram/seutpHook', {
+        //     link: [...getCommonLinks()],
+        //     environment: environment,
+        //     handler: 'src/sst/http/telegram/telegram.seutpHook',
+        // })
 
         /////
 

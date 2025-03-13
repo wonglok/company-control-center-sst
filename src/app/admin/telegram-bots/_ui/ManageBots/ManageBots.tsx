@@ -16,6 +16,9 @@ import { EditBot } from './EditBot'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { listConnectionToken } from '@/actions/connectionTokens/listConnectionToken'
 import { putTelegramBot } from '@/actions/telegram/putTelegramBot'
+import { Button } from '@/components/ui/button'
+import axios from 'axios'
+import { toast } from 'sonner'
 
 export type BotType = {
     itemID: string
@@ -27,7 +30,7 @@ export type BotType = {
     aiDevice: string
 }
 
-export function ManageBots() {
+export function ManageBots({ config, jwt }: any) {
     //
     let bots = useBots((r) => r.bots)
 
@@ -55,6 +58,7 @@ export function ManageBots() {
                     <TableCaption>{`A list of telegram bots.`}</TableCaption>
                     <TableHeader>
                         <TableRow>
+                            <TableHead className='text-left'>WebHook</TableHead>
                             <TableHead className='text-left'>Edit</TableHead>
                             <TableHead className='w-[150px]'>DisplayName</TableHead>
                             <TableHead>Bot Username</TableHead>
@@ -64,6 +68,68 @@ export function ManageBots() {
                     <TableBody>
                         {bots.map((bot: BotType) => (
                             <TableRow key={bot.itemID}>
+                                <TableCell className='text-left'>
+                                    <Button
+                                        variant={'outline'}
+                                        className='mr-3'
+                                        onClick={() => {
+                                            //
+                                            let restURL = config.restURL
+                                            //
+
+                                            fetch(`${restURL}/api/telegram/telegram/getBotHook/${bot.itemID}`, {
+                                                mode: 'cors',
+                                                method: 'POST',
+                                                body: JSON.stringify({
+                                                    ...bot,
+                                                    jwt: jwt,
+                                                }),
+                                            })
+                                                .then((r) => r.json())
+                                                .then((it) => {
+                                                    // console.log(it.result)
+
+                                                    if (it.ok) {
+                                                        toast.success('Webhook is Setup')
+                                                    } else {
+                                                        toast('Webhook has error')
+                                                    }
+                                                })
+                                        }}
+                                    >
+                                        Check
+                                    </Button>
+
+                                    <Button
+                                        onClick={() => {
+                                            //
+                                            let restURL = config.restURL
+                                            //
+
+                                            fetch(`${restURL}/api/telegram/telegram/setupBotHook/${bot.itemID}`, {
+                                                mode: 'cors',
+                                                method: 'POST',
+                                                body: JSON.stringify({
+                                                    ...bot,
+                                                    jwt: jwt,
+                                                }),
+                                            })
+                                                .then((r) => r.json())
+                                                .then((it) => {
+                                                    console.log(it)
+                                                    toast.success('Webhook is Setuped Successfully')
+                                                })
+                                                .catch((r) => {
+                                                    console.error(r)
+                                                    toast('Webhook Seutp failed')
+                                                })
+
+                                            //
+                                        }}
+                                    >
+                                        Setup
+                                    </Button>
+                                </TableCell>
                                 <TableCell className='text-left'>
                                     <EditBot bot={bot} aiDevices={aiDevices} />
                                 </TableCell>
