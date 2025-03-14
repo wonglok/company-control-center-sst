@@ -1,5 +1,15 @@
 import { Button } from '@/components/ui/button'
-import { fa4, faCheck, faClose, faCloud, faIceCream, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import {
+    fa4,
+    faCheck,
+    faClose,
+    faCloud,
+    faCloudBolt,
+    faGear,
+    faIceCream,
+    faPaperPlane,
+    faSpinner,
+} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -46,7 +56,7 @@ export function TelegramConnection({ jwt, config, bot }: any) {
                 variant={'outline'}
                 className='mr-3'
             >
-                <FontAwesomeIcon icon={faPaperPlane} className=' mr-3'></FontAwesomeIcon>
+                <FontAwesomeIcon icon={faCloudBolt} className=' mr-3'></FontAwesomeIcon>
 
                 {matches === 'loading' && (
                     <>
@@ -96,7 +106,7 @@ export function TelegramConnection({ jwt, config, bot }: any) {
                     //
                 }}
             >
-                Activate
+                <FontAwesomeIcon icon={faGear}></FontAwesomeIcon> Activate
             </Button>
         </>
     )

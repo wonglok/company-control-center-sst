@@ -25,6 +25,8 @@ import copy from 'copy-to-clipboard'
 import { CloudStatus } from './CloudStatus'
 import { TelegramConnection } from './TelegramConnection'
 import { BotSchema } from './BotSchema'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPaperPlane, faTeletype } from '@fortawesome/free-solid-svg-icons'
 
 export type BotType = {
     itemID: string
@@ -34,6 +36,7 @@ export type BotType = {
     webhookToken: string
     chatID: string
     botSchema: string
+    json: any
 }
 
 export function ManageBots({ config, jwt }: any) {
@@ -119,7 +122,7 @@ export function ManageBots({ config, jwt }: any) {
                                                 })
                                         }}
                                     >
-                                        Message Me
+                                        <FontAwesomeIcon icon={faPaperPlane}></FontAwesomeIcon> Message Me
                                     </Button>
                                 </TableCell>
                                 <TableCell className=''>

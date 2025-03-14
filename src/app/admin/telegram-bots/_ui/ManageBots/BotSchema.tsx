@@ -14,7 +14,7 @@ import { BotType } from './ManageBots'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormSchema } from '../CreateBot/CreateBot'
-import { z } from 'zod'
+import { array, z } from 'zod'
 import { useEffect, useRef, useState } from 'react'
 import { listConnectionToken } from '@/actions/connectionTokens/listConnectionToken'
 import { putTelegramBot } from '@/actions/telegram/putTelegramBot'
@@ -27,7 +27,12 @@ import { Editor } from '@monaco-editor/react'
 import { DialogClose } from '@radix-ui/react-dialog'
 
 // @ts-ignore
-import * as md2json from '@moox/markdown-to-json'
+import * as mdjs from '@moox/markdown-to-json'
+
+// import { unified } from 'unified'
+// import remarkParse from 'remark-parse'
+
+// const processor = unified().use(remarkParse)
 
 export function BotSchema({ bot }: { bot: BotType }) {
     const form = useForm<z.infer<typeof FormSchema>>({
@@ -37,7 +42,7 @@ export function BotSchema({ bot }: { bot: BotType }) {
         },
     })
 
-    const [json, setJSON] = useState({})
+    const [json, setJSON] = useState(bot.json)
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
         console.log(data)
@@ -108,8 +113,36 @@ export function BotSchema({ bot }: { bot: BotType }) {
                                             bot.botSchema = value || ''
                                             field.onChange({ target: { value } })
 
+                                            // let result = processor.parse(value)
+                                            // console.log(result)
                                             //toMd
-                                            setJSON(md2json.markdownAsJsTree(value))
+
+                                            let processed = mdjs.markdownAsJsTree(value)
+
+                                            let traverse = (node: any, parent: any) => {
+                                                if (typeof node === 'string') {
+                                                    if (parent.children instanceof Array) {
+                                                        parent.children.splice(
+                                                            parent.children.findIndex((kid: any) => kid === node),
+                                                            1,
+                                                        )
+                                                    }
+                                                }
+
+                                                if (node.children) {
+                                                    for (let item of node.children) {
+                                                        traverse(item, node)
+                                                    }
+                                                }
+                                            }
+
+                                            traverse(processed.body, processed)
+
+                                            bot.json = processed
+
+                                            setJSON(bot.json)
+
+                                            // setJSON(result)
 
                                             clearTimeout(refTimer.current)
                                             refTimer.current = setTimeout(() => {
