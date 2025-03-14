@@ -80,7 +80,7 @@ export function ListConnectors() {
                             <TableRow>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Name</TableHead>
-                                <TableHead className='text-center'>Copy</TableHead>
+                                {/* <TableHead className='text-center'>Copy</TableHead> */}
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -106,7 +106,7 @@ export function ListConnectors() {
                                             }}
                                         ></Input>
                                     </TableCell>
-                                    <TableCell className='text-center w-36'>
+                                    {/* <TableCell className='text-center w-36'>
                                         <Button
                                             onClick={(ev: any) => {
                                                 //
@@ -127,7 +127,7 @@ export function ListConnectors() {
                                         >
                                             Copy
                                         </Button>
-                                    </TableCell>
+                                    </TableCell> */}
                                 </TableRow>
                             ))}
                         </TableBody>
