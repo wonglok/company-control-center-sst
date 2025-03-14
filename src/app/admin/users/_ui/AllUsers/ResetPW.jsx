@@ -38,16 +38,16 @@ export function ResetPW({ user }) {
             </DialogTrigger>
             <DialogContent className="">
                 <DialogHeader>
-                    <DialogTitle>Edit profile</DialogTitle>
+                    <DialogTitle>Reset Password</DialogTitle>
                     <DialogDescription>
-                        Make changes to your profile here. Click save when you're done.
+                        {`Change User password`}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={onSubmit}>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="name" className="text-right">
-                                Name
+                                {`Name`}
                             </Label>
                             <div className="col-span-3">
                                 {user.username}
@@ -55,7 +55,7 @@ export function ResetPW({ user }) {
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="password" className="text-right">
-                                New Password
+                                {`New Password`}
                             </Label>
                             <Input id="password" type="password" autoFocus onChange={(ev) => {
                                 //
