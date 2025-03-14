@@ -24,6 +24,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { listTelegramBot } from '@/actions/telegram/listTelegramBot'
 import { useBots } from '../useBots'
 import { Editor } from '@monaco-editor/react'
+import { DialogClose } from '@radix-ui/react-dialog'
+
+// @ts-ignore
+import * as md2json from '@moox/markdown-to-json'
 
 export function BotSchema({ bot }: { bot: BotType }) {
     const form = useForm<z.infer<typeof FormSchema>>({
@@ -32,6 +36,8 @@ export function BotSchema({ bot }: { bot: BotType }) {
             ...bot,
         },
     })
+
+    const [json, setJSON] = useState({})
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
         console.log(data)
@@ -44,14 +50,35 @@ export function BotSchema({ bot }: { bot: BotType }) {
         })
             .then(() => {
                 toast.success('Successfully Updated')
+                if (refClose?.current && typeof refClose?.current?.click === 'function') {
+                    refClose?.current?.click()
+                }
             })
             .catch((r) => {
                 console.error(r)
-                toast.success('Error While Creating Record')
+                toast.success('Error While Saving Record')
             })
     }
 
+    let refClose = useRef<any>(<button></button>)
+
     let refTimer = useRef<number | NodeJS.Timeout>(0)
+
+    let save = () => {
+        putTelegramBot({
+            item: {
+                ...bot,
+                itemID: bot.itemID,
+            },
+        })
+            .then(() => {
+                toast.success('Successfully Updated')
+            })
+            .catch((r) => {
+                console.error(r)
+                toast.success('Error While Saving Record')
+            })
+    }
 
     let formUI = (
         <Form {...form}>
@@ -63,32 +90,42 @@ export function BotSchema({ bot }: { bot: BotType }) {
                         <FormItem>
                             <FormLabel>Bot Logic</FormLabel>
                             <FormControl>
-                                <Editor
-                                    className=' rounded-2xl overflow-hidden border border-gray-300 p-2'
-                                    height={'500px'}
-                                    value={field.value}
-                                    onChange={(value) => {
-                                        bot.botSchema = value || ''
-                                        field.onChange({ target: { value } })
-
-                                        clearTimeout(refTimer.current)
-                                        refTimer.current = setTimeout(() => {
-                                            putTelegramBot({
-                                                item: {
-                                                    ...bot,
-                                                    itemID: bot.itemID,
-                                                },
-                                            })
-                                                .then(() => {
-                                                    toast.success('Successfully Updated')
-                                                })
-                                                .catch((r) => {
-                                                    console.error(r)
-                                                    toast.success('Error While Creating Record')
-                                                })
-                                        }, 1000)
+                                <div
+                                    className='w-full flex space-x-3'
+                                    onKeyDownCapture={(ev) => {
+                                        if (ev.metaKey && ev.key === 's') {
+                                            ev.stopPropagation()
+                                            ev.preventDefault()
+                                            save()
+                                        }
                                     }}
-                                ></Editor>
+                                >
+                                    <Editor
+                                        className='w-1/2 rounded-2xl overflow-hidden border border-gray-300 p-2'
+                                        height={'75vh'}
+                                        value={field.value}
+                                        onChange={async (value) => {
+                                            bot.botSchema = value || ''
+                                            field.onChange({ target: { value } })
+
+                                            //toMd
+                                            setJSON(md2json.markdownAsJsTree(value))
+
+                                            clearTimeout(refTimer.current)
+                                            refTimer.current = setTimeout(() => {
+                                                save()
+                                            }, 1000)
+                                        }}
+                                    ></Editor>
+
+                                    <div className='w-1/2 rounded-2xl text-xs overflow-hidden border border-gray-300 p-2 shrink-0'>
+                                        {/*  */}
+                                        <pre className='w-full h-[75vh] whitespace-pre-wrap overflow-y-scroll'>
+                                            {JSON.stringify(json, null, '\t')}
+                                        </pre>
+                                        {/*  */}
+                                    </div>
+                                </div>
                                 {/* <Input placeholder='Display Name' {...field} /> */}
                             </FormControl>
                             <FormMessage />
@@ -106,10 +143,13 @@ export function BotSchema({ bot }: { bot: BotType }) {
 
     return (
         <Dialog>
+            <DialogClose asChild>
+                <button ref={refClose} />
+            </DialogClose>
             <DialogTrigger asChild>
                 <Button variant={'default'}>Bot Logic Editor</Button>
             </DialogTrigger>
-            <DialogContent className=''>
+            <DialogContent className=' max-w-[95vw]'>
                 <DialogHeader>
                     <DialogTitle>Bot Logic Editor</DialogTitle>
 

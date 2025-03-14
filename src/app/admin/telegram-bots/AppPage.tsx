@@ -24,9 +24,9 @@ export function AppPage({
                 <div className='grid gap-4 md:grid-cols-1 auto-rows-min'>
                     <div className='rounded-xl bg-muted/50'>
                         <div className='mb-3'>
-                            <CreateBot></CreateBot>
+                            <ManageBots jwt={jwt} config={config}></ManageBots>
                         </div>
-                        <ManageBots jwt={jwt} config={config}></ManageBots>
+                        <CreateBot></CreateBot>
                     </div>
                 </div>
             </Dashboard>
