@@ -150,6 +150,8 @@ export function ManageBots({ config, jwt }: any) {
                                                 if (!clientInfo) {
                                                     return
                                                 }
+                                                //
+
                                                 fetch(`${restURL}/api/telegram/telegram/sendMessage/${bot.itemID}`, {
                                                     mode: 'cors',
                                                     method: 'POST',
@@ -157,6 +159,7 @@ export function ManageBots({ config, jwt }: any) {
                                                         ...bot,
                                                         clientID: clientInfo.itemID,
                                                         verify: `${md5(clientInfo.secret)}`,
+                                                        chatID: `${bot.chatID}`,
                                                         message: 'sending a test message from admin panel',
                                                     }),
                                                 })

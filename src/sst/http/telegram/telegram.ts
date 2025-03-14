@@ -164,7 +164,7 @@ export const sendMessage = async (event: LambdaFunctionURLEvent, context: any) =
     } else {
         throw new Error('bad verification token')
     }
-    //
+    //|  +726ms      703086702
 
     let botData = (await dyna
         .send(
@@ -190,11 +190,15 @@ export const sendMessage = async (event: LambdaFunctionURLEvent, context: any) =
 
     if (botData && botData.aiDevice === clientData.itemID) {
         const botToken = `${botData.botToken}`
-        const chatID = `${botData.chatID}`
+        // const chatID = `${botData.chatID}`
 
         const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`
 
         const text = `${inbound.message}`
+
+        const chatID = `${inbound.chatID}`
+
+        console.log(inbound)
 
         try {
             // Send the message via the Telegram Bot API
