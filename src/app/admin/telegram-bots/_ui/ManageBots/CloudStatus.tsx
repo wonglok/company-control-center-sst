@@ -1,5 +1,5 @@
 import { getOnlineConnections } from '@/actions/getOnlineConnections'
-import { faCheck, faClose, faCloud, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faClose, faCloud, faRobot, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useEffect, useState } from 'react'
 
@@ -19,7 +19,7 @@ export function CloudStatus({ bot }: any) {
     return (
         <>
             <div className='inline-flex items-center justify-center h-full'>
-                <FontAwesomeIcon className='mr-2 size-5' icon={faCloud}></FontAwesomeIcon>
+                <FontAwesomeIcon className='mr-2 size-5' icon={faRobot}></FontAwesomeIcon>
                 {loading ? (
                     <>
                         {/*  */}

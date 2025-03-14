@@ -23,6 +23,7 @@ import { getConnectionToken } from '@/actions/connectionTokens/getConnectionToke
 import md5 from 'md5'
 import copy from 'copy-to-clipboard'
 import { CloudStatus } from './CloudStatus'
+import { TelegramConnection } from './TelegramConnection'
 
 export type BotType = {
     itemID: string
@@ -76,7 +77,11 @@ export function ManageBots({ config, jwt }: any) {
                                 <TableCell className='text-left'>
                                     <EditBot bot={bot} />
                                 </TableCell>
+
                                 <TableCell className='text-left'>
+                                    <Button variant={'outline'} className='mr-3'>
+                                        <TelegramConnection jwt={jwt} bot={bot} config={config}></TelegramConnection>
+                                    </Button>
                                     <Button
                                         className='mr-3'
                                         onClick={() => {
@@ -96,25 +101,6 @@ export function ManageBots({ config, jwt }: any) {
                                                 .then((it) => {
                                                     // console.log(it)
                                                     toast.success('Successfully Activated WebHook')
-
-                                                    //
-                                                    let restURL = config.restURL
-                                                    fetch(`${restURL}/api/telegram/telegram/getBotHook/${bot.itemID}`, {
-                                                        mode: 'cors',
-                                                        method: 'POST',
-                                                        body: JSON.stringify({
-                                                            ...bot,
-                                                            jwt: jwt,
-                                                        }),
-                                                    })
-                                                        .then((r) => r.json())
-                                                        .then((it) => {
-                                                            if (it.isWorking) {
-                                                                toast.success('Webhook is Verfiied')
-                                                            } else {
-                                                                toast.error('Webhook needs activation')
-                                                            }
-                                                        })
                                                 })
                                                 .catch((r) => {
                                                     console.error(r)
@@ -178,7 +164,7 @@ export function ManageBots({ config, jwt }: any) {
                                 </TableCell>
                                 <TableCell className=''>
                                     <Button variant={'link'}>
-                                        Connection Status: <CloudStatus bot={bot}></CloudStatus>
+                                        <CloudStatus bot={bot}></CloudStatus>
                                     </Button>
                                 </TableCell>
 
