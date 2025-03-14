@@ -19,6 +19,7 @@ import { listUsers } from '@/actions/users/listUsers'
 import { Button } from '@/components/ui/button'
 import { getMySelf } from '@/actions/getMySelf'
 import { removeUser } from '@/actions/users/removeUser'
+import { ResetPW } from './ResetPW'
 export function AllUsers() {
     let users = useUsers(r => r.users)
     let loading = useUsers(r => r.loading)
@@ -66,6 +67,7 @@ export function AllUsers() {
                                 <TableRow>
                                     <TableHead>Role</TableHead>
                                     <TableHead>Name</TableHead>
+                                    <TableHead>Reset Password</TableHead>
                                     <TableHead className='text-center'>Remove</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -77,6 +79,9 @@ export function AllUsers() {
                                         </TableCell>
                                         <TableCell className=''>
                                             {user.username}
+                                        </TableCell>
+                                        <TableCell className=''>
+                                            <ResetPW user={user}></ResetPW>
                                         </TableCell>
                                         <TableCell className='text-center'>
                                             <Button disabled={user.username === myself?.username} variant={'destructive'} onClick={() => {
