@@ -65,7 +65,7 @@ export function ManageBots({ config, jwt }: any) {
                         <TableRow>
                             <TableHead className='text-left'>Edit</TableHead>
                             <TableHead className='text-left'>WebHook</TableHead>
-                            <TableHead className='text-left'>Connect</TableHead>
+                            <TableHead className='text-left'>Bot Connect</TableHead>
                             <TableHead className='text-left'>Status</TableHead>
                             <TableHead>Bot Username</TableHead>
                             {/* <TableHead>AI Device</TableHead> */}
