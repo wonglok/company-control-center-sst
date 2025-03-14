@@ -13,17 +13,18 @@ import { useBots } from '../useBots'
 import { useEffect, useState } from 'react'
 import { listTelegramBot } from '@/actions/telegram/listTelegramBot'
 import { EditBot } from './EditBot'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { listConnectionToken } from '@/actions/connectionTokens/listConnectionToken'
-import { putTelegramBot } from '@/actions/telegram/putTelegramBot'
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+// import { listConnectionToken } from '@/actions/connectionTokens/listConnectionToken'
+// import { putTelegramBot } from '@/actions/telegram/putTelegramBot'
 import { Button } from '@/components/ui/button'
-import axios from 'axios'
+// import axios from 'axios'
 import { toast } from 'sonner'
-import { getConnectionToken } from '@/actions/connectionTokens/getConnectionToken'
+// import { getConnectionToken } from '@/actions/connectionTokens/getConnectionToken'
 import md5 from 'md5'
 import copy from 'copy-to-clipboard'
 import { CloudStatus } from './CloudStatus'
 import { TelegramConnection } from './TelegramConnection'
+import { BotSchema } from './BotSchema'
 
 export type BotType = {
     itemID: string
@@ -32,7 +33,7 @@ export type BotType = {
     botToken: string
     webhookToken: string
     chatID: string
-    aiDevice: string
+    botSchema: string
 }
 
 export function ManageBots({ config, jwt }: any) {
@@ -64,10 +65,10 @@ export function ManageBots({ config, jwt }: any) {
                     <TableHeader>
                         <TableRow>
                             <TableHead className='text-left'>Edit</TableHead>
-                            <TableHead className='text-left'>WebHook</TableHead>
-                            <TableHead className='text-left'>Bot Connect</TableHead>
-                            <TableHead className='text-left'>Status</TableHead>
-                            <TableHead>Bot Username</TableHead>
+                            <TableHead>Logic</TableHead>
+                            <TableHead className='text-left'>Telegram Integration</TableHead>
+                            <TableHead className='text-left'>Bot Integration</TableHead>
+                            <TableHead className='text-left'>Bot Link</TableHead>
                             {/* <TableHead>AI Device</TableHead> */}
                         </TableRow>
                     </TableHeader>
@@ -76,6 +77,10 @@ export function ManageBots({ config, jwt }: any) {
                             <TableRow key={bot.itemID}>
                                 <TableCell className='text-left'>
                                     <EditBot bot={bot} />
+                                </TableCell>
+
+                                <TableCell className='font-medium'>
+                                    <BotSchema key={bot.itemID} bot={bot}></BotSchema>
                                 </TableCell>
 
                                 <TableCell className='text-left'>
@@ -117,6 +122,9 @@ export function ManageBots({ config, jwt }: any) {
                                         Message Me
                                     </Button>
                                 </TableCell>
+                                <TableCell className=''>
+                                    <CloudStatus key={bot.itemID} bot={bot}></CloudStatus>
+                                </TableCell>
                                 <TableCell>
                                     <Button
                                         className=''
@@ -132,11 +140,6 @@ export function ManageBots({ config, jwt }: any) {
                                         Copy Link
                                     </Button>
                                 </TableCell>
-                                <TableCell className=''>
-                                    <CloudStatus key={bot.itemID} bot={bot}></CloudStatus>
-                                </TableCell>
-
-                                <TableCell className='font-medium'>{bot.botUserName}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

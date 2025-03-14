@@ -16,6 +16,8 @@ import { useEffect, useState } from 'react'
 import { listConnectionToken } from '@/actions/connectionTokens/listConnectionToken'
 import { useBots } from '../useBots'
 import { listTelegramBot } from '@/actions/telegram/listTelegramBot'
+import { Textarea } from '@/components/ui/textarea'
+import Editor from '@monaco-editor/react'
 
 export const FormSchema = z.object({
     displayName: z.string({
@@ -33,7 +35,7 @@ export const FormSchema = z.object({
     chatID: z.string({
         required_error: 'Your Chat Number ID is required.',
     }),
-    aiDevice: z.string(),
+    botSchema: z.string(),
 })
 
 export function CreateBot() {
@@ -45,16 +47,20 @@ export function CreateBot() {
             botToken: '',
             webhookToken: '',
             chatID: '',
-            aiDevice: '',
+            botSchema: `
+
+# Bot
+
+            `.trim(),
         },
     })
 
-    let [aiDevices, setDevices] = useState([])
-    useEffect(() => {
-        listConnectionToken().then((data: any) => {
-            setDevices(data)
-        })
-    }, [])
+    // let [aiDevices, setDevices] = useState([])
+    // useEffect(() => {
+    //     listConnectionToken().then((data: any) => {
+    //         setDevices(data)
+    //     })
+    // }, [])
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
         console.log(data)
@@ -160,13 +166,35 @@ export function CreateBot() {
                     )}
                 />
 
+                <FormField
+                    control={form.control}
+                    name='botSchema'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Bot Logic Blueprint</FormLabel>
+                            <FormControl>
+                                <Editor
+                                    className=' rounded-2xl overflow-hidden border border-gray-300 p-2'
+                                    height={'500px'}
+                                    value={field.value}
+                                    onChange={(value) => {
+                                        field.onChange({ target: { value } })
+                                    }}
+                                ></Editor>
+                                {/* <Textarea placeholder='Logic' {...field} /> */}
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
                 {/*
 
                 console.log(aiDevices)
 
                 */}
 
-                <FormField
+                {/* <FormField
                     control={form.control}
                     name='aiDevice'
                     render={({ field }) => {
@@ -206,7 +234,7 @@ export function CreateBot() {
                             </FormItem>
                         )
                     }}
-                />
+                /> */}
 
                 <Button type='submit'>Submit</Button>
             </form>

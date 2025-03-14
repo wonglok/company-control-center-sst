@@ -269,6 +269,7 @@ export const platformHook = async (event: LambdaFunctionURLEvent, context: any) 
                                         //
                                         botID: botData.itemID,
                                         message: ctx.message,
+                                        botSchema: botData.botSchema || '',
                                     },
                                 }),
                             }),
