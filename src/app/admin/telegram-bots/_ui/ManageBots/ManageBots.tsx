@@ -62,7 +62,7 @@ export function ManageBots({ config, jwt }: any) {
                         <TableRow>
                             <TableHead className='text-left'>WebHook</TableHead>
                             <TableHead className='text-left'>Edit</TableHead>
-                            <TableHead className='w-[150px]'>DisplayName</TableHead>
+                            {/* <TableHead className='w-[150px]'>DisplayName</TableHead> */}
                             <TableHead>Bot Username</TableHead>
                             <TableHead>AI Device</TableHead>
                         </TableRow>
@@ -183,7 +183,7 @@ export function ManageBots({ config, jwt }: any) {
                                 <TableCell className='text-left'>
                                     <EditBot bot={bot} aiDevices={aiDevices} />
                                 </TableCell>
-                                <TableCell className='font-medium'>{bot.displayName}</TableCell>
+                                {/* <TableCell className='font-medium'>{bot.displayName}</TableCell> */}
                                 <TableCell className='font-medium'>{bot.botUserName}</TableCell>
                                 <TableCell className='text-right'>
                                     <Select
