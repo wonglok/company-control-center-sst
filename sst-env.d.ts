@@ -46,18 +46,6 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayWebSocket"
       "url": string
     }
-    "TELEGRAM_BOT_TOKEN": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "TELEGRAM_CHAT_ID": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "TELEGRAM_WEBHOOK_TOKEN": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
     "TelegramBotTable": {
       "name": string
       "type": "sst.aws.Dynamo"

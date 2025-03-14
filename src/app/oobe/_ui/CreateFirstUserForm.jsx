@@ -40,6 +40,7 @@ export function CreateFirstUserForm() {
                 />
                 <span className='text-red-500 text-sm'>{typeof state === 'object' && state.errors?.username}</span>
             </div>
+
             {/* Password Input */}
             <div className="mb-4">
                 <label htmlFor="password" className="block text-gray-600">

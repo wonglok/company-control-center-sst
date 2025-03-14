@@ -8,6 +8,8 @@ import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 import axios from 'axios'
 import { jwt2data } from '@/sst/ws/util/auth'
+import { BotType } from '@/app/admin/telegram-bots/_ui/ManageBots/ManageBots'
+import md5 from 'md5'
 
 const dyna = new DynamoDBClient({
     region: process.env.SST_AWS_REGION,
@@ -126,6 +128,93 @@ export const setupBotHook = async (event: LambdaFunctionURLEvent, context: any) 
     }
 }
 
+export const sendMessage = async (event: LambdaFunctionURLEvent, context: any) => {
+    let botID = event?.pathParameters?.botID || ''
+    let inbound = JSON.parse((event.body as string) || '{}')
+
+    let clientID = inbound.clientID
+    let verify = inbound.verify
+
+    let clientData = (await dyna
+        .send(
+            new GetItemCommand({
+                TableName: Resource.ConnectionTokensTable.name,
+                Key: marshall({
+                    itemID: clientID,
+                }),
+            }),
+        )
+        .then((r) => {
+            if (r.Item) {
+                return unmarshall(r.Item)
+            } else {
+                return false
+            }
+        })
+        .catch((r) => {
+            console.error(r)
+
+            return false
+        })) as {
+        itemID: string
+        secret: string
+    }
+
+    if (clientData && verify === `${md5(clientData.secret)}`) {
+    } else {
+        throw new Error('bad verification token')
+    }
+    //
+
+    let botData = (await dyna
+        .send(
+            new GetItemCommand({
+                TableName: Resource.TelegramBotTable.name,
+                Key: marshall({
+                    itemID: botID,
+                }),
+            }),
+        )
+        .then((r) => {
+            if (r.Item) {
+                return unmarshall(r.Item)
+            } else {
+                return false
+            }
+        })
+        .catch((r) => {
+            console.error(r)
+
+            return false
+        })) as BotType
+
+    if (botData && botData.aiDevice === clientData.itemID) {
+        const botToken = `${botData.botToken}`
+        const chatID = `${botData.chatID}`
+
+        const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`
+
+        const text = `${inbound.message}`
+
+        try {
+            // Send the message via the Telegram Bot API
+            const response = await axios.post(telegramUrl, {
+                chat_id: chatID,
+                text: text,
+            })
+
+            return { success: true }
+        } catch (e) {
+            console.log(e)
+            return { success: false }
+        }
+    } else {
+        throw new Error('error')
+    }
+}
+
+//
+
 // setup webhook
 export const platformHook = async (event: LambdaFunctionURLEvent, context: any) => {
     let secretToken = event.headers['x-telegram-bot-api-secret-token']
@@ -205,10 +294,6 @@ export const platformHook = async (event: LambdaFunctionURLEvent, context: any) 
                     if (item.clientID === botData.aiDevice) {
                         console.log('matched!!!!!!!!')
                         console.log('matched!!!!!!!!')
-                        console.log('matched!!!!!!!!')
-                        console.log('matched!!!!!!!!')
-                        console.log('matched!!!!!!!!')
-                        console.log('matched!!!!!!!!')
 
                         await wss
                             .send(
@@ -218,6 +303,7 @@ export const platformHook = async (event: LambdaFunctionURLEvent, context: any) 
                                         type: 'telegram_message',
                                         payload: {
                                             //
+                                            botID: botData.itemID,
                                             message: ctx.message,
                                         },
                                     }),
@@ -279,104 +365,3 @@ export const platformHook = async (event: LambdaFunctionURLEvent, context: any) 
 // //
 
 // //
-
-// export const seutpHook = async (ctx: LambdaFunctionURLEvent) => {
-//     let data = JSON.parse((ctx.body as string) || '{}')
-
-//     if (data.token) {
-//         let bot = await getBot(Resource.TELEGRAM_BOT_TOKEN.value)
-
-//         bot.createWebhook({
-//             domain: url.hostname,
-//             path: `/api/telegram/telegram/telegraf`,
-//             secret_token: data.token,
-//         })
-
-//         return {
-//             data: { success: true },
-//         }
-//     } else {
-//         return {
-//             data: { success: false },
-//         }
-//     }
-// }
-
-// // setup webhook
-// export const telegraf = async (event: any, context: any) => {
-//     let secretToken = event.headers['x-telegram-bot-api-secret-token']
-
-//     console.log('secretToken', secretToken)
-
-//     //
-//     let bot = await getBot(Resource.TELEGRAM_BOT_TOKEN.value)
-
-//     bot.on(message('text'), async (ctx) => {
-//         //
-
-//         let results: any[] = await dyna
-//             .send(
-//                 new ScanCommand({
-//                     TableName: Resource.ConnectionsTable.name,
-//                     ScanFilter: {},
-//                 }),
-//             )
-//             .then((r) => r.Items?.map((item) => unmarshall(item)))
-//             .then(async (data: any) => {
-//                 let bucket: any[] = []
-//                 for (let item of data) {
-//                     //
-
-//                     console.log(item)
-
-//                     await wss
-//                         .send(
-//                             new PostToConnectionCommand({
-//                                 ConnectionId: item.itemID,
-//                                 Data: JSON.stringify({
-//                                     type: 'telegram_message',
-//                                     payload: {
-//                                         //
-//                                         message: ctx.message,
-//                                     },
-//                                 }),
-//                             }),
-//                         )
-//                         .then(() => {
-//                             bucket.push(item)
-//                         })
-//                         .catch(async (r) => {
-//                             //
-
-//                             //
-
-//                             //
-
-//                             await dyna.send(
-//                                 new DeleteItemCommand({
-//                                     TableName: Resource.ConnectionsTable.name,
-//                                     Key: marshall({
-//                                         itemID: item.itemID,
-//                                     }),
-//                                 }),
-//                             )
-//                         })
-//                 }
-
-//                 return bucket
-//             })
-//             .catch((err) => {
-//                 console.log(err)
-//                 return []
-//             })
-
-//         //
-
-//         // await ctx.reply(ctx.message.text)
-//     })
-
-//     return await http(bot.webhookCallback(`/api/telegram/telegram/telegraf`, { secretToken: secretToken }))(
-//         event,
-//         context,
-//     )
-// }
