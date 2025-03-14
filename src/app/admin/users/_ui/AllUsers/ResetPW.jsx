@@ -31,8 +31,7 @@ export function ResetPW({ user }) {
     }
 
     return (
-        <Dialog >
-
+        <Dialog>
             <DialogTrigger ref={ref} asChild>
                 <Button variant="outline">Reset Password</Button>
             </DialogTrigger>
