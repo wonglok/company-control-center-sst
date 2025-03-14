@@ -173,29 +173,6 @@ export function ManageBots({ config, jwt }: any) {
                                 </TableCell>
 
                                 <TableCell className='font-medium'>{bot.botUserName}</TableCell>
-                                {/* <TableCell className='text-right'>
-                                    <Select
-                                        //
-                                        value={bot.aiDevice}
-                                        onValueChange={(value) => {
-                                            bot.aiDevice = value
-                                            putTelegramBot({ item: bot })
-                                        }}
-                                    >
-                                        <SelectTrigger className='w-[250px]'>
-                                            <SelectValue placeholder={'Please choose a device.'} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {aiDevices.map((ai: any) => {
-                                                return (
-                                                    <SelectItem key={ai.itemID} value={ai.itemID}>
-                                                        {ai.name}
-                                                    </SelectItem>
-                                                )
-                                            })}
-                                        </SelectContent>
-                                    </Select>
-                                </TableCell> */}
                             </TableRow>
                         ))}
                     </TableBody>

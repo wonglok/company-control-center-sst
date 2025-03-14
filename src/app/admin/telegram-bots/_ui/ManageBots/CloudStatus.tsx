@@ -7,13 +7,24 @@ export function CloudStatus({ bot }: any) {
     let [loading, setLoading] = useState(true)
     let [isOnline, setOnline] = useState(false)
     useEffect(() => {
-        setLoading(true)
-        getOnlineConnections().then((data) => {
-            console.log(data)
-            let isOnline = data.online.some((r) => r.clientID === bot.itemID)
-            setOnline(isOnline)
-            setLoading(false)
-        })
+        let load = () => {
+            setLoading(true)
+            getOnlineConnections().then((data) => {
+                console.log(data)
+                let isOnline = data.online.some((r) => r.clientID === bot.itemID)
+                setOnline(isOnline)
+                setLoading(false)
+            })
+        }
+        load()
+
+        let ttt = setInterval(() => {
+            load()
+        }, 5000)
+
+        return () => {
+            clearInterval(ttt)
+        }
     }, [bot.itemID])
 
     return (
