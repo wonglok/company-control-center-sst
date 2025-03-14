@@ -255,7 +255,7 @@ export const platformHook = async (event: LambdaFunctionURLEvent, context: any) 
 |  +6ms          displayName: '',
 |  +6ms          botToken: '
 ',
-|  +6ms          chatID: '703086702',
+|  +6ms          chatID: '',
 |  +6ms          itemID: '',
 |  +6ms          aiDevice: '',
 |  +6ms          webhookToken: '',

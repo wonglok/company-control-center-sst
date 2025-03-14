@@ -119,7 +119,7 @@ export function EditBot({ bot }: { bot: BotType }) {
                     name='chatID'
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Chat ID Number to Send Msg to Yourself</FormLabel>
+                            <FormLabel>Chat ID for Messaging yourself</FormLabel>
                             <FormControl>
                                 <Input placeholder='Token' {...field} />
                             </FormControl>
