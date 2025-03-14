@@ -84,11 +84,12 @@ export function ManageBots({ config, jwt }: any) {
                                     </Button>
                                     <Button
                                         className='mr-3'
-                                        onClick={() => {
+                                        onClick={(ev: any) => {
                                             //
                                             let restURL = config.restURL
                                             //
 
+                                            toast.success('Activaing WebHook....')
                                             fetch(`${restURL}/api/telegram/telegram/setupBotHook/${bot.itemID}`, {
                                                 mode: 'cors',
                                                 method: 'POST',
@@ -101,6 +102,9 @@ export function ManageBots({ config, jwt }: any) {
                                                 .then((it) => {
                                                     // console.log(it)
                                                     toast.success('Successfully Activated WebHook')
+                                                    window.dispatchEvent(
+                                                        new CustomEvent('reload-webhook-status', { detail: {} }),
+                                                    )
                                                 })
                                                 .catch((r) => {
                                                     console.error(r)
@@ -163,7 +167,7 @@ export function ManageBots({ config, jwt }: any) {
                                     </Button>
                                 </TableCell>
                                 <TableCell className=''>
-                                    <Button variant={'link'}>
+                                    <Button variant={'outline'}>
                                         <CloudStatus bot={bot}></CloudStatus>
                                     </Button>
                                 </TableCell>

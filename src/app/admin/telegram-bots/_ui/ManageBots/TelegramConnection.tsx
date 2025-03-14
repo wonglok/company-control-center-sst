@@ -7,27 +7,34 @@ export function TelegramConnection({ jwt, config, bot }: any) {
     let [matches, setMatch] = useState('loading')
     useEffect(() => {
         //
-        let restURL = config.restURL
-        fetch(`${restURL}/api/telegram/telegram/getBotHook/${bot.itemID}`, {
-            mode: 'cors',
-            method: 'POST',
-            body: JSON.stringify({
-                //
-                jwt,
-                //
-                ...bot,
-            }),
-        })
-            .then((r) => r.json())
-            .then((it) => {
-                if (it.isWorking) {
-                    setMatch('ok')
-                    //  toast.success('Webhook is Verfiied')
-                } else {
-                    setMatch('bad')
-                    //  toast.error('Webhook needs activation')
-                }
+        let load = () => {
+            setMatch('loading')
+            let restURL = config.restURL
+            fetch(`${restURL}/api/telegram/telegram/getBotHook/${bot.itemID}`, {
+                mode: 'cors',
+                method: 'POST',
+                body: JSON.stringify({
+                    //
+                    jwt,
+                    //
+                    ...bot,
+                }),
             })
+                .then((r) => r.json())
+                .then((it) => {
+                    if (it.isWorking) {
+                        setMatch('ok')
+                        //  toast.success('Webhook is Verfiied')
+                    } else {
+                        setMatch('bad')
+                        //  toast.error('Webhook needs activation')
+                    }
+                })
+        }
+
+        load()
+
+        window.addEventListener('reload-webhook-status', load)
     }, [config, bot])
 
     return (
