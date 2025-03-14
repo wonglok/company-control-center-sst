@@ -21,6 +21,8 @@ import axios from 'axios'
 import { toast } from 'sonner'
 import { getConnectionToken } from '@/actions/connectionTokens/getConnectionToken'
 import md5 from 'md5'
+import copy from 'copy-to-clipboard'
+import { CloudStatus } from './CloudStatus'
 
 export type BotType = {
     itemID: string
@@ -42,12 +44,12 @@ export function ManageBots({ config, jwt }: any) {
         })
     }, [])
 
-    let [aiDevices, setDevices] = useState([])
-    useEffect(() => {
-        listConnectionToken().then((data: any) => {
-            setDevices(data)
-        })
-    }, [])
+    // let [aiDevices, setDevices] = useState([])
+    // useEffect(() => {
+    //     listConnectionToken().then((data: any) => {
+    //         setDevices(data)
+    //     })
+    // }, [])
 
     return (
         <Card>
@@ -64,7 +66,7 @@ export function ManageBots({ config, jwt }: any) {
                             <TableHead className='text-left'>Edit</TableHead>
                             {/* <TableHead className='w-[150px]'>DisplayName</TableHead> */}
                             <TableHead>Bot Username</TableHead>
-                            <TableHead>AI Device</TableHead>
+                            {/* <TableHead>AI Device</TableHead> */}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -122,59 +124,63 @@ export function ManageBots({ config, jwt }: any) {
                                     </Button>
 
                                     <Button
-                                        className=''
+                                        className='mr-3'
                                         variant={'outline'}
                                         onClick={() => {
                                             //
                                             let restURL = config.restURL
                                             //
 
-                                            getConnectionToken({
-                                                item: {
-                                                    itemID: bot.aiDevice,
-                                                },
-                                            }).then((clientInfo: any) => {
-                                                console.log(clientInfo)
-
-                                                if (!clientInfo) {
-                                                    return
-                                                }
-                                                //
-
-                                                fetch(`${restURL}/api/telegram/telegram/sendMessage/${bot.itemID}`, {
-                                                    mode: 'cors',
-                                                    method: 'POST',
-                                                    body: JSON.stringify({
-                                                        ...bot,
-                                                        clientID: clientInfo.itemID,
-                                                        verify: `${md5(clientInfo.secret)}`,
-                                                        chatID: `${bot.chatID}`,
-                                                        message: 'sending a test message from admin panel',
-                                                    }),
-                                                })
-                                                    .then((r) => r.json())
-                                                    .then((it) => {
-                                                        console.log(it)
-                                                        toast.success('Successfully Setup WebHook')
-                                                    })
-                                                    .catch((r) => {
-                                                        console.error(r)
-                                                        toast('Webhook Seutp Failed')
-                                                    })
-
-                                                //
+                                            fetch(`${restURL}/api/telegram/telegram/sendMessage/${bot.itemID}`, {
+                                                mode: 'cors',
+                                                method: 'POST',
+                                                body: JSON.stringify({
+                                                    ...bot,
+                                                    clientID: bot.itemID,
+                                                    chatID: `${bot.chatID}`,
+                                                    message: 'sending a test message from admin panel',
+                                                }),
                                             })
+                                                .then((r) => r.json())
+                                                .then((it) => {
+                                                    console.log(it.success)
+                                                    if (it.success) {
+                                                        toast.success('Successfully Sent Message')
+                                                    } else {
+                                                        toast.success('Failed Sending Message')
+                                                    }
+                                                })
+                                                .catch((r) => {
+                                                    console.error(r)
+                                                    toast('Webhook Seutp Failed')
+                                                })
                                         }}
                                     >
                                         Message Me
                                     </Button>
+
+                                    <Button
+                                        className=''
+                                        variant={'outline'}
+                                        onClick={() => {
+                                            //
+                                            copy(`${location.origin}?clientID=${bot.itemID}`)
+                                            //
+                                        }}
+                                    >
+                                        Copy Bot Link
+                                    </Button>
+
+                                    <Button variant={'link'}>
+                                        Cloud Status: <CloudStatus bot={bot}></CloudStatus>
+                                    </Button>
                                 </TableCell>
                                 <TableCell className='text-left'>
-                                    <EditBot bot={bot} aiDevices={aiDevices} />
+                                    <EditBot bot={bot} />
                                 </TableCell>
                                 {/* <TableCell className='font-medium'>{bot.displayName}</TableCell> */}
                                 <TableCell className='font-medium'>{bot.botUserName}</TableCell>
-                                <TableCell className='text-right'>
+                                {/* <TableCell className='text-right'>
                                     <Select
                                         //
                                         value={bot.aiDevice}
@@ -196,7 +202,7 @@ export function ManageBots({ config, jwt }: any) {
                                             })}
                                         </SelectContent>
                                     </Select>
-                                </TableCell>
+                                </TableCell> */}
                             </TableRow>
                         ))}
                     </TableBody>

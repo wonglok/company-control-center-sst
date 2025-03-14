@@ -49,10 +49,11 @@ const dataDefault = {
                     title: 'Users',
                     url: '/admin/users',
                 },
-                {
-                    title: 'AI Devices',
-                    url: '/admin/clients',
-                },
+
+                // {
+                //     title: 'AI Devices',
+                //     url: '/admin/clients',
+                // },
 
                 {
                     title: 'Telegram Bots',

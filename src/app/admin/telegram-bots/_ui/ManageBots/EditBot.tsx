@@ -24,7 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { listTelegramBot } from '@/actions/telegram/listTelegramBot'
 import { useBots } from '../useBots'
 
-export function EditBot({ bot, aiDevices }: { bot: BotType; aiDevices: any[] }) {
+export function EditBot({ bot }: { bot: BotType }) {
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -132,7 +132,7 @@ export function EditBot({ bot, aiDevices }: { bot: BotType; aiDevices: any[] }) 
             console.log(aiDevices)
             */}
 
-                <FormField
+                {/* <FormField
                     control={form.control}
                     name='aiDevice'
                     render={({ field }) => {
@@ -172,7 +172,7 @@ export function EditBot({ bot, aiDevices }: { bot: BotType; aiDevices: any[] }) 
                             </FormItem>
                         )
                     }}
-                />
+                /> */}
 
                 <DialogFooter className=''>
                     <div className='h-3'></div>

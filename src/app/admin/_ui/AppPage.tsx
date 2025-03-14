@@ -33,12 +33,12 @@ export function AppPage({
                     <div className='rounded-xl bg-muted/50'>
                         <CreateNewUser />
                     </div>
-                    <div className='rounded-xl bg-muted/50'>
+                    {/* <div className='rounded-xl bg-muted/50'>
                         <AddConnector />
                     </div>
                     <div className='rounded-xl bg-muted/50'>
                         <ListConnectors />
-                    </div>
+                    </div> */}
                 </div>
             </Dashboard>
         </>

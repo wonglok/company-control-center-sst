@@ -136,38 +136,37 @@ export const sendMessage = async (event: LambdaFunctionURLEvent, context: any) =
     let inbound = JSON.parse((event.body as string) || '{}')
 
     let clientID = inbound.clientID
-    let verify = inbound.verify
+    // let verify = inbound.verify
 
-    let clientData = (await dyna
-        .send(
-            new GetItemCommand({
-                TableName: Resource.ConnectionTokensTable.name,
-                Key: marshall({
-                    itemID: clientID,
-                }),
-            }),
-        )
-        .then((r) => {
-            if (r.Item) {
-                return unmarshall(r.Item)
-            } else {
-                return false
-            }
-        })
-        .catch((r) => {
-            console.error(r)
+    // let clientData = (await dyna
+    //     .send(
+    //         new GetItemCommand({
+    //             TableName: Resource.ConnectionTokensTable.name,
+    //             Key: marshall({
+    //                 itemID: clientID,
+    //             }),
+    //         }),
+    //     )
+    //     .then((r) => {
+    //         if (r.Item) {
+    //             return unmarshall(r.Item)
+    //         } else {
+    //             return false
+    //         }
+    //     })
+    //     .catch((r) => {
+    //         console.error(r)
 
-            return false
-        })) as {
-        itemID: string
-        secret: string
-    }
+    //         return false
+    //     })) as {
+    //     itemID: string
+    //     secret: string
+    // }
 
-    if (clientData && verify === `${md5(clientData.secret)}`) {
-    } else {
-        throw new Error('bad verification token')
-    }
-    //|  +726ms      703086702
+    // if (clientData && verify === `${md5(clientData.secret)}`) {
+    // } else {
+    //     throw new Error('bad verification token')
+    // }
 
     let botData = (await dyna
         .send(
@@ -191,7 +190,7 @@ export const sendMessage = async (event: LambdaFunctionURLEvent, context: any) =
             return false
         })) as BotType
 
-    if (botData && botData.aiDevice === clientData.itemID) {
+    if (botData) {
         const botToken = `${botData.botToken}`
         // const chatID = `${botData.chatID}`
 
