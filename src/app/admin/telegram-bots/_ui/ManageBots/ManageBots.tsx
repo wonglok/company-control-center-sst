@@ -62,9 +62,10 @@ export function ManageBots({ config, jwt }: any) {
                     <TableCaption>{`A list of telegram bots.`}</TableCaption>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className='text-left'>WebHook</TableHead>
                             <TableHead className='text-left'>Edit</TableHead>
-                            {/* <TableHead className='w-[150px]'>DisplayName</TableHead> */}
+                            <TableHead className='text-left'>WebHook</TableHead>
+                            <TableHead className='text-left'>Connect</TableHead>
+                            <TableHead className='text-left'>Status</TableHead>
                             <TableHead>Bot Username</TableHead>
                             {/* <TableHead>AI Device</TableHead> */}
                         </TableRow>
@@ -72,6 +73,9 @@ export function ManageBots({ config, jwt }: any) {
                     <TableBody>
                         {bots.map((bot: BotType) => (
                             <TableRow key={bot.itemID}>
+                                <TableCell className='text-left'>
+                                    <EditBot bot={bot} />
+                                </TableCell>
                                 <TableCell className='text-left'>
                                     <Button
                                         className='mr-3'
@@ -158,7 +162,8 @@ export function ManageBots({ config, jwt }: any) {
                                     >
                                         Message Me
                                     </Button>
-
+                                </TableCell>
+                                <TableCell>
                                     <Button
                                         className=''
                                         variant={'outline'}
@@ -168,17 +173,15 @@ export function ManageBots({ config, jwt }: any) {
                                             //
                                         }}
                                     >
-                                        Copy Bot Link
+                                        Copy Link
                                     </Button>
-
+                                </TableCell>
+                                <TableCell className=''>
                                     <Button variant={'link'}>
-                                        Cloud Status: <CloudStatus bot={bot}></CloudStatus>
+                                        Connection Status: <CloudStatus bot={bot}></CloudStatus>
                                     </Button>
                                 </TableCell>
-                                <TableCell className='text-left'>
-                                    <EditBot bot={bot} />
-                                </TableCell>
-                                {/* <TableCell className='font-medium'>{bot.displayName}</TableCell> */}
+
                                 <TableCell className='font-medium'>{bot.botUserName}</TableCell>
                                 {/* <TableCell className='text-right'>
                                     <Select
