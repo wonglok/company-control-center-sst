@@ -79,43 +79,7 @@ export function ManageBots({ config, jwt }: any) {
                                 </TableCell>
 
                                 <TableCell className='text-left'>
-                                    <Button variant={'outline'} className='mr-3'>
-                                        <TelegramConnection jwt={jwt} bot={bot} config={config}></TelegramConnection>
-                                    </Button>
-                                    <Button
-                                        className='mr-3'
-                                        onClick={(ev: any) => {
-                                            //
-                                            let restURL = config.restURL
-                                            //
-
-                                            toast.success('Activaing WebHook....')
-                                            fetch(`${restURL}/api/telegram/telegram/setupBotHook/${bot.itemID}`, {
-                                                mode: 'cors',
-                                                method: 'POST',
-                                                body: JSON.stringify({
-                                                    ...bot,
-                                                    jwt: jwt,
-                                                }),
-                                            })
-                                                .then((r) => r.json())
-                                                .then((it) => {
-                                                    // console.log(it)
-                                                    toast.success('Successfully Activated WebHook')
-                                                    window.dispatchEvent(
-                                                        new CustomEvent('reload-webhook-status', { detail: {} }),
-                                                    )
-                                                })
-                                                .catch((r) => {
-                                                    console.error(r)
-                                                    toast('Webhook Seutp Failed')
-                                                })
-
-                                            //
-                                        }}
-                                    >
-                                        Activate
-                                    </Button>
+                                    <TelegramConnection jwt={jwt} bot={bot} config={config}></TelegramConnection>
 
                                     <Button
                                         className='mr-3'
@@ -159,7 +123,9 @@ export function ManageBots({ config, jwt }: any) {
                                         variant={'outline'}
                                         onClick={() => {
                                             //
-                                            copy(`${location.origin}?clientID=${bot.itemID}`)
+                                            copy(
+                                                `${location.origin}?clientID=${encodeURIComponent(bot.itemID)}&verify=${encodeURIComponent(`${md5(bot.botToken)}`)}`,
+                                            )
                                             //
                                         }}
                                     >
@@ -167,9 +133,7 @@ export function ManageBots({ config, jwt }: any) {
                                     </Button>
                                 </TableCell>
                                 <TableCell className=''>
-                                    <Button variant={'outline'}>
-                                        <CloudStatus bot={bot}></CloudStatus>
-                                    </Button>
+                                    <CloudStatus key={bot.itemID} bot={bot}></CloudStatus>
                                 </TableCell>
 
                                 <TableCell className='font-medium'>{bot.botUserName}</TableCell>

@@ -135,38 +135,7 @@ export const sendMessage = async (event: LambdaFunctionURLEvent, context: any) =
     let botID = event?.pathParameters?.botID || ''
     let inbound = JSON.parse((event.body as string) || '{}')
 
-    let clientID = inbound.clientID
-    // let verify = inbound.verify
-
-    // let clientData = (await dyna
-    //     .send(
-    //         new GetItemCommand({
-    //             TableName: Resource.ConnectionTokensTable.name,
-    //             Key: marshall({
-    //                 itemID: clientID,
-    //             }),
-    //         }),
-    //     )
-    //     .then((r) => {
-    //         if (r.Item) {
-    //             return unmarshall(r.Item)
-    //         } else {
-    //             return false
-    //         }
-    //     })
-    //     .catch((r) => {
-    //         console.error(r)
-
-    //         return false
-    //     })) as {
-    //     itemID: string
-    //     secret: string
-    // }
-
-    // if (clientData && verify === `${md5(clientData.secret)}`) {
-    // } else {
-    //     throw new Error('bad verification token')
-    // }
+    let verify = inbound.verify
 
     let botData = (await dyna
         .send(
@@ -190,6 +159,11 @@ export const sendMessage = async (event: LambdaFunctionURLEvent, context: any) =
             return false
         })) as BotType
 
+    if (botData && verify === `${md5(botData.botToken)}`) {
+    } else {
+        throw new Error('bad verification token')
+    }
+
     if (botData) {
         const botToken = `${botData.botToken}`
         // const chatID = `${botData.chatID}`
@@ -199,8 +173,6 @@ export const sendMessage = async (event: LambdaFunctionURLEvent, context: any) =
         const text = `${inbound.message}`
 
         const chatID = `${inbound.chatID}`
-
-        console.log(inbound)
 
         try {
             // Send the message via the Telegram Bot API
@@ -251,22 +223,19 @@ export const platformHook = async (event: LambdaFunctionURLEvent, context: any) 
     /*
     
     {
-|  +6ms          botUserName: '',
-|  +6ms          displayName: '',
-|  +6ms          botToken: '
-',
-|  +6ms          chatID: '',
-|  +6ms          itemID: '',
-|  +6ms          aiDevice: '',
-|  +6ms          webhookToken: '',
-|  +6ms          jwt: ''
-|  +6ms        }
+        botUserName: '',
+        displayName: '',
+        botToken: '',
+        chatID: '',
+        itemID: '',
+        aiDevice: '',
+        webhookToken: '',
+        jwt: ''
+    }
 
     */
 
     console.log('secretToken', secretToken)
-
-    console.log('botData.aiDevice', botData.aiDevice)
 
     //
     let bot = await getBot(botData.botToken)
@@ -280,64 +249,48 @@ export const platformHook = async (event: LambdaFunctionURLEvent, context: any) 
                     TableName: Resource.ConnectionsTable.name,
                     FilterExpression: 'clientID = :clientID',
                     ExpressionAttributeValues: {
-                        ':clientID': { S: `${botData.aiDevice}` },
+                        ':clientID': { S: `${botID}` },
                     },
-                    //
-                    //
-                    // FilterExpression: '',
                 }),
             )
             .then((r) => r.Items?.map((item) => unmarshall(item)))
             .then(async (data: any) => {
-                let bucket: any[] = []
+                let onlineList: any[] = []
                 for (let item of data) {
                     //
 
-                    console.log(' item.clientID', item.clientID)
-                    console.log(item)
-                    //
+                    await wss
+                        .send(
+                            new PostToConnectionCommand({
+                                ConnectionId: item.itemID,
+                                Data: JSON.stringify({
+                                    type: 'telegram_message',
+                                    payload: {
+                                        //
+                                        botID: botData.itemID,
+                                        message: ctx.message,
+                                    },
+                                }),
+                            }),
+                        )
+                        .then(() => {
+                            onlineList.push(item)
+                        })
+                        .catch(async (r) => {
+                            //
 
-                    if (item.clientID === botData.aiDevice) {
-                        console.log('matched!!!!!!!!')
-                        console.log('matched!!!!!!!!')
-
-                        await wss
-                            .send(
-                                new PostToConnectionCommand({
-                                    ConnectionId: item.itemID,
-                                    Data: JSON.stringify({
-                                        type: 'telegram_message',
-                                        payload: {
-                                            //
-                                            botID: botData.itemID,
-                                            message: ctx.message,
-                                        },
+                            await dyna.send(
+                                new DeleteItemCommand({
+                                    TableName: Resource.ConnectionsTable.name,
+                                    Key: marshall({
+                                        itemID: item.itemID,
                                     }),
                                 }),
                             )
-                            .then(() => {
-                                bucket.push(item)
-                            })
-                            .catch(async (r) => {
-                                //
-
-                                //
-
-                                //
-
-                                await dyna.send(
-                                    new DeleteItemCommand({
-                                        TableName: Resource.ConnectionsTable.name,
-                                        Key: marshall({
-                                            itemID: item.itemID,
-                                        }),
-                                    }),
-                                )
-                            })
-                    }
+                        })
                 }
 
-                return bucket
+                return onlineList
             })
             .catch((err) => {
                 console.log(err)
