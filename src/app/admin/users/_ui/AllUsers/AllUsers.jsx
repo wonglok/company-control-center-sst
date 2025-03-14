@@ -18,6 +18,7 @@ import { useEffect } from 'react'
 import { listUsers } from '@/actions/users/listUsers'
 import { Button } from '@/components/ui/button'
 import { getMySelf } from '@/actions/getMySelf'
+import { removeUser } from '@/actions/users/removeUser'
 export function AllUsers() {
     let users = useUsers(r => r.users)
     let loading = useUsers(r => r.loading)
@@ -79,12 +80,17 @@ export function AllUsers() {
                                         </TableCell>
                                         <TableCell className='text-center'>
                                             <Button disabled={user.username === myself?.username} variant={'destructive'} onClick={() => {
-                                                if (user.username === myself?.username) {
-                                                    alert('you cannot remove yourself')
-                                                    return
+                                                if (window.confirm('remove user?')) {
+
+                                                    removeUser({ item: { itemID: user.itemID } }).then(() => {
+                                                        listUsers({}).then((data) => {
+                                                            console.log(data)
+                                                            useUsers.setState({ loading: false, users: data })
+                                                        })
+                                                    })
+                                                    //
+
                                                 }
-
-
                                             }}>Remove</Button>
                                         </TableCell>
                                     </TableRow>
