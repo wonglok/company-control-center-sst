@@ -1,4 +1,4 @@
-import { fa4, faCheck, faClose, faIceCream, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { fa4, faCheck, faClose, faCloud, faIceCream, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -32,6 +32,8 @@ export function TelegramConnection({ jwt, config, bot }: any) {
 
     return (
         <>
+            <FontAwesomeIcon icon={faPaperPlane} className=' mr-3'></FontAwesomeIcon>
+
             {matches === 'loading' && (
                 <>
                     <FontAwesomeIcon icon={faSpinner} className=' animate-spin'></FontAwesomeIcon>
