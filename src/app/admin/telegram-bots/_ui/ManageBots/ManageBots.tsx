@@ -72,6 +72,7 @@ export function ManageBots({ config, jwt }: any) {
                             <TableRow key={bot.itemID}>
                                 <TableCell className='text-left'>
                                     <Button
+                                        className='mr-3'
                                         onClick={() => {
                                             //
                                             let restURL = config.restURL
@@ -87,8 +88,27 @@ export function ManageBots({ config, jwt }: any) {
                                             })
                                                 .then((r) => r.json())
                                                 .then((it) => {
-                                                    console.log(it)
-                                                    toast.success('Successfully Setup WebHook')
+                                                    // console.log(it)
+                                                    toast.success('Successfully Activated WebHook')
+
+                                                    //
+                                                    let restURL = config.restURL
+                                                    fetch(`${restURL}/api/telegram/telegram/getBotHook/${bot.itemID}`, {
+                                                        mode: 'cors',
+                                                        method: 'POST',
+                                                        body: JSON.stringify({
+                                                            ...bot,
+                                                            jwt: jwt,
+                                                        }),
+                                                    })
+                                                        .then((r) => r.json())
+                                                        .then((it) => {
+                                                            if (it.isWorking) {
+                                                                toast.success('Webhook is Verfiied')
+                                                            } else {
+                                                                toast.error('Webhook needs activation')
+                                                            }
+                                                        })
                                                 })
                                                 .catch((r) => {
                                                     console.error(r)
@@ -98,38 +118,7 @@ export function ManageBots({ config, jwt }: any) {
                                             //
                                         }}
                                     >
-                                        Setup
-                                    </Button>
-
-                                    <Button
-                                        variant={'outline'}
-                                        className='mx-3'
-                                        onClick={() => {
-                                            //
-                                            let restURL = config.restURL
-                                            //
-
-                                            fetch(`${restURL}/api/telegram/telegram/getBotHook/${bot.itemID}`, {
-                                                mode: 'cors',
-                                                method: 'POST',
-                                                body: JSON.stringify({
-                                                    ...bot,
-                                                    jwt: jwt,
-                                                }),
-                                            })
-                                                .then((r) => r.json())
-                                                .then((it) => {
-                                                    // console.log(it.result)
-
-                                                    if (it.ok) {
-                                                        toast.success('Webhook is OK')
-                                                    } else {
-                                                        toast('Webhook has error')
-                                                    }
-                                                })
-                                        }}
-                                    >
-                                        Check
+                                        Activate
                                     </Button>
 
                                     <Button
@@ -177,7 +166,7 @@ export function ManageBots({ config, jwt }: any) {
                                             })
                                         }}
                                     >
-                                        Send Test Message
+                                        Message Me
                                     </Button>
                                 </TableCell>
                                 <TableCell className='text-left'>

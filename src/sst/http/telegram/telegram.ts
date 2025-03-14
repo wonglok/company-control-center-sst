@@ -20,7 +20,7 @@ let wss = new ApiGatewayManagementApiClient({
     endpoint: Resource.SocketAPI.managementEndpoint,
 })
 
-let url = new URL(Resource.RestAPI.url)
+let restURLObject = new URL(Resource.RestAPI.url)
 
 let getBot = (BOT_TOKEN: string) => {
     const bot = new Telegraf(BOT_TOKEN)
@@ -77,7 +77,10 @@ export const getBotHook = async (event: LambdaFunctionURLEvent, context: any) =>
             }
         }
         */
-            return r
+
+            return {
+                isWorking: r.result.url === `${Resource.RestAPI.url}/api/telegram/telegram/platformHook/${itemID}`,
+            }
         })
 }
 
@@ -113,7 +116,7 @@ export const setupBotHook = async (event: LambdaFunctionURLEvent, context: any) 
         let bot = await getBot(botData.botToken)
 
         await bot.createWebhook({
-            domain: url.hostname,
+            domain: restURLObject.hostname,
             path: `/api/telegram/telegram/platformHook/${botData.itemID}`,
             secret_token: botData.webhookToken,
         })

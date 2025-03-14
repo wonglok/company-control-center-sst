@@ -22,6 +22,7 @@ import { putConnectionToken } from '@/actions/connectionTokens/putConnectionToke
 import Link from 'next/link'
 import { getOnlineConnections } from '@/actions/getOnlineConnections'
 import { ConnectionStatus } from './ConnectionStatus'
+import md5 from 'md5'
 
 // Declare putConnectionTokenTimer on the window object
 declare global {
@@ -83,7 +84,7 @@ export function ListConnectors() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {tokens.slice(0, 3).map((token: { itemID: string; name: string }) => (
+                            {tokens.slice(0, 3).map((token: { itemID: string; name: string; secret: string }) => (
                                 <TableRow key={token.itemID}>
                                     <TableCell className='flex justify-center items-center flex-col'>
                                         <div className='h-2 w-full'></div>
@@ -111,7 +112,7 @@ export function ListConnectors() {
                                                 //
                                                 let url = `${location.origin}?clientID=${encodeURIComponent(
                                                     `${token.itemID}`,
-                                                )}`
+                                                )}&verify=${`${md5(token.secret)}`}`
 
                                                 copy(url)
 

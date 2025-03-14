@@ -14,6 +14,8 @@ import { v4 } from 'uuid'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useEffect, useState } from 'react'
 import { listConnectionToken } from '@/actions/connectionTokens/listConnectionToken'
+import { useBots } from '../useBots'
+import { listTelegramBot } from '@/actions/telegram/listTelegramBot'
 
 export const FormSchema = z.object({
     displayName: z.string({
@@ -74,6 +76,10 @@ export function CreateBot() {
                     chatID: '',
                 })
                 //
+
+                listTelegramBot().then((data: any) => {
+                    useBots.setState({ bots: data })
+                })
             })
             .catch((r) => {
                 console.error(r)
