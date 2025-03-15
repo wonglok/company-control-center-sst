@@ -1,59 +1,336 @@
-import { EditorFromTextArea } from 'codemirror'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+//@ts-ignore
+import CodeMirrorReact from 'react-codemirror'
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/addon/hint/show-hint.css'
+
+//@ts-ignore
+import { procFQL } from './procFQL'
+import { create } from 'zustand'
+
+const useMirror = create<{
+    cm: any
+    api: any
+    suggestions: {}
+    value: ''
+    ctx: {}
+    dictionary: {}
+    CodeMirror: any
+    reload: () => void
+}>((): any => {
+    return {
+        //
+        dictionary: {},
+        reload: () => {},
+        suggestion: {},
+        //
+    }
+})
 
 export function CodeMirrorCompo({ value, onChange }: any) {
     let ref = useRef<null | HTMLTextAreaElement>(null)
-    let [cm, setCM] = useState<false | EditorFromTextArea>(false)
+    let [ready, setReady] = useState<false | true>(false)
 
     useEffect(() => {
-        if (typeof value === 'string') {
-            if (cm) {
-                cm.setValue(value)
-            }
-        }
-    }, [cm, value])
-
-    useEffect(() => {
-        let task = []
-        if (ref.current) {
-            import('codemirror').then(async (CodeMirror) => {
-                await import('codemirror')
-
+        import('codemirror')
+            .then((r) => r.defineMode)
+            .then(async (defineMode) => {
+                // @ts-ignore
+                await import('codemirror/keymap/sublime.js')
+                // @ts-ignore
                 await import('codemirror/addon/hint/show-hint.js')
-                await import('codemirror/addon/fold/foldcode.js')
-                await import('codemirror/addon/fold/foldgutter.js')
-                await import('codemirror/addon/fold/brace-fold.js')
+                // await import('codemirror/addon/hint/show-hint.css')
 
-                if (ref.current) {
-                    let res = CodeMirror.fromTextArea(ref.current)
+                defineMode('funQueryLanguage', () => {
+                    var parserState = {
+                        curlyQuoteIsOpen: false,
+                        curlyQuoteName: 'Quote',
+                    }
 
-                    res.on('change', () => {
-                        onChange(res.getValue())
-                    })
+                    let self = {
+                        // tables: [
+                        //     //
+                        //     'home_page_bucket',
+                        //     'menu_page_bucket',
+                        // ],
+                    }
 
-                    setCM(res)
-                }
+                    return {
+                        token(stream: any, state: any) {
+                            let title = ''
+                            let quote = ''
+                            let detectedType: any = null
+
+                            let dictionary: any = useMirror.getState().dictionary
+
+                            Object.keys(dictionary || {}).forEach((kn) => {
+                                if (detectedType === null) {
+                                    if (stream.match(kn)) {
+                                        let detected = dictionary[kn][0]
+                                        detectedType = detected
+                                    } else {
+                                        detectedType = null
+                                    }
+                                }
+                            })
+
+                            // self.tables.forEach((et) => {
+                            //     if (detectedType === null) {
+                            //         if (stream.match(et)) {
+                            //             detectedType = 'TableInstance'
+                            //         }
+                            //     }
+                            // })
+
+                            if (stream.match(/### .+/g)) {
+                                title += ' ParagraphTitle-3'
+                            } else if (stream.match(/## .+/g)) {
+                                title += ' ParagraphTitle-2'
+                            } else if (stream.match(/# .+/g)) {
+                                title += ' ParagraphTitle-1'
+                            }
+
+                            let output = (detectedType ? detectedType + ' ' : '') + title + quote
+                            if (detectedType === null) {
+                                stream.next()
+                            }
+
+                            return output
+                            // if (stream.match('const')) {
+                            //   return 'style-a'
+                            // } else if (stream.match('bbb')) {
+                            //   return 'style-b'
+                            // } else {
+                            //   stream.next()
+                            //   return null
+                            // }
+                        },
+                    }
+                })
+
+                setReady(true)
             })
-        }
+
         return () => {}
     }, [])
 
+    useEffect(() => {
+        let ans = procFQL({ query: value })
+
+        let suggestions = [
+            //
+            ['posts', 'comments', 'settings'],
+        ]
+
+        let dictionary = ans.dictionary
+
+        let dictionaryKNs = Object.keys(dictionary)
+
+        let getOther = ({ kn }: any) => {
+            return dictionaryKNs
+                .filter((ekn) => {
+                    return ekn !== kn
+                })
+                .filter((ekn) => {
+                    return dictionary[ekn].includes(dictionary[kn][0])
+                })
+        }
+
+        // forEach Word
+        dictionaryKNs.forEach((kn) => {
+            let other = getOther({ kn })
+            if (other.length > 0) {
+                suggestions.push([kn, ...other])
+            }
+        })
+
+        useMirror.setState({
+            value,
+            suggestions,
+            ctx: ans.ctx,
+            dictionary: ans.dictionary,
+        })
+    }, [value])
+
+    let options = useMemo(() => {
+        let handleSuggestions = (cm, option) => {
+            return new Promise(async (resolve, reject) => {
+                let Pos = await import('codemirror').then((r) => r.Pos)
+
+                let run = async () => {
+                    var suggs = useMirror.getState().suggestions
+
+                    // console.log(JSON.stringify(suggs, null, '  '))
+                    var cursor = cm.getCursor(),
+                        line = cm.getLine(cursor.line)
+                    var start = cursor.ch,
+                        end = cursor.ch
+                    while (start && /\w/.test(line.charAt(start - 1))) --start
+                    while (end < line.length && /\w/.test(line.charAt(end))) ++end
+                    var word = line.slice(start, end).toLowerCase()
+
+                    // let flatMe = (c, arr) => {
+                    //     arr.forEach((i) => {
+                    //         if (!c.includes(i)) {
+                    //             i = i.replace(/_/, ' ')
+                    //             c.push(i)
+                    //         }
+                    //     })
+                    //     c = uniq(c)
+                    //     return c
+                    // }
+
+                    for (var i = 0; i < suggs.length; i++) {
+                        if (suggs[i].indexOf(word) !== -1) {
+                            return resolve({
+                                list: suggs[i].filter((e) => e),
+                                from: Pos(cursor.line, start),
+                                to: Pos(cursor.line, end),
+                            })
+                        }
+                    }
+                    return resolve(null)
+                }
+
+                run()
+                // setTimeout(run, 0)
+            })
+            /* eslint-enable */
+        }
+        return {
+            extraKeys: {
+                'Ctrl-Space': 'autocomplete',
+                'Cmd-S': () => {
+                    //
+                },
+            },
+            // codemirror options
+            keyMap: 'sublime',
+            tabSize: 2,
+            mode: 'funQueryLanguage',
+            // theme: 'chrome',
+            lineWrapping: true,
+            lineNumbers: true,
+            line: true,
+            hintOptions: {
+                customKeys: {
+                    'Arrow-Up': '',
+                    'Arrow-Down': '',
+                },
+                alignWithWord: false,
+                hint: handleSuggestions,
+                closeOnUnfocus: true,
+            },
+        }
+    }, [])
+
+    //options={options}
+
+    useEffect(() => {
+        let lastCursor = ''
+        let autoPop = () => {
+            let self = useMirror.getState()
+            if (self.cm) {
+                let cursor = self.cm.getCursor()
+                let nowCursor = JSON.stringify(cursor)
+                if (nowCursor === lastCursor) {
+                    return
+                } else {
+                    lastCursor = nowCursor
+                }
+                let nullVal: any = null
+
+                self.CodeMirror.commands.autocomplete(self.cm, nullVal, { completeSingle: true })
+                // self.CodeMirror.commands.undo(self.cm)
+                // self.CodeMirror.commands.redo(self.cm)
+                // self.cm.setCursor({ line: cursor.line, ch: cursor.ch })
+            }
+        }
+
+        let tt = setInterval(() => {
+            autoPop()
+        }, 1)
+
+        return () => {
+            clearInterval(tt)
+        }
+    }, [])
+
+    //
+
     return (
         <>
-            <div className='w-full h-full bg-red-500  codemirrorbox'>
-                <textarea className=' w-full h-full CodeMirror' ref={ref}></textarea>
-            </div>
+            {ready && (
+                <CodeMirrorReact
+                    ref={(api: any) => {
+                        if (api) {
+                            let cm = api.getCodeMirror()
+
+                            cm.on('cursor', () => {
+                                console.log(123)
+                            })
+
+                            import('codemirror').then((CodeMirror) => {
+                                useMirror.setState({
+                                    CodeMirror,
+                                    cm,
+                                    api,
+                                })
+                            })
+                        }
+                    }}
+                    className='h-full codemirrorbox'
+                    value={value}
+                    onChange={async (value: any, event: any) => {
+                        //
+                        let self = useMirror.getState()
+                        if (self.cm) {
+                            let cursor = self.cm.getCursor()
+                            let nullVal: any = null
+
+                            self.CodeMirror.commands.autocomplete(self.cm, nullVal, { completeSingle: true })
+                            self.CodeMirror.commands.undo(self.cm)
+                            self.CodeMirror.commands.redo(self.cm)
+                            self.cm.setCursor({ line: cursor.line, ch: cursor.ch })
+
+                            useMirror.setState({
+                                value,
+                            })
+                        }
+                    }}
+                    options={options}
+                />
+            )}
             <style
                 dangerouslySetInnerHTML={{
-                    __html: `
-                
-.rhymes-suggestions li{
-  cursor: pointer;
-  margin-bottom: 0px;
+                    __html: /* css */ `
+
+.cm-TableInstance{
+  font-weight: bold;
+  border-bottom: rgb(31, 202, 173) solid 2px;
 }
-.rhymes-suggestions li:hover{
-  text-decoration: underline;
+.cm-HolderInstance{
+  font-weight: bold;
+  border-bottom: rgb(202, 108, 31) dashed 2px;
 }
+.cm-ResultInstnace{
+  font-weight: bold;
+  border-bottom: rgb(202, 31, 165) dashed 2px;
+}
+.cm-FieldInstance{
+  font-weight: bold;
+  border-bottom: rgb(202, 122, 31) dashed 2px;
+}
+
+.cm-OrderInstance{
+  font-weight: bold;
+  border-bottom: rgb(31, 191, 202) dashed 2px;
+}
+.cm-NumberInstance{
+  font-weight: bold;
+  background-color: rgb(176, 224, 228);
+}
+
 .codemirrorbox{
   height: 500px;
 }
@@ -120,31 +397,6 @@ export function CodeMirrorCompo({ value, onChange }: any) {
   border-bottom: rgb(31, 182, 202) dashed 2px;
 }
 
-.cm-TableInstance{
-  font-weight: bold;
-  border-bottom: rgb(31, 202, 173) solid 2px;
-}
-.cm-HolderInstance{
-  font-weight: bold;
-  border-bottom: rgb(202, 108, 31) dashed 2px;
-}
-.cm-ResultInstnace{
-  font-weight: bold;
-  border-bottom: rgb(202, 31, 165) dashed 2px;
-}
-.cm-FieldInstance{
-  font-weight: bold;
-  border-bottom: rgb(202, 122, 31) dashed 2px;
-}
-
-.cm-OrderInstance{
-  font-weight: bold;
-  border-bottom: rgb(31, 191, 202) dashed 2px;
-}
-.cm-NumberInstance{
-  font-weight: bold;
-  background-color: rgb(176, 224, 228);
-}
 
 .cm-IDInstance{
   font-weight: bold;
@@ -153,52 +405,6 @@ export function CodeMirrorCompo({ value, onChange }: any) {
 
 .cm-Table{
   border-bottom: rgba(52, 209, 20, 0.55) solid 2px;
-}
-
-.cm-Rhyme{
-  border-bottom: rgba(52, 209, 20, 0.55) solid 2px;
-}
-
-.cm-Quote{
-  background: rgb(253, 255, 134, 0.55);
-}
-
-.cm-StarQuote{
-  background: rgba(255, 227, 134, 0.8);
-}
-
-.cm-DoubleStarQuote{
-  background: rgb(255, 203, 134);
-}
-
-.cm-HiddenQuote{
-  background: rgba(255, 134, 255, 0.8);
-}
-
-.cm-DoubleHiddenQuote{
-  background: rgb(212, 0, 255, 0.8);
-}
-
-.cm-ControversialQuote{
-  color: white;
-  background: rgb(4, 0, 255);
-}
-
-.cm-Existence{
-  padding-bottom: 1px;
-  border-bottom: hotpink solid 2px;
-}
-.cm-Being{
-  padding-bottom: 1px;
-  border-bottom: rgb(31, 182, 202) solid 2px;
-}
-.cm-Quote.cm-Existence{
-  padding-bottom: 1px;
-  border-bottom: hotpink solid 2px;
-}
-.cm-Quote.cm-Being{
-  padding-bottom: 1px;
-  border-bottom: rgb(31, 182, 202) solid 2px;
 }
 
 /* folding */
@@ -219,10 +425,10 @@ export function CodeMirrorCompo({ value, onChange }: any) {
   cursor: pointer;
 }
 .CodeMirror-foldgutter-open:after {
-  content: "<";
+  content: "\\25BE";
 }
 .CodeMirror-foldgutter-folded:after {
-  content: ">";
+  content: "\\25B8";
 }
 
 .cm-colormark{
@@ -313,7 +519,11 @@ export function CodeMirrorCompo({ value, onChange }: any) {
   white-space: pre;
 }
 
-                `,
+.listbox {
+  padding: 0px;
+}
+              
+`,
                 }}
             ></style>
         </>

@@ -37,6 +37,7 @@ import remarkParse from 'remark-parse'
 // import { generateTasks } from '@/actions/taskAI/generateTasks'
 // import { UnControlled as CodeMirror } from 'react-codemirror2'
 import { CodeMirrorCompo } from './CodeMirrorCompo'
+import { procFQL } from './procFQL'
 
 const processor = unified().use(remarkParse)
 
@@ -101,7 +102,7 @@ export function BotSchema({ bot }: { bot: BotType }) {
                         <FormItem>
                             <FormControl>
                                 <div
-                                    className='w-full flex space-x-3'
+                                    className='w-full flex flex-col space-x-3'
                                     onKeyDownCapture={(ev) => {
                                         if (ev.metaKey && ev.key === 's') {
                                             ev.stopPropagation()
@@ -110,10 +111,18 @@ export function BotSchema({ bot }: { bot: BotType }) {
                                         }
                                     }}
                                 >
-                                    <div className='w-1/2 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
-                                        <Editor
-                                            className='w-1/2 rounded-2xl overflow-hidden border border-gray-300 p-2'
-                                            height={'85vh'}
+                                    <div className='w-full h-1/2 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
+                                        <CodeMirrorCompo
+                                            value={field.value}
+                                            onChange={(value: string) => {
+                                                field.onChange({
+                                                    target: { value: value },
+                                                })
+                                            }}
+                                        ></CodeMirrorCompo>
+                                        {/* <Editor
+                                            className='w-full h-full rounded-2xl overflow-hidden border border-gray-300 p-2'
+                                            height={'500px'}
                                             value={field.value}
                                             language={'markdown'}
                                             onChange={async (value) => {
@@ -122,13 +131,18 @@ export function BotSchema({ bot }: { bot: BotType }) {
 
                                                 // // let result = processor.parse(value)
                                                 // // console.log(result)
-                                                // //toMd
 
                                                 // // let processed = mdjs.markdownAsJsTree(value)
 
                                                 let processText = async (rawText: string) => {
                                                     //
                                                     // return rawText
+
+                                                    let data = await procFQL({ query: rawText })
+
+                                                    console.log(data)
+
+                                                    return data.ctx
                                                 }
 
                                                 let simpleJSON = md2json.parse(value)
@@ -157,12 +171,12 @@ export function BotSchema({ bot }: { bot: BotType }) {
                                                     save()
                                                 }, 5000)
                                             }}
-                                        ></Editor>
+                                        ></Editor> */}
                                     </div>
 
-                                    <div className='w-1/2 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
+                                    <div className='w-full h-1/2 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
                                         {/*  */}
-                                        <pre className='w-full text-[12px] h-[85vh] whitespace-pre-wrap overflow-y-scroll'>
+                                        <pre className='w-full text-[12px] h-full whitespace-pre-wrap overflow-y-scroll'>
                                             {JSON.stringify(json, null, '  ')}
                                         </pre>
                                         {/*  */}
