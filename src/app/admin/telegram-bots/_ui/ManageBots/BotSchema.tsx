@@ -27,10 +27,16 @@ import { Editor } from '@monaco-editor/react'
 import { DialogClose } from '@radix-ui/react-dialog'
 
 // @ts-ignore
+import md2json from 'md-2-json'
+
+// @ts-ignore
 import * as mdjs from '@moox/markdown-to-json'
 
 import { unified } from 'unified'
 import remarkParse from 'remark-parse'
+// import { generateTasks } from '@/actions/taskAI/generateTasks'
+// import { UnControlled as CodeMirror } from 'react-codemirror2'
+import { CodeMirrorCompo } from './CodeMirrorCompo'
 
 const processor = unified().use(remarkParse)
 
@@ -65,7 +71,7 @@ export function BotSchema({ bot }: { bot: BotType }) {
             })
     }
 
-    let refClose = useRef<any>(<button></button>)
+    let refClose = useRef<any>(<></>)
 
     let refTimer = useRef<number | NodeJS.Timeout>(0)
 
@@ -93,7 +99,6 @@ export function BotSchema({ bot }: { bot: BotType }) {
                     name='botSchema'
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Bot Logic</FormLabel>
                             <FormControl>
                                 <div
                                     className='w-full flex space-x-3'
@@ -105,63 +110,59 @@ export function BotSchema({ bot }: { bot: BotType }) {
                                         }
                                     }}
                                 >
-                                    <Editor
-                                        className='w-1/2 rounded-2xl overflow-hidden border border-gray-300 p-2'
-                                        height={'75vh'}
-                                        value={field.value}
-                                        onChange={async (value) => {
-                                            bot.botSchema = value || ''
-                                            field.onChange({ target: { value } })
+                                    <div className='w-1/2 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
+                                        <Editor
+                                            className='w-1/2 rounded-2xl overflow-hidden border border-gray-300 p-2'
+                                            height={'85vh'}
+                                            value={field.value}
+                                            language={'markdown'}
+                                            onChange={async (value) => {
+                                                bot.botSchema = value || ''
+                                                field.onChange({ target: { value } })
 
-                                            // let result = processor.parse(value)
-                                            // console.log(result)
-                                            //toMd
+                                                // // let result = processor.parse(value)
+                                                // // console.log(result)
+                                                // //toMd
 
-                                            // let processed = mdjs.markdownAsJsTree(value)
+                                                // // let processed = mdjs.markdownAsJsTree(value)
 
-                                            let processed = processor.parse(value)
-                                            var traverse = (tree: any, current: any, events: any) => {
-                                                // console.log(tree, current)
-                                                delete tree.position
-                                                delete current.position
+                                                let processText = async (rawText: string) => {
+                                                    //
+                                                    // return rawText
+                                                }
 
-                                                events.any(current)
+                                                let simpleJSON = md2json.parse(value)
 
-                                                //visit children of current
-                                                if (current?.children instanceof Array) {
-                                                    for (var key of Object.keys(current.children)) {
-                                                        var item = current.children[key]
-                                                        traverse(current, item, events)
+                                                let walk = async (obj: any) => {
+                                                    for (let kn in obj) {
+                                                        if (kn === 'raw') {
+                                                            let rawText = obj[kn]
+                                                            obj['json'] = await processText(rawText as string)
+                                                        } else {
+                                                            await walk(obj[kn])
+                                                        }
                                                     }
                                                 }
-                                            }
 
-                                            let events = {
-                                                any: (current: any) => {
-                                                    console.log(current)
-                                                },
-                                            }
+                                                await walk(simpleJSON)
 
-                                            processed.children.forEach((kid) => {
-                                                traverse(processed, kid, events)
-                                            })
+                                                bot.json = simpleJSON
 
-                                            bot.json = processed
+                                                setJSON(bot.json)
 
-                                            setJSON(bot.json)
+                                                // setJSON(result)
 
-                                            // setJSON(result)
-
-                                            clearTimeout(refTimer.current)
-                                            refTimer.current = setTimeout(() => {
-                                                save()
-                                            }, 5000)
-                                        }}
-                                    ></Editor>
+                                                clearTimeout(refTimer.current)
+                                                refTimer.current = setTimeout(() => {
+                                                    save()
+                                                }, 5000)
+                                            }}
+                                        ></Editor>
+                                    </div>
 
                                     <div className='w-1/2 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
                                         {/*  */}
-                                        <pre className='w-full text-[12px] h-[75vh] whitespace-pre-wrap overflow-y-scroll'>
+                                        <pre className='w-full text-[12px] h-[85vh] whitespace-pre-wrap overflow-y-scroll'>
                                             {JSON.stringify(json, null, '  ')}
                                         </pre>
                                         {/*  */}
@@ -176,32 +177,20 @@ export function BotSchema({ bot }: { bot: BotType }) {
 
                 <DialogFooter className=''>
                     <div className='h-3'></div>
-                    <Button type='submit'>Save changes</Button>
+                    <Button
+                        type='button'
+                        onClick={() => {
+                            save()
+                        }}
+                    >
+                        Save changes
+                    </Button>
                 </DialogFooter>
             </form>
         </Form>
     )
 
-    return (
-        <Dialog>
-            <DialogClose asChild>
-                <button ref={refClose} />
-            </DialogClose>
-            <DialogTrigger asChild>
-                <Button variant={'default'}>Bot Logic Editor</Button>
-            </DialogTrigger>
-            <DialogContent className=' max-w-[95vw]'>
-                <DialogHeader>
-                    <DialogTitle>Bot Logic Editor</DialogTitle>
-
-                    {/* <DialogDescription>
-                        Make changes to your profile here. Click save when you're done.
-                    </DialogDescription> */}
-                </DialogHeader>
-                {formUI}
-            </DialogContent>
-        </Dialog>
-    )
+    return <>{formUI}</>
 }
 
 //

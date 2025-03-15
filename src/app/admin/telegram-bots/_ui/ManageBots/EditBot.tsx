@@ -185,7 +185,7 @@ export function EditBot({ bot }: { bot: BotType }) {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button>Edit Bot</Button>
+                <Button>Config</Button>
             </DialogTrigger>
             <DialogContent className='sm:max-w-[425px]'>
                 <DialogHeader>

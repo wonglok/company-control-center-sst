@@ -27,6 +27,7 @@ import { TelegramConnection } from './TelegramConnection'
 import { BotSchema } from './BotSchema'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faTeletype } from '@fortawesome/free-solid-svg-icons'
+import Link from 'next/link'
 
 export type BotType = {
     itemID: string
@@ -68,7 +69,7 @@ export function ManageBots({ config, jwt }: any) {
                     <TableHeader>
                         <TableRow>
                             <TableHead className='text-left'>Edit</TableHead>
-                            <TableHead>Logic</TableHead>
+                            <TableHead>Schema</TableHead>
                             <TableHead className='text-left'>Telegram Integration</TableHead>
                             <TableHead className='text-left'>Bot Integration</TableHead>
                             <TableHead className='text-left'>Bot Link</TableHead>
@@ -83,7 +84,10 @@ export function ManageBots({ config, jwt }: any) {
                                 </TableCell>
 
                                 <TableCell className='font-medium'>
-                                    <BotSchema key={bot.itemID} bot={bot}></BotSchema>
+                                    <Link href={`/admin/telegram-bots/schema/${bot.itemID}`}>
+                                        <Button>Logic</Button>
+                                    </Link>
+                                    {/* <BotSchema key={bot.itemID} bot={bot}></BotSchema> */}
                                 </TableCell>
 
                                 <TableCell className='text-left'>

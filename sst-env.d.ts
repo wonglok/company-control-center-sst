@@ -25,6 +25,10 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Dynamo"
     }
+    "DEEPSEEK_API_KEY": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "GlobalVarsTable": {
       "name": string
       "type": "sst.aws.Dynamo"
