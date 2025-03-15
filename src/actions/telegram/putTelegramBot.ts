@@ -16,7 +16,9 @@ export const putTelegramBot = async ({ item }: { item: { itemID: string } | any 
     await dyna.send(
         new PutItemCommand({
             TableName: Resource.TelegramBotTable.name,
-            Item: marshall(item),
+            Item: marshall(item, {
+                convertClassInstanceToMap: true,
+            }),
         }),
     )
 }

@@ -29,10 +29,10 @@ import { DialogClose } from '@radix-ui/react-dialog'
 // @ts-ignore
 import * as mdjs from '@moox/markdown-to-json'
 
-// import { unified } from 'unified'
-// import remarkParse from 'remark-parse'
+import { unified } from 'unified'
+import remarkParse from 'remark-parse'
 
-// const processor = unified().use(remarkParse)
+const processor = unified().use(remarkParse)
 
 export function BotSchema({ bot }: { bot: BotType }) {
     const form = useForm<z.infer<typeof FormSchema>>({
@@ -117,26 +117,34 @@ export function BotSchema({ bot }: { bot: BotType }) {
                                             // console.log(result)
                                             //toMd
 
-                                            let processed = mdjs.markdownAsJsTree(value)
+                                            // let processed = mdjs.markdownAsJsTree(value)
 
-                                            let traverse = (node: any, parent: any) => {
-                                                if (typeof node === 'string') {
-                                                    if (parent.children instanceof Array) {
-                                                        parent.children.splice(
-                                                            parent.children.findIndex((kid: any) => kid === node),
-                                                            1,
-                                                        )
-                                                    }
-                                                }
+                                            let processed = processor.parse(value)
+                                            var traverse = (tree: any, current: any, events: any) => {
+                                                // console.log(tree, current)
+                                                delete tree.position
+                                                delete current.position
 
-                                                if (node.children) {
-                                                    for (let item of node.children) {
-                                                        traverse(item, node)
+                                                events.any(current)
+
+                                                //visit children of current
+                                                if (current?.children instanceof Array) {
+                                                    for (var key of Object.keys(current.children)) {
+                                                        var item = current.children[key]
+                                                        traverse(current, item, events)
                                                     }
                                                 }
                                             }
 
-                                            traverse(processed.body, processed)
+                                            let events = {
+                                                any: (current: any) => {
+                                                    console.log(current)
+                                                },
+                                            }
+
+                                            processed.children.forEach((kid) => {
+                                                traverse(processed, kid, events)
+                                            })
 
                                             bot.json = processed
 
@@ -147,14 +155,14 @@ export function BotSchema({ bot }: { bot: BotType }) {
                                             clearTimeout(refTimer.current)
                                             refTimer.current = setTimeout(() => {
                                                 save()
-                                            }, 1000)
+                                            }, 5000)
                                         }}
                                     ></Editor>
 
-                                    <div className='w-1/2 rounded-2xl text-xs overflow-hidden border border-gray-300 p-2 shrink-0'>
+                                    <div className='w-1/2 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
                                         {/*  */}
-                                        <pre className='w-full h-[75vh] whitespace-pre-wrap overflow-y-scroll'>
-                                            {JSON.stringify(json, null, '\t')}
+                                        <pre className='w-full text-[12px] h-[75vh] whitespace-pre-wrap overflow-y-scroll'>
+                                            {JSON.stringify(json, null, '  ')}
                                         </pre>
                                         {/*  */}
                                     </div>
@@ -195,3 +203,5 @@ export function BotSchema({ bot }: { bot: BotType }) {
         </Dialog>
     )
 }
+
+//
