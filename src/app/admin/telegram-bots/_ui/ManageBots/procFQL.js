@@ -66,7 +66,7 @@ export const procSentence = ({ command, dictionary, ctx }) => {
     }
 
     nlp(command)
-        .match(`make a bucket and call it [.]`)
+        .match(`make a data bucket and call it [.]`)
         .not('the')
         .not('and')
         .out('tags')

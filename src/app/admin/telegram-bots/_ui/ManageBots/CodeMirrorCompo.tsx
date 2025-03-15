@@ -153,42 +153,33 @@ export function CodeMirrorCompo({ value, onChange }: any) {
     }, [value])
 
     let options = useMemo(() => {
-        let handleSuggestions = (cm, option) => {
+        let handleSuggestions = (cm: any) => {
             return new Promise(async (resolve, reject) => {
                 let Pos = await import('codemirror').then((r) => r.Pos)
 
                 let run = async () => {
-                    var suggs = useMirror.getState().suggestions
+                    var suggs = useMirror.getState().suggestions as any[]
 
                     // console.log(JSON.stringify(suggs, null, '  '))
                     var cursor = cm.getCursor(),
                         line = cm.getLine(cursor.line)
+
                     var start = cursor.ch,
                         end = cursor.ch
                     while (start && /\w/.test(line.charAt(start - 1))) --start
                     while (end < line.length && /\w/.test(line.charAt(end))) ++end
                     var word = line.slice(start, end).toLowerCase()
 
-                    // let flatMe = (c, arr) => {
-                    //     arr.forEach((i) => {
-                    //         if (!c.includes(i)) {
-                    //             i = i.replace(/_/, ' ')
-                    //             c.push(i)
-                    //         }
-                    //     })
-                    //     c = uniq(c)
-                    //     return c
-                    // }
-
-                    for (var i = 0; i < suggs.length; i++) {
-                        if (suggs[i].indexOf(word) !== -1) {
+                    for (let sug of suggs) {
+                        if (sug.indexOf(word) !== -1) {
                             return resolve({
-                                list: suggs[i].filter((e) => e),
+                                list: sug.filter((e: any) => e),
                                 from: Pos(cursor.line, start),
                                 to: Pos(cursor.line, end),
                             })
                         }
                     }
+
                     return resolve(null)
                 }
 
