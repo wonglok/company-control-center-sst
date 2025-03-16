@@ -8,16 +8,7 @@ import 'codemirror/addon/hint/show-hint.css'
 import { procFQL } from './procFQL'
 import { create } from 'zustand'
 
-const useMirror = create<{
-    cm: any
-    api: any
-    suggestions: {}
-    value: ''
-    ctx: {}
-    dictionary: {}
-    CodeMirror: any
-    reload: () => void
-}>((): any => {
+const useMirror = create<any>(() => {
     return {
         //
         dictionary: {},
@@ -33,15 +24,15 @@ export function CodeMirrorCompo({ value, onChange }: any) {
 
     useEffect(() => {
         import('codemirror')
-            .then((r) => r.defineMode)
-            .then(async (defineMode) => {
+            .then((r) => r)
+            .then(async (CodeMirror) => {
                 // @ts-ignore
                 await import('codemirror/keymap/sublime.js')
                 // @ts-ignore
                 await import('codemirror/addon/hint/show-hint.js')
                 // await import('codemirror/addon/hint/show-hint.css')
 
-                defineMode('funQueryLanguage', () => {
+                CodeMirror.defineMode('funQueryLanguage', () => {
                     let parserState = {
                         curlyQuoteIsOpen: false,
                         curlyQuoteName: 'Quote',
