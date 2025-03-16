@@ -42,7 +42,7 @@ export function CodeMirrorCompo({ value, onChange }: any) {
                 // await import('codemirror/addon/hint/show-hint.css')
 
                 defineMode('funQueryLanguage', () => {
-                    var parserState = {
+                    let parserState = {
                         curlyQuoteIsOpen: false,
                         curlyQuoteName: 'Quote',
                     }
@@ -122,25 +122,25 @@ export function CodeMirrorCompo({ value, onChange }: any) {
             ['posts', 'comments', 'settings'],
         ]
 
-        let dictionary = ans.dictionary
+        let dictionary: any = ans.dictionary
 
         let dictionaryKNs = Object.keys(dictionary)
 
-        let getOther = ({ kn }: any) => {
+        let getOther = ({ keyname }: any) => {
             return dictionaryKNs
                 .filter((ekn) => {
-                    return ekn !== kn
+                    return ekn !== keyname
                 })
                 .filter((ekn) => {
-                    return dictionary[ekn].includes(dictionary[kn][0])
+                    return dictionary[ekn].includes(dictionary[keyname][0])
                 })
         }
 
         // forEach Word
-        dictionaryKNs.forEach((kn) => {
-            let other = getOther({ kn })
+        dictionaryKNs.forEach((keyname) => {
+            let other = getOther({ keyname: keyname })
             if (other.length > 0) {
-                suggestions.push([kn, ...other])
+                suggestions.push([keyname, ...other])
             }
         })
 
@@ -158,17 +158,17 @@ export function CodeMirrorCompo({ value, onChange }: any) {
                 let Pos = await import('codemirror').then((r) => r.Pos)
 
                 let run = async () => {
-                    var suggs = useMirror.getState().suggestions as any[]
+                    let suggs = useMirror.getState().suggestions as any[]
 
                     // console.log(JSON.stringify(suggs, null, '  '))
-                    var cursor = cm.getCursor(),
+                    let cursor = cm.getCursor(),
                         line = cm.getLine(cursor.line)
 
-                    var start = cursor.ch,
+                    let start = cursor.ch,
                         end = cursor.ch
                     while (start && /\w/.test(line.charAt(start - 1))) --start
                     while (end < line.length && /\w/.test(line.charAt(end))) ++end
-                    var word = line.slice(start, end).toLowerCase()
+                    let word = line.slice(start, end).toLowerCase()
 
                     for (let sug of suggs) {
                         if (sug.indexOf(word) !== -1) {
