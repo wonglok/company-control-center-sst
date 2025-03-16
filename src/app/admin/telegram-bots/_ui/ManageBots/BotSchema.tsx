@@ -19,31 +19,15 @@ import { useEffect, useRef, useState } from 'react'
 import { listConnectionToken } from '@/actions/connectionTokens/listConnectionToken'
 import { putTelegramBot } from '@/actions/telegram/putTelegramBot'
 import { toast } from 'sonner'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { listTelegramBot } from '@/actions/telegram/listTelegramBot'
-import { useBots } from '../useBots'
-import { Editor } from '@monaco-editor/react'
-import { DialogClose } from '@radix-ui/react-dialog'
-
-// @ts-ignore
-import md2json from 'md-2-json'
-
-// @ts-ignore
-import * as mdjs from '@moox/markdown-to-json'
 
 import { unified } from 'unified'
 import remarkParse from 'remark-parse'
 // import { generateTasks } from '@/actions/taskAI/generateTasks'
 // import { UnControlled as CodeMirror } from 'react-codemirror2'
 import { CodeMirrorCompo } from './CodeMirrorCompo'
-import { procFQL } from './procFQL'
 import { useBot } from '../../schema/[botID]/useBot'
 
-const processor = unified().use(remarkParse)
-
-export function BotSchema() {
-    let bot = useBot((r) => r.bot)
+export function BotSchema({ bot }: any) {
     let save = ({ bot }: any) => {
         putTelegramBot({
             item: {
@@ -77,21 +61,29 @@ export function BotSchema() {
                     if (ev.metaKey && ev.key === 's') {
                         ev.stopPropagation()
                         ev.preventDefault()
-                        save({ bot })
+
+                        let bot = useBot.getState().bot
+
+                        if (bot) {
+                            clearTimeout(refTimer.current)
+                            refTimer.current = setTimeout(() => {
+                                save({ bot })
+                            }, 1000)
+                        }
                     }
                 }}
             >
                 <div className='w-2/3 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
-                    {bot && (
+                    {
                         <CodeMirrorCompo
-                            save={({ bot }: any) => {
+                            autoSave={({ bot }: any) => {
                                 clearTimeout(refTimer.current)
                                 refTimer.current = setTimeout(() => {
                                     save({ bot })
-                                }, 500)
+                                }, 1000)
                             }}
                         ></CodeMirrorCompo>
-                    )}
+                    }
                 </div>
 
                 <div className='w-1/3 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>

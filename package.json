@@ -59,6 +59,7 @@
     "codemirror": "5",
     "compromise": "^11.14.3",
     "copy-to-clipboard": "^3.3.3",
+    "extract-urls": "^1.4.1",
     "file-loader": "^6.2.0",
     "glslify-loader": "^2.0.0",
     "jose": "^5.9.6",

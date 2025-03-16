@@ -4,23 +4,275 @@ import CodeMirrorReact from 'react-codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/addon/hint/show-hint.css'
 
-//@ts-ignore
-import { procFQL } from './procFQL'
 import { create } from 'zustand'
 import { useBot } from '../../schema/[botID]/useBot'
-import { BotSchema } from './BotSchema'
+import nlp from 'compromise'
+
+// @ts-ignore
+import md2json from 'md-2-json'
+
+// @ts-ignore
+import extractURLs from 'extract-urls'
 
 const useMirror = create<any>(() => {
     return {
         //
-        dictionary: {},
+        value: '',
+        highlight: {},
         reload: () => {},
         suggestion: {},
         //
     }
 })
 
-export function CodeMirrorCompo({ save }: any) {
+// let getID = () => {
+//     return `_` + (Math.random() * 1000000000).toFixed(0)
+// }
+
+const css = /* css */ `
+.cm-URLToken{
+  border-bottom: rgb(31, 202, 173) solid 2px;
+}
+.cm-TableToken{
+  font-weight: bold;
+  border-bottom: rgb(31, 202, 173) solid 2px;
+}
+.cm-HolderToken{
+  font-weight: bold;
+  border-bottom: rgb(202, 108, 31) dashed 2px;
+}
+.cm-ResultInstnace{
+  font-weight: bold;
+  border-bottom: rgb(202, 31, 165) dashed 2px;
+}
+.cm-FieldToken{
+  font-weight: bold;
+  border-bottom: rgb(202, 122, 31) dashed 2px;
+}
+.cm-OrderToken{
+  font-weight: bold;
+  border-bottom: rgb(31, 191, 202) dashed 2px;
+}
+.cm-NumberToken{
+  font-weight: bold;
+  background-color: rgb(176, 224, 228);
+}
+`
+
+const procFQL = ({ query }: any) => {
+    // Context
+    let globals: { [key: string]: any } = {
+        dbs: [],
+        sections: [],
+    }
+    let highlight = {}
+
+    nlp.plugin({
+        tags: {},
+        words: highlight,
+        patterns: {},
+        regex: {},
+        plurals: {},
+    })
+
+    query
+        .split(/(###.|##.|#.)/)
+        .map((r: string) => r.trim())
+        .filter((e: any) => e.trim() !== '#')
+        .filter((e: any) => e.trim() !== '##')
+        .filter((e: any) => e.trim() !== '###')
+        .filter((e: any) => e.trim())
+        .forEach((sentence: string) => {
+            let [title, ...contents] = sentence.split('\n')
+
+            let section = {
+                title: title,
+                type: 'section',
+                info: [],
+            }
+
+            if (title.includes('everyday')) {
+                section.type = 'repeat-task'
+            }
+
+            contents.forEach((content) => {
+                procSentence({ command: `${content}`, highlight, globals, section })
+            })
+
+            globals.sections.push(section)
+        })
+
+    return JSON.parse(
+        JSON.stringify({
+            globals,
+            highlight,
+        }),
+    )
+}
+
+const procSentence = ({ command, highlight, globals, section, steps }: { command: string } | any) => {
+    let cleanID = (text: string) => {
+        const match = `${text || ''}`.match(/\w+/)
+        return match ? match[0] : null
+    }
+    let addBucket = ({ holderObj }: any) => {
+        section.info.push(holderObj)
+    }
+
+    let tagsToLexicon = ({ lexicon, keyname, tagsToAdd }: any) => {
+        let lexArr = (lexicon[keyname] = lexicon[keyname] || [])
+        tagsToAdd.forEach((tag: any) => {
+            if (!lexArr.includes(tag)) {
+                lexArr.unshift(tag)
+            }
+        })
+    }
+
+    let holder: any = {
+        type: '',
+        id: '',
+    }
+
+    section.text = command
+
+    nlp(command)
+        .match(`provide me a [.] database called [.]`)
+        .not('the')
+        .not('and')
+        .out('tags')
+        .forEach((entry: any, idx: number) => {
+            if (idx === 0) {
+                holder.type = cleanID(entry.text)
+            }
+            if (idx === 1) {
+                holder.id = cleanID(entry.text)
+                tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
+                addBucket({ holderObj: holder })
+            }
+        })
+
+    nlp(command)
+        .match(`provide me a system database called [.]`)
+        .not('the')
+        .not('and')
+        .out('tags')
+        .forEach((entry: any) => {
+            holder.type = 'system'
+            holder.id = cleanID(entry.text)
+            tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
+            // addBucket({ holderName: cleanID(entry.text), holderObj: holder })
+        })
+
+    command
+        .split('\n')
+        .filter((r: string) => r)
+        .forEach((subCommand: string) => {
+            if (subCommand.startsWith('fetch data from')) {
+                let urls = nlp(subCommand).urls().out('array')
+
+                let targetDB = nlp(command).match(`add to [.]`).not('the').not('and').out('array')[0]
+
+                tagsToLexicon({ lexicon: highlight, keyname: targetDB, tagsToAdd: ['HolderToken'] })
+
+                tagsToLexicon({ lexicon: highlight, keyname: urls[0], tagsToAdd: ['URLToken'] })
+            }
+
+            //
+        })
+
+    // nlp(command)
+    //     .match(`fetch data from [*]`)
+    //     .not('the')
+    //     .not('and')
+    //     .out('tags')
+    //     .forEach((entry: any) => {
+    //         query.table = cleanID(entry.text)
+    //         addQuery({ query })
+    //         tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['TableToken'] })
+    //     })
+
+    // if (command.toLowerCase().indexOf('go get some data') !== -1) {
+
+    //     // , just skip [.] items and get the first [.]
+    //     nlp(command)
+    //         .match(`store results in [.] and`)
+    //         .not('the')
+    //         .not('and')
+    //         .out('tags')
+    //         .forEach((entry) => {
+    //             query.bucket = cleanID(entry.text)
+    //         })
+
+    //     nlp(command)
+    //         .match(`#HolderToken? and name it with [.] label`)
+    //         .not('the')
+    //         .not('and')
+    //         .out('tags')
+    //         .forEach((entry, idx) => {
+    //             if (idx === 0) {
+    //                 query.id = cleanID(entry.text)
+    //                 tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['ResultInstnace'] })
+    //             }
+    //         })
+
+    //     nlp(command)
+    //         .match(`#HolderToken? look for [.] with ID [.] in it?`)
+    //         .not('the')
+    //         .not('and')
+    //         .out('tags')
+    //         .forEach((entry, idx) => {
+    //             if (idx === 0) {
+    //                 query.lookForField = cleanID(entry.text)
+    //                 tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['FieldToken'] })
+    //             } else if (idx === 1) {
+    //                 query.lookForID = Number(cleanID(entry.text))
+    //                 tagsToLexicon({ lexicon: highlight, keyname: 'ID ' + cleanID(entry.text), tagsToAdd: ['IDToken'] })
+    //             }
+    //         })
+
+    //     // nlp(command)
+    //     //   .match(`skip [*] items and get the first [*]`)
+    //     //   .not('the')
+    //     //   .not('and')
+    //     //   .out('tags')
+    //     //   .forEach((entry, idx) => {
+    //     //     if (idx === 0) {
+    //     //       query.skip = cleanID(entry.text)
+    //     //     } else if (idx === 1) {
+    //     //       query.limit = Number(cleanID(entry.text))
+    //     //     }
+    //     //   })
+
+    //     nlp(command)
+    //         .match(`sort with [.] order`)
+    //         .not('the')
+    //         .not('and')
+    //         .out('tags')
+    //         .forEach((entry, idx) => {
+    //             if (idx === 0) {
+    //                 query.sort = cleanID(entry.text).toUpperCase()
+    //                 tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['OrderToken'] })
+    //             }
+    //         })
+
+    //     nlp(command)
+    //         .match(`skip [.] items and get the first [.] items`)
+    //         .not('the')
+    //         .not('and')
+    //         .out('tags')
+    //         .forEach((entry, idx) => {
+    //             if (idx === 0) {
+    //                 query.skip = cleanID(entry.text).toUpperCase()
+    //                 tagsToLexicon({ lexicon: highlight, keyname: 'skip ' + cleanID(entry.text), tagsToAdd: ['NumberToken'] })
+    //             } else if (idx === 1) {
+    //                 query.limit = cleanID(entry.text).toUpperCase()
+    //                 tagsToLexicon({ lexicon: highlight, keyname: 'first ' + cleanID(entry.text), tagsToAdd: ['NumberToken'] })
+    //             }
+    //         })
+    // }
+}
+
+export function CodeMirrorCompo({ autoSave }: any) {
     let bot = useBot((r) => r.bot)
 
     let [ready, setReady] = useState<false | true>(false)
@@ -33,15 +285,14 @@ export function CodeMirrorCompo({ save }: any) {
                 await import('codemirror/keymap/sublime.js')
                 // @ts-ignore
                 await import('codemirror/addon/hint/show-hint.js')
-                // await import('codemirror/addon/hint/show-hint.css')
 
                 useMirror.setState({
                     CodeMirror: CodeMirror,
                 })
                 CodeMirror.defineMode('funQueryLanguage', () => {
                     var parserState = {
-                        curlyQuoteIsOpen: false,
-                        curlyQuoteName: 'Quote',
+                        curlyShortCodeIsOpen: false,
+                        curlyShortCodeName: 'ShortCode',
                     }
 
                     return {
@@ -49,13 +300,15 @@ export function CodeMirrorCompo({ save }: any) {
                             let title = ''
                             let quote = ''
                             let detectedType: any = null
+                            let streamText = stream.string
 
-                            let dictionary: any = useMirror.getState().dictionary
+                            let highlight: any = useMirror.getState().highlight
+                            let bot: any = useMirror.getState().bot
 
-                            Object.keys(dictionary || {}).forEach((kn) => {
+                            Object.keys(highlight || {}).forEach((kn) => {
                                 if (detectedType === null) {
                                     if (stream.match(kn)) {
-                                        let detected = dictionary[kn][0]
+                                        let detected = highlight[kn][0]
                                         detectedType = detected
                                     } else {
                                         detectedType = null
@@ -71,53 +324,7 @@ export function CodeMirrorCompo({ save }: any) {
                                 title += ' ParagraphTitle-1'
                             }
 
-                            if (stream.string.match(/}/, false)) {
-                                quote = parserState.curlyQuoteName = 'Quote'
-                                // parserState.curlyQuoteIsOpen = false
-                            }
-                            if (stream.string.match(/\+}/, false)) {
-                                quote = parserState.curlyQuoteName = 'StarQuote'
-                                // parserState.curlyQuoteIsOpen = false
-                            }
-                            if (stream.string.match(/\+\+}/, false)) {
-                                quote = parserState.curlyQuoteName = 'DoubleStarQuote'
-                                // parserState.curlyQuoteIsOpen = false
-                            }
-
-                            if (stream.string.match(/-}/, false)) {
-                                quote = parserState.curlyQuoteName = 'HiddenQuote'
-                                // parserState.curlyQuoteIsOpen = false
-                            }
-                            if (stream.string.match(/--}/, false)) {
-                                quote = parserState.curlyQuoteName = 'DoubleHiddenQuote'
-                                // parserState.curlyQuoteIsOpen = false
-                            }
-
-                            if (stream.string.match(/\+-}/, false)) {
-                                quote = parserState.curlyQuoteName = 'ControversialQuote'
-                                // parserState.curlyQuoteIsOpen = false
-                            }
-                            if (stream.string.match(/-\+}/, false)) {
-                                quote = parserState.curlyQuoteName = 'ControversialQuote'
-                                // parserState.curlyQuoteIsOpen = false
-                            }
-
-                            if (stream.match(/{/, false)) {
-                                parserState.curlyQuoteIsOpen = true
-                            }
-
-                            if (stream.match(/}/, false)) {
-                                quote = parserState.curlyQuoteName
-                                parserState.curlyQuoteIsOpen = false
-                            }
-
-                            if (parserState.curlyQuoteIsOpen) {
-                                quote = parserState.curlyQuoteName
-                            } else {
-                                parserState.curlyQuoteName = 'Quote'
-                            }
-
-                            let output = (detectedType ? detectedType + ' ' : '') + title + quote
+                            let output = `${detectedType || ''} ${title} ${streamText} ${quote} ${bot?.botSchema || ''}`
                             if (detectedType === null) {
                                 stream.next()
                             }
@@ -133,35 +340,32 @@ export function CodeMirrorCompo({ save }: any) {
         return () => {}
     }, [])
 
-    useEffect(() => {
-        let value = bot.botSchema
-        if (!value) {
-            return
-        }
+    let onChangeBot = ({ value }: any) => {
+        let result = procFQL({ query: value })
 
-        let ans = procFQL({ query: value })
-
-        let suggestions = [
+        let suggestions: any = [
             //
-            ['posts', 'comments', 'settings'],
+            // ['posts', 'comments', 'settings'],
         ]
 
-        let dictionary: any = ans.dictionary
+        let highlight: any = result.highlight
 
-        let dictionaryKNs = Object.keys(dictionary)
+        console.log(highlight)
+
+        let highlightKNs = Object.keys(highlight)
 
         let getOther = ({ keyname }: any) => {
-            return dictionaryKNs
+            return highlightKNs
                 .filter((ekn) => {
                     return ekn !== keyname
                 })
                 .filter((ekn) => {
-                    return dictionary[ekn].includes(dictionary[keyname][0])
+                    return highlight[ekn].includes(highlight[keyname][0])
                 })
         }
 
         // forEach Word
-        dictionaryKNs.forEach((keyname) => {
+        highlightKNs.forEach((keyname) => {
             let other = getOther({ keyname: keyname })
             if (other.length > 0) {
                 suggestions.push([keyname, ...other])
@@ -170,24 +374,49 @@ export function CodeMirrorCompo({ save }: any) {
 
         useMirror.setState({
             suggestions,
-            ctx: ans.ctx,
-            dictionary: ans.dictionary,
+            highlight: result.highlight,
         })
 
         let newBot = {
             ...bot,
-            botSchema: bot.botSchema,
+            botSchema: value,
             json: {
-                ...ans,
+                ...result,
             },
         }
-        save({ bot: newBot })
 
-        //
-        useBot.setState({
-            bot: newBot,
-        })
-    }, [bot.botSchema])
+        autoSave({ bot: newBot })
+
+        useBot.setState({ bot: newBot })
+
+        let self = useMirror.getState()
+        if (self.cm) {
+            // let cursor = self.cm.getCursor()
+
+            // let nullVal: any = null
+
+            // self.CodeMirror.commands.autocomplete(self.cm, nullVal, { completeSingle: true })
+            self.CodeMirror.commands.undo(self.cm)
+            self.CodeMirror.commands.redo(self.cm)
+            // self.cm.setCursor({ line: cursor.line, ch: cursor.ch })
+        }
+    }
+
+    let value = useMirror((r) => r.value)
+
+    useEffect(() => {
+        if (bot) {
+            useMirror.setState({
+                value: bot?.botSchema,
+            })
+        }
+    }, [])
+
+    useEffect(() => {
+        if (value) {
+            onChangeBot({ value })
+        }
+    }, [value])
 
     let options = useMemo(() => {
         let handleSuggestions = (cm: any) => {
@@ -198,13 +427,16 @@ export function CodeMirrorCompo({ save }: any) {
                     let suggs = (useMirror.getState().suggestions as any[]) || []
 
                     // console.log(JSON.stringify(suggs, null, '  '))
+
                     let cursor = cm.getCursor(),
                         line = cm.getLine(cursor.line)
 
                     let start = cursor.ch,
                         end = cursor.ch
+
                     while (start && /\w/.test(line.charAt(start - 1))) --start
                     while (end < line.length && /\w/.test(line.charAt(end))) ++end
+
                     let word = line.slice(start, end).toLowerCase()
 
                     for (let sug of suggs) {
@@ -260,7 +492,7 @@ export function CodeMirrorCompo({ save }: any) {
             let self = useMirror.getState()
             if (self.cm) {
                 let cursor = self.cm.getCursor()
-                let nowCursor = JSON.stringify(cursor)
+                let nowCursor = JSON.stringify(cursor) + bot.botSchema
                 if (nowCursor === lastCursor) {
                     return
                 } else {
@@ -269,10 +501,6 @@ export function CodeMirrorCompo({ save }: any) {
                 let nullVal: any = null
 
                 self.CodeMirror.commands.autocomplete(self.cm, nullVal, { completeSingle: true })
-
-                // self.CodeMirror.commands.undo(self.cm)
-                // self.CodeMirror.commands.redo(self.cm)
-                // self.cm.setCursor({ line: cursor.line, ch: cursor.ch })
             }
         }
 
@@ -283,7 +511,7 @@ export function CodeMirrorCompo({ save }: any) {
         return () => {
             clearInterval(tt)
         }
-    }, [])
+    }, [bot.botSchema])
 
     //
 
@@ -307,7 +535,13 @@ export function CodeMirrorCompo({ save }: any) {
                     className='h-full codemirrorbox'
                     value={bot.botSchema}
                     onChange={async (value: any, event: any) => {
-                        useBot.setState({ bot: { ...bot, botSchema: value } })
+                        useMirror.setState({
+                            value: value,
+                        })
+
+                        // let newBot = { ...bot, botSchema: value }
+                        // useBot.setState({ bot: newBot })
+                        // onChangeBot({ bot: newBot })
                     }}
                     options={options}
                 />
@@ -315,34 +549,13 @@ export function CodeMirrorCompo({ save }: any) {
             <style
                 dangerouslySetInnerHTML={{
                     __html: /* css */ `
+${css}
 
-.cm-TableInstance{
-  font-weight: bold;
-  border-bottom: rgb(31, 202, 173) solid 2px;
-}
-.cm-HolderInstance{
-  font-weight: bold;
-  border-bottom: rgb(202, 108, 31) dashed 2px;
-}
-.cm-ResultInstnace{
-  font-weight: bold;
-  border-bottom: rgb(202, 31, 165) dashed 2px;
-}
-.cm-FieldInstance{
-  font-weight: bold;
-  border-bottom: rgb(202, 122, 31) dashed 2px;
-}
-.cm-OrderInstance{
-  font-weight: bold;
-  border-bottom: rgb(31, 191, 202) dashed 2px;
-}
-.cm-NumberInstance{
-  font-weight: bold;
-  background-color: rgb(176, 224, 228);
+.cm-ShortCode{
+  background: rgb(253, 255, 134, 0.55);
 }
 
-
-.cm-IDInstance{
+.cm-IDToken{
   font-weight: bold;
   border-bottom: rgb(31, 139, 202) dashed 2px;
 }
