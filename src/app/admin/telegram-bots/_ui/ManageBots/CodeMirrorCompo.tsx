@@ -64,7 +64,6 @@ const css = /* css */ `
 const procFQL = ({ query }: any) => {
     // Context
     let globals: { [key: string]: any } = {
-        dbs: [],
         sections: [],
     }
     let highlight = {}
@@ -78,8 +77,8 @@ const procFQL = ({ query }: any) => {
     })
 
     query
-        .split(/(###.|##.|#.)/)
-        .map((r: string) => r.trim())
+        .split(/(###|##.|#.)/)
+        .map((r: string) => r)
         .filter((e: any) => e.trim() !== '#')
         .filter((e: any) => e.trim() !== '##')
         .filter((e: any) => e.trim() !== '###')
@@ -87,20 +86,21 @@ const procFQL = ({ query }: any) => {
         .forEach((sentence: string) => {
             let [title, ...contents] = sentence.split('\n')
 
-            let section = {
+            let section: any = {
                 title: title.trim(),
                 type: 'section',
-                time: '',
-                metadata: {},
+            }
+
+            if (title.includes('resources:')) {
+                section.type = 'resources'
             }
 
             if (title.includes('everyday:')) {
                 section.type = 'everyday-task'
                 section.time = nlp(title).dates().text()
             }
-            if (title.includes('bot feature:')) {
-                section.type = 'bot-feature'
-                section.time = nlp(title).dates().text()
+            if (title.includes('bot:')) {
+                section.type = 'bot'
             }
 
             contents.forEach((content) => {
@@ -122,9 +122,6 @@ const procSentence = ({ command, highlight, globals, section, steps }: { command
     let cleanID = (text: string) => {
         const match = `${text || ''}`.match(/\w+/)
         return match ? match[0] : null
-    }
-    let addDatabase = ({ holderObj }: any) => {
-        globals.dbs.push(holderObj)
     }
 
     let tagsToLexicon = ({ lexicon, keyname, tagsToAdd }: any) => {
@@ -149,10 +146,11 @@ const procSentence = ({ command, highlight, globals, section, steps }: { command
         .not('and')
         .out('tags')
         .forEach((entry: any, idx: number) => {
-            holder.type = 'user'
+            holder.type = 'userDB'
             holder.id = cleanID(entry.text)
             tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
-            addDatabase({ holderObj: holder })
+            section.db = section.db || []
+            section.db.push(holder)
         })
 
     nlp(command)
@@ -161,28 +159,52 @@ const procSentence = ({ command, highlight, globals, section, steps }: { command
         .not('and')
         .out('tags')
         .forEach((entry: any) => {
-            holder.type = 'system'
+            holder.type = 'systemDB'
             holder.id = cleanID(entry.text)
             tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
-            addDatabase({ holderObj: holder })
+            section.db = section.db || []
+            section.db.push(holder)
         })
 
-    command
-        .split('\n')
-        .filter((r: string) => r)
-        .forEach((subCommand: string) => {
-            if (subCommand.startsWith('fetch data from')) {
-                let urls = nlp(subCommand).urls().out('array')
+    nlp(command)
+        .match(`fetch data from [.] * save to [.]`)
+        .not('the')
+        .not('and')
+        .out('tags')
+        .forEach((entry: any, idx: number) => {
+            if (idx === 0) {
+                let urls = nlp(command).urls().out('array')
 
-                let targetDB = nlp(command).match(`add to [.]`).not('the').not('and').out('array')[0]
-
-                tagsToLexicon({ lexicon: highlight, keyname: targetDB, tagsToAdd: ['HolderToken'] })
-
-                tagsToLexicon({ lexicon: highlight, keyname: urls[0], tagsToAdd: ['URLToken'] })
+                urls.forEach((url: string) => {
+                    console.log(url)
+                })
             }
 
-            //
+            // holder.type = 'systemDB'
+            // holder.id = cleanID(entry.text)
+            // tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
+            // section.db = section.db || []
+            // section.db.push(holder)
         })
+
+    // command
+    //     .split('\n')
+    //     .filter((r: string) => r.trim())
+    //     .forEach((subCommand: string) => {
+    //         if (subCommand) {
+    //             let urls = nlp(subCommand).urls().out('array')
+
+    //             let targetDB = nlp(command).match(`add to [.]`).not('the').not('and').out('array')[0]
+
+    //             section.urls = urls
+    //             section.target = targetDB
+
+    //             tagsToLexicon({ lexicon: highlight, keyname: targetDB, tagsToAdd: ['HolderToken'] })
+    //             tagsToLexicon({ lexicon: highlight, keyname: urls[0], tagsToAdd: ['URLToken'] })
+    //         }
+
+    //         //
+    //     })
 
     // nlp(command)
     //     .match(`fetch data from [*]`)

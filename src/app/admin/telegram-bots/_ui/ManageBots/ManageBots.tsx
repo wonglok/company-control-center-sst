@@ -101,6 +101,7 @@ export function ManageBots({ config, jwt }: any) {
                                                     ...bot,
                                                     clientID: bot.itemID,
                                                     chatID: `${bot.chatID}`,
+                                                    verify: `${md5(bot.botToken)}`,
                                                     message: 'sending a test message from admin panel',
                                                 }),
                                             })
