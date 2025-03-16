@@ -50,13 +50,6 @@ export function ManageBots({ config, jwt }: any) {
         })
     }, [])
 
-    // let [aiDevices, setDevices] = useState([])
-    // useEffect(() => {
-    //     listConnectionToken().then((data: any) => {
-    //         setDevices(data)
-    //     })
-    // }, [])
-
     return (
         <Card>
             <CardHeader>

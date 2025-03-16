@@ -88,7 +88,6 @@ export default $config({
         const wss = new sst.aws.ApiGatewayWebSocket('SocketAPI')
 
         const SESSION_SECRET = new sst.Secret('SESSION_SECRET')
-        const DEEPSEEK_API_KEY = new sst.Secret('DEEPSEEK_API_KEY')
 
         const api = new sst.aws.ApiGatewayV2('RestAPI')
 
@@ -110,7 +109,6 @@ export default $config({
         }
 
         const getCommonLinks = () => [
-            DEEPSEEK_API_KEY,
             TelegramBotTable,
             ConnectionsTable,
             wss,

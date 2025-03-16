@@ -332,7 +332,6 @@ export function CodeMirrorCompo({ save }: any) {
   font-weight: bold;
   border-bottom: rgb(202, 122, 31) dashed 2px;
 }
-
 .cm-OrderInstance{
   font-weight: bold;
   border-bottom: rgb(31, 191, 202) dashed 2px;
@@ -342,13 +341,19 @@ export function CodeMirrorCompo({ save }: any) {
   background-color: rgb(176, 224, 228);
 }
 
+
+.cm-IDInstance{
+  font-weight: bold;
+  border-bottom: rgb(31, 139, 202) dashed 2px;
+}
+
 .codemirrorbox{
-  height: 500px;
+  height: 100%;
 }
 @keyframes fadeIn {
   0% {
     opacity: 0;
-    transform: perspective(500px) translateZ(-50px) translateY(50px) rotateX(-30deg);
+    transform: scale(1.0) perspective(500px) translateZ(-150px) translateY(100px) rotateX(-40deg);
   }
   100%{
     opacity: 1;
@@ -382,17 +387,7 @@ export function CodeMirrorCompo({ save }: any) {
 
   animation: fadeIn 0.5s cubic-bezier(0.075, 0.82, 0.165, 1) 0.2s 1 normal both;
 }
-.CodeMirror-hint {
-  margin-bottom: 5px;
-}
-.CodeMirror-hint:hover {
-  text-decoration: underline;
-}
-.CodeMirror-hint-active{
-  font-weight: bold;
-  color: green;
-  /* text-decoration: underline; */
-}
+
 .cm-ParagraphTitle-1{
   font-size: 35px;
   font-weight: bold;
@@ -408,10 +403,18 @@ export function CodeMirrorCompo({ save }: any) {
   border-bottom: rgb(31, 182, 202) dashed 2px;
 }
 
+////////
 
-.cm-IDInstance{
+.CodeMirror-hint {
+  margin-bottom: 5px;
+}
+.CodeMirror-hint:hover {
+  text-decoration: underline;
+}
+.CodeMirror-hint-active{
   font-weight: bold;
-  border-bottom: rgb(31, 139, 202) dashed 2px;
+  color: green;
+  /* text-decoration: underline; */
 }
 
 .cm-Table{

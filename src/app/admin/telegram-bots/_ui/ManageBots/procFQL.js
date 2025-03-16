@@ -8,7 +8,7 @@ export const procFQL = ({ query }) => {
     // Context
     let ctx = {
         queries: [],
-        buckets: [],
+        buckets: []
     }
     let dictionary = {
     }
@@ -25,32 +25,31 @@ export const procFQL = ({ query }) => {
         procSentence({ command: sentence, dictionary, ctx })
     })
 
-    console.log(dictionary)
+    //
+
     return {
         ctx,
         dictionary
     }
+
+    //
 }
 
 export const procSentence = ({ command, dictionary, ctx }) => {
     let cleanID = (text) => {
-        text = `${text}`
-        return text.match(/\w+/)[0] || ''
+        return text.match(/\w+/)[0] || null
     }
     let addBucket = ({ holderObj }) => {
-        ctx.buckets.push(holderObj)
+        ctx.buckets.push(JSON.parse(JSON.stringify(holderObj)))
     }
     let addQuery = ({ query }) => {
-        ctx.queries.push(query)
+        ctx.queries.push(JSON.parse(JSON.stringify(query)))
     }
-
-    let addWordToDictionary = ({ dictionary, keyname, tagsToAdd }) => {
-        dictionary[keyname] = dictionary[keyname] || []
-
-        let arrayInstnaces = dictionary[keyname]
+    let tagsToLexicon = ({ lexicon, keyname, tagsToAdd }) => {
+        let lexArr = lexicon[keyname] = lexicon[keyname] || []
         tagsToAdd.forEach((tag) => {
-            if (!arrayInstnaces.includes(tag)) {
-                arrayInstnaces.unshift(tag)
+            if (!lexArr.includes(tag)) {
+                lexArr.unshift(tag)
             }
         })
     }
@@ -65,29 +64,21 @@ export const procSentence = ({ command, dictionary, ctx }) => {
         id: '',
         bucket: ''
     }
-    nlp(command)
-        .match(`for everday, [.]`)
-        .not('the')
-        .not('and')
-        .out('tags')
-        .forEach((entry) => {
-            holder.id = cleanID(entry.text)
-            addWordToDictionary({ dictionary: dictionary, keyname: cleanID(entry.text), tagsToAdd: ['HolderInstance'] })
-            addBucket({ holderName: cleanID(entry.text), holderObj: holder })
-        })
 
     nlp(command)
-        .match(`make a bucket and call it [.]`)
+        .match(`make a data bucket and call it [.]`)
         .not('the')
         .not('and')
         .out('tags')
         .forEach((entry) => {
             holder.id = cleanID(entry.text)
-            addWordToDictionary({ dictionary: dictionary, keyname: cleanID(entry.text), tagsToAdd: ['HolderInstance'] })
+            tagsToLexicon({ lexicon: dictionary, keyname: cleanID(entry.text), tagsToAdd: ['HolderInstance'] })
             addBucket({ holderName: cleanID(entry.text), holderObj: holder })
         })
 
     if (command.toLowerCase().indexOf('go get some data') !== -1) {
+        //
+
         nlp(command)
             .match(`go get some data from [.] table`)
             .not('the')
@@ -96,9 +87,9 @@ export const procSentence = ({ command, dictionary, ctx }) => {
             .forEach((entry) => {
                 query.table = cleanID(entry.text)
                 addQuery({ query })
-                addWordToDictionary({ dictionary: dictionary, keyname: cleanID(entry.text), tagsToAdd: ['TableInstance'] })
+                tagsToLexicon({ lexicon: dictionary, keyname: cleanID(entry.text), tagsToAdd: ['TableInstance'] })
             })
-        // , just skip [.] items and get the first [.]
+
         nlp(command)
             .match(`store results in [.] and`)
             .not('the')
@@ -116,7 +107,7 @@ export const procSentence = ({ command, dictionary, ctx }) => {
             .forEach((entry, idx) => {
                 if (idx === 0) {
                     query.id = cleanID(entry.text)
-                    addWordToDictionary({ dictionary: dictionary, keyname: cleanID(entry.text), tagsToAdd: ['ResultInstnace'] })
+                    tagsToLexicon({ lexicon: dictionary, keyname: cleanID(entry.text), tagsToAdd: ['ResultInstnace'] })
                 }
             })
 
@@ -128,10 +119,10 @@ export const procSentence = ({ command, dictionary, ctx }) => {
             .forEach((entry, idx) => {
                 if (idx === 0) {
                     query.lookForField = cleanID(entry.text)
-                    addWordToDictionary({ dictionary: dictionary, keyname: cleanID(entry.text), tagsToAdd: ['FieldInstance'] })
+                    tagsToLexicon({ lexicon: dictionary, keyname: cleanID(entry.text), tagsToAdd: ['FieldInstance'] })
                 } else if (idx === 1) {
                     query.lookForID = Number(cleanID(entry.text))
-                    addWordToDictionary({ dictionary: dictionary, keyname: 'ID ' + cleanID(entry.text), tagsToAdd: ['IDInstance'] })
+                    tagsToLexicon({ lexicon: dictionary, keyname: 'ID ' + cleanID(entry.text), tagsToAdd: ['IDInstance'] })
                 }
             })
 
@@ -156,7 +147,7 @@ export const procSentence = ({ command, dictionary, ctx }) => {
             .forEach((entry, idx) => {
                 if (idx === 0) {
                     query.sort = cleanID(entry.text).toUpperCase()
-                    addWordToDictionary({ dictionary: dictionary, keyname: cleanID(entry.text), tagsToAdd: ['OrderInstance'] })
+                    tagsToLexicon({ lexicon: dictionary, keyname: cleanID(entry.text), tagsToAdd: ['OrderInstance'] })
                 }
             })
 
@@ -168,10 +159,10 @@ export const procSentence = ({ command, dictionary, ctx }) => {
             .forEach((entry, idx) => {
                 if (idx === 0) {
                     query.skip = cleanID(entry.text).toUpperCase()
-                    addWordToDictionary({ dictionary: dictionary, keyname: 'skip ' + cleanID(entry.text), tagsToAdd: ['NumberInstance'] })
+                    tagsToLexicon({ lexicon: dictionary, keyname: 'skip ' + cleanID(entry.text), tagsToAdd: ['NumberInstance'] })
                 } else if (idx === 1) {
                     query.limit = cleanID(entry.text).toUpperCase()
-                    addWordToDictionary({ dictionary: dictionary, keyname: 'first ' + cleanID(entry.text), tagsToAdd: ['NumberInstance'] })
+                    tagsToLexicon({ lexicon: dictionary, keyname: 'first ' + cleanID(entry.text), tagsToAdd: ['NumberInstance'] })
                 }
             })
     }

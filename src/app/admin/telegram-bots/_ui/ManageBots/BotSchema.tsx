@@ -64,13 +64,15 @@ export function BotSchema() {
 
     let formUI = (
         <form
+            //
             onSubmit={(ev) => {
                 ev.preventDefault()
             }}
+            //
             className='space-y-2'
         >
             <div
-                className='w-full flex space-x-3'
+                className='w-full h-[78vh] flex space-x-3'
                 onKeyDownCapture={(ev) => {
                     if (ev.metaKey && ev.key === 's') {
                         ev.stopPropagation()
@@ -79,7 +81,7 @@ export function BotSchema() {
                     }
                 }}
             >
-                <div className='w-1/2 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
+                <div className='w-2/3 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
                     {bot && (
                         <CodeMirrorCompo
                             save={({ bot }: any) => {
@@ -92,7 +94,7 @@ export function BotSchema() {
                     )}
                 </div>
 
-                <div className='w-1/2 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
+                <div className='w-1/3 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
                     {/*  */}
                     <pre className='w-full text-[12px] h-full whitespace-pre-wrap overflow-y-scroll'>
                         {JSON.stringify(bot.json, null, 2)}
