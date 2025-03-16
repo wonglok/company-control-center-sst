@@ -7,6 +7,8 @@ import 'codemirror/addon/hint/show-hint.css'
 import { create } from 'zustand'
 import { useBot } from '../../schema/[botID]/useBot'
 import nlp from 'compromise'
+import plg from 'compromise-dates'
+nlp.plugin(plg)
 
 // @ts-ignore
 import md2json from 'md-2-json'
@@ -86,13 +88,19 @@ const procFQL = ({ query }: any) => {
             let [title, ...contents] = sentence.split('\n')
 
             let section = {
-                title: title,
+                title: title.trim(),
                 type: 'section',
-                info: [],
+                time: '',
+                metadata: {},
             }
 
-            if (title.includes('everyday')) {
-                section.type = 'repeat-task'
+            if (title.includes('everyday:')) {
+                section.type = 'everyday-task'
+                section.time = nlp(title).dates().text()
+            }
+            if (title.includes('bot feature:')) {
+                section.type = 'bot-feature'
+                section.time = nlp(title).dates().text()
             }
 
             contents.forEach((content) => {
@@ -115,8 +123,8 @@ const procSentence = ({ command, highlight, globals, section, steps }: { command
         const match = `${text || ''}`.match(/\w+/)
         return match ? match[0] : null
     }
-    let addBucket = ({ holderObj }: any) => {
-        section.info.push(holderObj)
+    let addDatabase = ({ holderObj }: any) => {
+        globals.dbs.push(holderObj)
     }
 
     let tagsToLexicon = ({ lexicon, keyname, tagsToAdd }: any) => {
@@ -129,26 +137,22 @@ const procSentence = ({ command, highlight, globals, section, steps }: { command
     }
 
     let holder: any = {
-        type: '',
+        type: 'database',
         id: '',
     }
 
     section.text = command
 
     nlp(command)
-        .match(`provide me a [.] database called [.]`)
+        .match(`provide me a user database called [.]`)
         .not('the')
         .not('and')
         .out('tags')
         .forEach((entry: any, idx: number) => {
-            if (idx === 0) {
-                holder.type = cleanID(entry.text)
-            }
-            if (idx === 1) {
-                holder.id = cleanID(entry.text)
-                tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
-                addBucket({ holderObj: holder })
-            }
+            holder.type = 'user'
+            holder.id = cleanID(entry.text)
+            tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
+            addDatabase({ holderObj: holder })
         })
 
     nlp(command)
@@ -160,7 +164,7 @@ const procSentence = ({ command, highlight, globals, section, steps }: { command
             holder.type = 'system'
             holder.id = cleanID(entry.text)
             tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
-            // addBucket({ holderName: cleanID(entry.text), holderObj: holder })
+            addDatabase({ holderObj: holder })
         })
 
     command

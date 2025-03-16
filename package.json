@@ -58,6 +58,7 @@
     "clsx": "^2.1.1",
     "codemirror": "5",
     "compromise": "^11.14.3",
+    "compromise-dates": "^3.7.1",
     "copy-to-clipboard": "^3.3.3",
     "extract-urls": "^1.4.1",
     "file-loader": "^6.2.0",
