@@ -7,6 +7,8 @@ import 'codemirror/addon/hint/show-hint.css'
 //@ts-ignore
 import { procFQL } from './procFQL'
 import { create } from 'zustand'
+import { useBot } from '../../schema/[botID]/useBot'
+import { BotSchema } from './BotSchema'
 
 const useMirror = create<any>(() => {
     return {
@@ -18,8 +20,9 @@ const useMirror = create<any>(() => {
     }
 })
 
-export function CodeMirrorCompo({ value, onChange }: any) {
-    let ref = useRef<null | HTMLTextAreaElement>(null)
+export function CodeMirrorCompo({ save }: any) {
+    let bot = useBot((r) => r.bot)
+
     let [ready, setReady] = useState<false | true>(false)
 
     useEffect(() => {
@@ -32,18 +35,13 @@ export function CodeMirrorCompo({ value, onChange }: any) {
                 await import('codemirror/addon/hint/show-hint.js')
                 // await import('codemirror/addon/hint/show-hint.css')
 
+                useMirror.setState({
+                    CodeMirror: CodeMirror,
+                })
                 CodeMirror.defineMode('funQueryLanguage', () => {
-                    let parserState = {
+                    var parserState = {
                         curlyQuoteIsOpen: false,
                         curlyQuoteName: 'Quote',
-                    }
-
-                    let self = {
-                        // tables: [
-                        //     //
-                        //     'home_page_bucket',
-                        //     'menu_page_bucket',
-                        // ],
                     }
 
                     return {
@@ -65,14 +63,6 @@ export function CodeMirrorCompo({ value, onChange }: any) {
                                 }
                             })
 
-                            // self.tables.forEach((et) => {
-                            //     if (detectedType === null) {
-                            //         if (stream.match(et)) {
-                            //             detectedType = 'TableInstance'
-                            //         }
-                            //     }
-                            // })
-
                             if (stream.match(/### .+/g)) {
                                 title += ' ParagraphTitle-3'
                             } else if (stream.match(/## .+/g)) {
@@ -81,20 +71,58 @@ export function CodeMirrorCompo({ value, onChange }: any) {
                                 title += ' ParagraphTitle-1'
                             }
 
+                            if (stream.string.match(/}/, false)) {
+                                quote = parserState.curlyQuoteName = 'Quote'
+                                // parserState.curlyQuoteIsOpen = false
+                            }
+                            if (stream.string.match(/\+}/, false)) {
+                                quote = parserState.curlyQuoteName = 'StarQuote'
+                                // parserState.curlyQuoteIsOpen = false
+                            }
+                            if (stream.string.match(/\+\+}/, false)) {
+                                quote = parserState.curlyQuoteName = 'DoubleStarQuote'
+                                // parserState.curlyQuoteIsOpen = false
+                            }
+
+                            if (stream.string.match(/-}/, false)) {
+                                quote = parserState.curlyQuoteName = 'HiddenQuote'
+                                // parserState.curlyQuoteIsOpen = false
+                            }
+                            if (stream.string.match(/--}/, false)) {
+                                quote = parserState.curlyQuoteName = 'DoubleHiddenQuote'
+                                // parserState.curlyQuoteIsOpen = false
+                            }
+
+                            if (stream.string.match(/\+-}/, false)) {
+                                quote = parserState.curlyQuoteName = 'ControversialQuote'
+                                // parserState.curlyQuoteIsOpen = false
+                            }
+                            if (stream.string.match(/-\+}/, false)) {
+                                quote = parserState.curlyQuoteName = 'ControversialQuote'
+                                // parserState.curlyQuoteIsOpen = false
+                            }
+
+                            if (stream.match(/{/, false)) {
+                                parserState.curlyQuoteIsOpen = true
+                            }
+
+                            if (stream.match(/}/, false)) {
+                                quote = parserState.curlyQuoteName
+                                parserState.curlyQuoteIsOpen = false
+                            }
+
+                            if (parserState.curlyQuoteIsOpen) {
+                                quote = parserState.curlyQuoteName
+                            } else {
+                                parserState.curlyQuoteName = 'Quote'
+                            }
+
                             let output = (detectedType ? detectedType + ' ' : '') + title + quote
                             if (detectedType === null) {
                                 stream.next()
                             }
 
                             return output
-                            // if (stream.match('const')) {
-                            //   return 'style-a'
-                            // } else if (stream.match('bbb')) {
-                            //   return 'style-b'
-                            // } else {
-                            //   stream.next()
-                            //   return null
-                            // }
                         },
                     }
                 })
@@ -106,6 +134,11 @@ export function CodeMirrorCompo({ value, onChange }: any) {
     }, [])
 
     useEffect(() => {
+        let value = bot.botSchema
+        if (!value) {
+            return
+        }
+
         let ans = procFQL({ query: value })
 
         let suggestions = [
@@ -136,12 +169,25 @@ export function CodeMirrorCompo({ value, onChange }: any) {
         })
 
         useMirror.setState({
-            value,
             suggestions,
             ctx: ans.ctx,
             dictionary: ans.dictionary,
         })
-    }, [value])
+
+        let newBot = {
+            ...bot,
+            botSchema: bot.botSchema,
+            json: {
+                ...ans,
+            },
+        }
+        save({ bot: newBot })
+
+        //
+        useBot.setState({
+            bot: newBot,
+        })
+    }, [bot.botSchema])
 
     let options = useMemo(() => {
         let handleSuggestions = (cm: any) => {
@@ -149,7 +195,7 @@ export function CodeMirrorCompo({ value, onChange }: any) {
                 let Pos = await import('codemirror').then((r) => r.Pos)
 
                 let run = async () => {
-                    let suggs = useMirror.getState().suggestions as any[]
+                    let suggs = (useMirror.getState().suggestions as any[]) || []
 
                     // console.log(JSON.stringify(suggs, null, '  '))
                     let cursor = cm.getCursor(),
@@ -223,6 +269,7 @@ export function CodeMirrorCompo({ value, onChange }: any) {
                 let nullVal: any = null
 
                 self.CodeMirror.commands.autocomplete(self.cm, nullVal, { completeSingle: true })
+
                 // self.CodeMirror.commands.undo(self.cm)
                 // self.CodeMirror.commands.redo(self.cm)
                 // self.cm.setCursor({ line: cursor.line, ch: cursor.ch })
@@ -248,10 +295,6 @@ export function CodeMirrorCompo({ value, onChange }: any) {
                         if (api) {
                             let cm = api.getCodeMirror()
 
-                            cm.on('cursor', () => {
-                                console.log(123)
-                            })
-
                             import('codemirror').then((CodeMirror) => {
                                 useMirror.setState({
                                     CodeMirror,
@@ -262,23 +305,9 @@ export function CodeMirrorCompo({ value, onChange }: any) {
                         }
                     }}
                     className='h-full codemirrorbox'
-                    value={value}
+                    value={bot.botSchema}
                     onChange={async (value: any, event: any) => {
-                        //
-                        let self = useMirror.getState()
-                        if (self.cm) {
-                            let cursor = self.cm.getCursor()
-                            let nullVal: any = null
-
-                            self.CodeMirror.commands.autocomplete(self.cm, nullVal, { completeSingle: true })
-                            self.CodeMirror.commands.undo(self.cm)
-                            self.CodeMirror.commands.redo(self.cm)
-                            self.cm.setCursor({ line: cursor.line, ch: cursor.ch })
-
-                            useMirror.setState({
-                                value,
-                            })
-                        }
+                        useBot.setState({ bot: { ...bot, botSchema: value } })
                     }}
                     options={options}
                 />
@@ -331,7 +360,7 @@ export function CodeMirrorCompo({ value, onChange }: any) {
   font-family: 'Inconsolata', 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 17px;
+  font-size: 14px;
 }
 .CodeMirror-gutters{
   background-color: rgb(255,255,255,0.25);

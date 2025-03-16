@@ -25,6 +25,7 @@ export const procFQL = ({ query }) => {
         procSentence({ command: sentence, dictionary, ctx })
     })
 
+    console.log(dictionary)
     return {
         ctx,
         dictionary
@@ -64,9 +65,19 @@ export const procSentence = ({ command, dictionary, ctx }) => {
         id: '',
         bucket: ''
     }
+    nlp(command)
+        .match(`for everday, [.]`)
+        .not('the')
+        .not('and')
+        .out('tags')
+        .forEach((entry) => {
+            holder.id = cleanID(entry.text)
+            addWordToDictionary({ dictionary: dictionary, keyname: cleanID(entry.text), tagsToAdd: ['HolderInstance'] })
+            addBucket({ holderName: cleanID(entry.text), holderObj: holder })
+        })
 
     nlp(command)
-        .match(`make a data bucket and call it [.]`)
+        .match(`make a bucket and call it [.]`)
         .not('the')
         .not('and')
         .out('tags')
