@@ -138,6 +138,7 @@ export const sendMessage = async (event: LambdaFunctionURLEvent, context: any) =
     let verify = inbound.verify
 
     let botData = (await dyna
+        //
         .send(
             new GetItemCommand({
                 TableName: Resource.TelegramBotTable.name,
@@ -146,6 +147,7 @@ export const sendMessage = async (event: LambdaFunctionURLEvent, context: any) =
                 }),
             }),
         )
+        //
         .then((r) => {
             if (r.Item) {
                 return unmarshall(r.Item)
@@ -153,6 +155,7 @@ export const sendMessage = async (event: LambdaFunctionURLEvent, context: any) =
                 return false
             }
         })
+        //
         .catch((r) => {
             console.error(r)
 

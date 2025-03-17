@@ -73,7 +73,7 @@ export function BotSchema({ bot }: any) {
                     }
                 }}
             >
-                <div className='w-2/3 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
+                <div className='w-1/2 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
                     {
                         <CodeMirrorCompo
                             autoSave={({ bot }: any) => {
@@ -86,11 +86,9 @@ export function BotSchema({ bot }: any) {
                     }
                 </div>
 
-                <div className='w-1/3 rounded-2xl overflow-hidden border border-gray-300 p-2 shrink-0'>
+                <div className='w-1/2 rounded-2xl border border-gray-300 p-2 shrink-0 overflow-auto'>
                     {/*  */}
-                    <pre className='w-full text-[12px] h-full whitespace-pre-wrap overflow-y-scroll'>
-                        {JSON.stringify(bot.json, null, 2)}
-                    </pre>
+                    <pre className='w-full text-[10px] h-full whitespace-pre'>{JSON.stringify(bot.json, null, 4)}</pre>
                     {/*  */}
                 </div>
             </div>

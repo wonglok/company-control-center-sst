@@ -15,6 +15,7 @@ import md2json from 'md-2-json'
 
 // @ts-ignore
 import extractURLs from 'extract-urls'
+import { StringMap } from 'aws-lambda/trigger/cognito-user-pool-trigger/_common'
 
 const useMirror = create<any>(() => {
     return {
@@ -63,9 +64,7 @@ const css = /* css */ `
 
 const procFQL = ({ query }: any) => {
     // Context
-    let globals: { [key: string]: any } = {
-        sections: [],
-    }
+    let globals: { [key: string]: any } = {}
     let highlight = {}
 
     nlp.plugin({
@@ -76,39 +75,52 @@ const procFQL = ({ query }: any) => {
         plurals: {},
     })
 
-    query
-        .split(/(###|##.|#.)/)
-        .map((r: string) => r)
-        .filter((e: any) => e.trim() !== '#')
-        .filter((e: any) => e.trim() !== '##')
-        .filter((e: any) => e.trim() !== '###')
-        .filter((e: any) => e.trim())
-        .forEach((sentence: string) => {
-            let [title, ...contents] = sentence.split('\n')
-
-            let section: any = {
-                title: title.trim(),
-                type: 'section',
-            }
-
-            if (title.includes('resources:')) {
-                section.type = 'resources'
-            }
-
-            if (title.includes('everyday:')) {
-                section.type = 'everyday-task'
-                section.time = nlp(title).dates().text()
-            }
-            if (title.includes('bot:')) {
-                section.type = 'bot'
-            }
-
-            contents.forEach((content) => {
-                procSentence({ command: `${content}`, highlight, globals, section })
-            })
-
-            globals.sections.push(section)
+    let titles = query
+        .split('\n')
+        .filter((r: string) => {
+            return r.startsWith('### ') || r.startsWith('## ') || r.startsWith('# ')
         })
+        .filter((r: string) => r)
+
+    let allStr = query
+    titles.forEach((title: string) => {
+        allStr = allStr.replace(title, '____SPLITTER____' + title + '____IDX____')
+    })
+
+    let groups: string[] = allStr
+        .split('____SPLITTER____')
+        // .filter((r: string) => r)
+        .map((r: string) => {
+            let arr = r.split('____IDX____')
+
+            if (arr[0] && arr[1]) {
+                return {
+                    title: arr[0].trim(),
+                    text: arr[1].trim(),
+                    steps: arr[1]
+                        .trim()
+                        .split('\n')
+                        .filter((r: string) => r)
+                        .map((text) => {
+                            return {
+                                cmd: text,
+                            }
+                        }),
+                }
+            } else {
+                return false
+            }
+        })
+        .filter((r: any) => r)
+
+    groups.forEach((group: any) => {
+        group.steps.map((step: any) => {
+            procSentence({ title: group.title, command: step.cmd, highlight, globals, step, group })
+            return step
+        })
+    })
+
+    globals.groups = groups
 
     return JSON.parse(
         JSON.stringify({
@@ -118,7 +130,7 @@ const procFQL = ({ query }: any) => {
     )
 }
 
-const procSentence = ({ command, highlight, globals, section, steps }: { command: string } | any) => {
+const procSentence = ({ command, highlight, globals, group }: { command: string } | any) => {
     let cleanID = (text: string) => {
         const match = `${text || ''}`.match(/\w+/)
         return match ? match[0] : null
@@ -138,10 +150,8 @@ const procSentence = ({ command, highlight, globals, section, steps }: { command
         id: '',
     }
 
-    section.text = command
-
     nlp(command)
-        .match(`provide me a user database called [.]`)
+        .match(`create * user database (called|*) [.]`)
         .not('the')
         .not('and')
         .out('tags')
@@ -149,12 +159,12 @@ const procSentence = ({ command, highlight, globals, section, steps }: { command
             holder.type = 'userDB'
             holder.id = cleanID(entry.text)
             tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
-            section.db = section.db || []
-            section.db.push(holder)
+            group.database = group.database || []
+            group.database.push(holder)
         })
 
     nlp(command)
-        .match(`provide me a system database called [.]`)
+        .match(`create * system database (called|*) [.]`)
         .not('the')
         .not('and')
         .out('tags')
@@ -162,8 +172,8 @@ const procSentence = ({ command, highlight, globals, section, steps }: { command
             holder.type = 'systemDB'
             holder.id = cleanID(entry.text)
             tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
-            section.db = section.db || []
-            section.db.push(holder)
+            group.database = group.database || []
+            group.database.push(holder)
         })
 
     nlp(command)
@@ -315,47 +325,48 @@ export function CodeMirrorCompo({ autoSave }: any) {
                 useMirror.setState({
                     CodeMirror: CodeMirror,
                 })
+
                 CodeMirror.defineMode('funQueryLanguage', () => {
-                    var parserState = {
+                    let parserState = {
                         curlyShortCodeIsOpen: false,
                         curlyShortCodeName: 'ShortCode',
                     }
 
                     return {
                         token(stream: any, state: any) {
-                            let title = ''
-                            let quote = ''
-                            let detectedType: any = null
-                            let streamText = stream.string
+                            let outputStr = ''
+                            // let streamText = stream.string
 
-                            let highlight: any = useMirror.getState().highlight
-                            let bot: any = useMirror.getState().bot
+                            let highlight: any = useMirror.getState().highlight || {}
+                            let bot: any = useBot.getState().bot
 
-                            Object.keys(highlight || {}).forEach((kn) => {
-                                if (detectedType === null) {
-                                    if (stream.match(kn)) {
-                                        let detected = highlight[kn][0]
-                                        detectedType = detected
-                                    } else {
-                                        detectedType = null
-                                    }
+                            let foundHighlight = ''
+                            for (let kn in highlight) {
+                                if (stream.match(kn)) {
+                                    foundHighlight = ` ${highlight[kn][0]}`
+                                    outputStr += `${foundHighlight}`
                                 }
-                            })
+                            }
 
+                            let title = ''
                             if (stream.match(/### .+/g)) {
-                                title += ' ParagraphTitle-3'
+                                title = ' ParagraphTitle-3'
                             } else if (stream.match(/## .+/g)) {
-                                title += ' ParagraphTitle-2'
+                                title = ' ParagraphTitle-2'
                             } else if (stream.match(/# .+/g)) {
-                                title += ' ParagraphTitle-1'
+                                title = ' ParagraphTitle-1'
                             }
 
-                            let output = `${detectedType || ''} ${title} ${streamText} ${quote} ${bot?.botSchema || ''}`
-                            if (detectedType === null) {
+                            if (title !== '') {
+                                outputStr += title
+                            }
+
+                            if (outputStr !== '') {
+                                return outputStr
+                            } else {
                                 stream.next()
+                                return outputStr
                             }
-
-                            return output
                         },
                     }
                 })
@@ -366,7 +377,7 @@ export function CodeMirrorCompo({ autoSave }: any) {
         return () => {}
     }, [])
 
-    let onChangeBot = ({ value }: any) => {
+    let onChangeBot = ({ value, saveToDB = false }: any) => {
         let result = procFQL({ query: value })
 
         let suggestions: any = [
@@ -411,21 +422,11 @@ export function CodeMirrorCompo({ autoSave }: any) {
             },
         }
 
-        autoSave({ bot: newBot })
+        if (saveToDB) {
+            autoSave({ bot: newBot })
+        }
 
         useBot.setState({ bot: newBot })
-
-        let self = useMirror.getState()
-        if (self.cm) {
-            // let cursor = self.cm.getCursor()
-
-            // let nullVal: any = null
-
-            // self.CodeMirror.commands.autocomplete(self.cm, nullVal, { completeSingle: true })
-            self.CodeMirror.commands.undo(self.cm)
-            self.CodeMirror.commands.redo(self.cm)
-            // self.cm.setCursor({ line: cursor.line, ch: cursor.ch })
-        }
     }
 
     let value = useMirror((r) => r.value)
@@ -440,7 +441,7 @@ export function CodeMirrorCompo({ autoSave }: any) {
 
     useEffect(() => {
         if (value) {
-            onChangeBot({ value })
+            onChangeBot({ value, saveToDB: true })
         }
     }, [value])
 
@@ -564,10 +565,15 @@ export function CodeMirrorCompo({ autoSave }: any) {
                         useMirror.setState({
                             value: value,
                         })
+                        let self = useMirror.getState()
+                        if (self.cm) {
+                            // self.CodeMirror.commands.undo(self.cm)
+                            // self.CodeMirror.commands.redo(self.cm)
 
-                        // let newBot = { ...bot, botSchema: value }
-                        // useBot.setState({ bot: newBot })
-                        // onChangeBot({ bot: newBot })
+                            let cursor = self.cm.getCursor()
+                            self.CodeMirror.commands.autocomplete(self.cm, false, { completeSingle: true })
+                            self.cm.setCursor({ line: cursor.line, ch: cursor.ch })
+                        }
                     }}
                     options={options}
                 />
@@ -628,17 +634,18 @@ ${css}
 }
 
 .cm-ParagraphTitle-1{
-  font-size: 35px;
-  font-weight: bold;
+font-size: 25px;
+font-weight: bold;
   border-bottom: rgb(31, 182, 202) dashed 2px;
 }
 .cm-ParagraphTitle-2{
-  font-size: 25px;
-  font-weight: bold;
+font-size: 20px;
+font-weight: bold;
   border-bottom: rgb(31, 182, 202) dashed 2px;
 }
 .cm-ParagraphTitle-3{
-  font-weight: bold;
+    font-size: 17px;
+    font-weight: bold;
   border-bottom: rgb(31, 182, 202) dashed 2px;
 }
 
@@ -775,7 +782,7 @@ ${css}
 .listbox {
   padding: 0px;
 }
-              
+
 `,
                 }}
             ></style>
