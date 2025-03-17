@@ -81,10 +81,6 @@ const procFQL = ({ query }: any) => {
             return r.startsWith('### ') || r.startsWith('## ') || r.startsWith('# ')
         })
         .filter((r: string) => r)
-        .filter((r: string) => r.replace('###', ''))
-        .filter((r: string) => r.replace('##', ''))
-        .filter((r: string) => r.replace('#', ''))
-        .filter((r: string) => r)
 
     let allStr = query
     titles.forEach((title: string) => {
@@ -155,7 +151,7 @@ const procSentence = ({ command, highlight, globals, group }: { command: string 
     }
 
     nlp(command)
-        .match(`create * user database (called|*) [.]`)
+        .match(`provide * user database (called|*) [.]`)
         .not('the')
         .not('and')
         .out('tags')
@@ -168,7 +164,7 @@ const procSentence = ({ command, highlight, globals, group }: { command: string 
         })
 
     nlp(command)
-        .match(`create * system database (called|*) [.]`)
+        .match(`provide * system database (called|*) [.]`)
         .not('the')
         .not('and')
         .out('tags')
@@ -334,43 +330,108 @@ export function CodeMirrorCompo({ autoSave }: any) {
                     let parserState = {
                         curlyShortCodeIsOpen: false,
                         curlyShortCodeName: 'ShortCode',
+                        curlyQuoteName: '',
                     }
 
                     return {
                         token(stream: any, state: any) {
-                            let outputStr = ''
-                            // let streamText = stream.string
-
-                            let highlight: any = useMirror.getState().highlight || {}
-                            let bot: any = useBot.getState().bot
-
-                            let foundHighlight = ''
-                            for (let kn in highlight) {
-                                if (stream.match(kn)) {
-                                    foundHighlight = ` ${highlight[kn][0]}`
-                                    outputStr += `${foundHighlight}`
-                                }
-                            }
-
                             let title = ''
+                            let quote = ''
+                            let detectedType: any = null
+
+                            let self = useMirror.getState()
+
+                            Object.keys(self.highlight || {}).forEach((kn) => {
+                                if (detectedType === null) {
+                                    if (stream.match(kn)) {
+                                        let detected = self.highlight[kn][0]
+                                        detectedType = detected
+                                    } else {
+                                        detectedType = null
+                                    }
+                                }
+                            })
+
+                            // self.tables.forEach((et) => {
+                            //     if (detectedType === null) {
+                            //         detectedType = et.reduce((ans, item) => {
+                            //             // console.log(item)
+                            //             if (stream.match(item)) {
+                            //                 ans = 'TableInstance'
+                            //             }
+                            //             return ans
+                            //         }, null)
+                            //     }
+                            // })
+
                             if (stream.match(/### .+/g)) {
-                                title = ' ParagraphTitle-3'
+                                title += ' ParagraphTitle-3'
                             } else if (stream.match(/## .+/g)) {
-                                title = ' ParagraphTitle-2'
+                                title += ' ParagraphTitle-2'
                             } else if (stream.match(/# .+/g)) {
-                                title = ' ParagraphTitle-1'
+                                title += ' ParagraphTitle-1'
                             }
 
-                            if (title !== '') {
-                                outputStr += title
-                            }
+                            // if (stream.string.match(/}/, false)) {
+                            //     quote = parserState.curlyQuoteName = 'Quote'
+                            //     // parserState.curlyQuoteIsOpen = false
+                            // }
+                            // if (stream.string.match(/\+}/, false)) {
+                            //     quote = parserState.curlyQuoteName = 'StarQuote'
+                            //     // parserState.curlyQuoteIsOpen = false
+                            // }
+                            // if (stream.string.match(/\+\+}/, false)) {
+                            //     quote = parserState.curlyQuoteName = 'DoubleStarQuote'
+                            //     // parserState.curlyQuoteIsOpen = false
+                            // }
 
-                            if (outputStr !== '') {
-                                return outputStr
-                            } else {
+                            // if (stream.string.match(/-}/, false)) {
+                            //     quote = parserState.curlyQuoteName = 'HiddenQuote'
+                            //     // parserState.curlyQuoteIsOpen = false
+                            // }
+                            // if (stream.string.match(/--}/, false)) {
+                            //     quote = parserState.curlyQuoteName = 'DoubleHiddenQuote'
+                            //     // parserState.curlyQuoteIsOpen = false
+                            // }
+
+                            // if (stream.string.match(/\+-}/, false)) {
+                            //     quote = parserState.curlyQuoteName = 'ControversialQuote'
+                            //     // parserState.curlyQuoteIsOpen = false
+                            // }
+                            // if (stream.string.match(/-\+}/, false)) {
+                            //     quote = parserState.curlyQuoteName = 'ControversialQuote'
+                            //     // parserState.curlyQuoteIsOpen = false
+                            // }
+
+                            // if (stream.match(/{/, false)) {
+                            //     parserState.curlyQuoteIsOpen = true
+                            // }
+
+                            // if (stream.match(/}/, false)) {
+                            //     quote = parserState.curlyQuoteName
+                            //     parserState.curlyQuoteIsOpen = false
+                            // }
+
+                            // if (parserState.curlyQuoteIsOpen) {
+                            //     quote = parserState.curlyQuoteName
+                            // } else {
+                            //     parserState.curlyQuoteName = 'Quote'
+                            // }
+
+                            let output = (detectedType ? detectedType + ' ' : '') + title + quote
+                            if (detectedType === null) {
                                 stream.next()
-                                return outputStr
                             }
+
+                            return output
+                            // if (stream.match('const')) {
+                            //   return 'style-a'
+                            // } else if (stream.match('bbb')) {
+                            //   return 'style-b'
+                            // } else {
+                            //   stream.next()
+                            //   return null
+                            // }
                         },
                     }
                 })
@@ -569,15 +630,16 @@ export function CodeMirrorCompo({ autoSave }: any) {
                         useMirror.setState({
                             value: value,
                         })
-                        let self = useMirror.getState()
-                        if (self.cm) {
-                            // self.CodeMirror.commands.undo(self.cm)
-                            // self.CodeMirror.commands.redo(self.cm)
 
-                            let cursor = self.cm.getCursor()
-                            self.CodeMirror.commands.autocomplete(self.cm, false, { completeSingle: true })
-                            self.cm.setCursor({ line: cursor.line, ch: cursor.ch })
-                        }
+                        setTimeout(() => {
+                            let self = useMirror.getState()
+                            if (self.cm) {
+                                // self.CodeMirror.commands.undo(self.cm)
+                                // self.CodeMirror.commands.redo(self.cm)
+
+                                self.CodeMirror.commands.autocomplete(self.cm, false, { completeSingle: true })
+                            }
+                        })
                     }}
                     options={options}
                 />
