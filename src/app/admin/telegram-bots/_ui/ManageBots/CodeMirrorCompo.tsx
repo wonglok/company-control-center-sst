@@ -81,6 +81,10 @@ const procFQL = ({ query }: any) => {
             return r.startsWith('### ') || r.startsWith('## ') || r.startsWith('# ')
         })
         .filter((r: string) => r)
+        .filter((r: string) => r.replace('###', ''))
+        .filter((r: string) => r.replace('##', ''))
+        .filter((r: string) => r.replace('#', ''))
+        .filter((r: string) => r)
 
     let allStr = query
     titles.forEach((title: string) => {
@@ -89,7 +93,7 @@ const procFQL = ({ query }: any) => {
 
     let groups: string[] = allStr
         .split('____SPLITTER____')
-        // .filter((r: string) => r)
+        .filter((r: string) => r)
         .map((r: string) => {
             let arr = r.split('____IDX____')
 
