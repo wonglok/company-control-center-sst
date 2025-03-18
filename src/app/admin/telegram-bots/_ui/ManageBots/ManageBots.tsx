@@ -28,6 +28,7 @@ import { BotSchema } from './BotSchema'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faTeletype } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
+import { deleteTelegramBot } from '@/actions/telegram/deleteTelegramBot'
 
 export type BotType = {
     itemID: string
@@ -38,6 +39,10 @@ export type BotType = {
     chatID: string
     botSchema: string
     json: any
+    graph: {
+        edges: []
+        nodes: []
+    }
 }
 
 export function ManageBots({ config, jwt }: any) {
@@ -62,11 +67,11 @@ export function ManageBots({ config, jwt }: any) {
                     <TableHeader>
                         <TableRow>
                             <TableHead className='text-left'>Edit</TableHead>
-                            <TableHead>Schema</TableHead>
+                            <TableHead>Workflow</TableHead>
                             <TableHead className='text-left'>Telegram Integration</TableHead>
                             <TableHead className='text-left'>Bot Integration</TableHead>
                             <TableHead className='text-left'>Bot Link</TableHead>
-                            {/* <TableHead>AI Device</TableHead> */}
+                            <TableHead>Remove</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -77,8 +82,8 @@ export function ManageBots({ config, jwt }: any) {
                                 </TableCell>
 
                                 <TableCell className='font-medium'>
-                                    <Link href={`/admin/telegram-bots/schema/${bot.itemID}`}>
-                                        <Button>Logic</Button>
+                                    <Link href={`/admin/telegram-bots/editor/${bot.itemID}`}>
+                                        <Button>Edit</Button>
                                     </Link>
                                     {/* <BotSchema key={bot.itemID} bot={bot}></BotSchema> */}
                                 </TableCell>
@@ -139,6 +144,23 @@ export function ManageBots({ config, jwt }: any) {
                                         }}
                                     >
                                         Copy Link
+                                    </Button>
+                                </TableCell>
+                                <TableCell>
+                                    <Button
+                                        className=''
+                                        variant={'outline'}
+                                        onClick={() => {
+                                            if (window.confirm('remove?')) {
+                                                deleteTelegramBot({ item: bot }).then(() => {
+                                                    listTelegramBot().then((data: any) => {
+                                                        useBots.setState({ bots: data })
+                                                    })
+                                                })
+                                            }
+                                        }}
+                                    >
+                                        Remove Bot
                                     </Button>
                                 </TableCell>
                             </TableRow>
