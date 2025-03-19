@@ -1,14 +1,5 @@
 import { useFlow } from './useFlow'
-import {
-    addEdge,
-    applyEdgeChanges,
-    applyNodeChanges,
-    Background,
-    Controls,
-    OnNodeDrag,
-    ReactFlow,
-    useNodes,
-} from '@xyflow/react'
+import { addEdge, applyEdgeChanges, applyNodeChanges, Background, Controls, OnNodeDrag, ReactFlow } from '@xyflow/react'
 import { useCallback, useEffect } from 'react'
 import { edgeTypes } from '../_ui/CustomEdges'
 import { nodeTypes } from '../_ui/CustomNodes'
@@ -17,10 +8,8 @@ import md5 from 'md5'
 import '@xyflow/react/dist/style.css'
 import { putTelegramBot } from '@/actions/telegram/putTelegramBot'
 import { toast } from 'sonner'
-import { useBot } from '../../schema/[botID]/useBot'
 import { getTelegramBot } from '@/actions/telegram/getTelegramBot'
-import { useParams, useRouter } from 'next/navigation'
-import { BotType } from '../../_ui/ManageBots/ManageBots'
+import { useParams } from 'next/navigation'
 
 export const Editor = () => {
     let nodes = useFlow((r) => r.nodes)
@@ -127,11 +116,10 @@ export const Editor = () => {
                             edges: now.edges,
                             nodes: now.nodes,
                         }),
-                        //
                     )
 
                     save({ bot: now.bot })
-                }, 100)
+                }, 350)
                 //
             }
         })

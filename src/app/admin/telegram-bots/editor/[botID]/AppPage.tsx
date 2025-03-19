@@ -12,6 +12,8 @@ import { SidebarRight } from '@/components/sidebar-right'
 // import { ConnectedSockets } from '@/app/app/_ui/ConnectedSockets/ConnectedSockets'
 // import { Suspense } from 'react'
 // import { Skeleton } from '@/components/ui/skeleton'
+import { DndContext } from '@dnd-kit/core'
+import { DragAndDrop } from '../_ui/DragAndDrop/DragAndDrop'
 
 export function AppPage({
     botID,
@@ -26,15 +28,15 @@ export function AppPage({
 }) {
     //
 
-    let bot = useFlow((r) => r.bot)
+    // let bot = useFlow((r) => r.bot)
 
-    useEffect(() => {
-        getTelegramBot({ item: { itemID: botID } }).then((data) => {
-            if (data) {
-                useFlow.setState({ bot: data as BotType })
-            }
-        })
-    }, [botID])
+    // useEffect(() => {
+    //     getTelegramBot({ item: { itemID: botID } }).then((data) => {
+    //         if (data) {
+    //             useFlow.setState({ bot: data as BotType })
+    //         }
+    //     })
+    // }, [botID])
 
     return (
         <>
@@ -45,9 +47,12 @@ export function AppPage({
                     </>
                 }
                 title2={<>{`Editor`}</>}
-                sidebar={<SidebarRight side='right' />}
+                // sidebar={<SidebarRight side='right' />}
             >
-                <div className='w-full h-full bg-gray-200 rounded-xl '>{bot && <Editor></Editor>}</div>
+                {/* <Editor></Editor> */}
+                <div className='w-full h-full bg-gray-200 rounded-xl  relative'>
+                    <DragAndDrop></DragAndDrop>
+                </div>
             </Dashboard>
         </>
     )

@@ -14,141 +14,33 @@ import {
     SidebarMenuSubItem,
     SidebarRail,
 } from '@/components/ui/sidebar'
+import { ArrowRight, Slash, SlashSquare, Terminal } from 'lucide-react'
 
 // This is sample data.
 const data = {
     navMain: [
         {
-            title: 'Getting Started',
-            nodeName: '#',
+            title: 'Telegram',
             items: [
                 {
-                    title: 'Installation',
-                    nodeName: '#',
+                    title: 'When Receive Message',
+                    nodeName: 'WhenReceiveTelegramMessageNode',
                 },
                 {
-                    title: 'Project Structure',
-                    nodeName: '#',
+                    title: 'Send Message',
+                    nodeName: 'SendTelegramMessageNode',
                 },
             ],
         },
         {
-            title: 'Building Your Application',
-            nodeName: '#',
+            title: 'Step',
             items: [
                 {
-                    title: 'Routing',
+                    title: 'Router',
                     nodeName: '#',
                 },
                 {
-                    title: 'Data Fetching',
-                    nodeName: '#',
-                    isActive: true,
-                },
-                {
-                    title: 'Rendering',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Caching',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Styling',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Optimizing',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Configuring',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Testing',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Authentication',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Deploying',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Upgrading',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Examples',
-                    nodeName: '#',
-                },
-            ],
-        },
-        {
-            title: 'API Reference',
-            nodeName: '#',
-            items: [
-                {
-                    title: 'Components',
-                    nodeName: '#',
-                },
-                {
-                    title: 'File Conventions',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Functions',
-                    nodeName: '#',
-                },
-                {
-                    title: 'next.config.js Options',
-                    nodeName: '#',
-                },
-                {
-                    title: 'CLI',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Edge Runtime',
-                    nodeName: '#',
-                },
-            ],
-        },
-        {
-            title: 'Architecture',
-            nodeName: '#',
-            items: [
-                {
-                    title: 'Accessibility',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Fast Refresh',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Next.js Compiler',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Supported Browsers',
-                    nodeName: '#',
-                },
-                {
-                    title: 'Turbopack',
-                    nodeName: '#',
-                },
-            ],
-        },
-        {
-            title: 'Community',
-            nodeName: '#',
-            items: [
-                {
-                    title: 'Contribution Guide',
+                    title: 'Activate Route',
                     nodeName: '#',
                 },
             ],
@@ -168,22 +60,24 @@ export function SidebarRight({ ...props }: React.ComponentProps<typeof Sidebar>)
         <Sidebar {...props}>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Table of Contents</SidebarGroupLabel>
+                    <SidebarGroupLabel>Differnet Kinds of Node</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {data.navMain.map((item) => (
                                 <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild>
-                                        <span onClick={() => createNode(`${item.nodeName}`)} className='font-medium'>
-                                            {item.title}
-                                        </span>
-                                    </SidebarMenuButton>
+                                    <div className='my-2 ml-1 flex items-center'>
+                                        <SlashSquare className='mr-2'></SlashSquare>
+                                        <span className='font-medium'>{item.title}</span>
+                                    </div>
                                     {item.items?.length ? (
                                         <SidebarMenuSub>
                                             {item.items.map((item) => (
                                                 <SidebarMenuSubItem key={item.title}>
-                                                    <SidebarMenuSubButton asChild isActive={item.isActive}>
-                                                        <span onClick={() => createNode(`${item.nodeName}`)}>
+                                                    <SidebarMenuSubButton asChild isActive={false}>
+                                                        <span
+                                                            className='cursor-pointer'
+                                                            onClick={() => createNode(`${item.nodeName}`)}
+                                                        >
                                                             {item.title}
                                                         </span>
                                                     </SidebarMenuSubButton>

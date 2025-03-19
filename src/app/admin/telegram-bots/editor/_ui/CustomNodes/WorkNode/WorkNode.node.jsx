@@ -11,11 +11,11 @@ export function WorkNode({ id, data }) {
     }, []);
 
     return <>
-        <div className='bg-red-200 w-full h-full'>
+        <div className='bg-white w-full h-full p-2 rounded-lg  border border-gray-500 '>
             <Handle type="target" position={Position.Top} />
             <div>
-                <label htmlFor="text">Text:</label>
-                <input id="text" name="text" onChange={onChange} className="nodrag" />
+                <label htmlFor="text" className='mr-3'>Text:</label>
+                <input id="text" name="text" onChange={onChange} className="nodrag border border-gray-300" />
             </div>
             <Handle type="source" position={Position.Bottom} id="a" />
             <Handle
