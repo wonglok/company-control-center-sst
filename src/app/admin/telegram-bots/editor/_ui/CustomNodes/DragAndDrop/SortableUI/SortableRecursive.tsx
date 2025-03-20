@@ -23,20 +23,19 @@ export function SortableRecursive({
     const [state, setState] = useState<ItemType[]>(list)
 
     useEffect(() => {
-        onChange(list, level)
+        onChange(state, level)
     }, [state])
 
-    //
-
-    //
-
     return (
-        <div className='border-l-4 border-t-4 pl-4 pt-4 mb-4 h-full min-w-52 inline-block bg-blue-500 bg-opacity-20'>
+        <div className='border-4 px-4 pt-4 mb-4 h-full min-w-52 inline-block bg-blue-500 bg-opacity-20'>
             <ReactSortable
                 setList={(newState: ItemType[]) => {
                     setState(
                         newState.map((r) => {
-                            return r
+                            return {
+                                ...r,
+                                id: r.id,
+                            }
                         }),
                     )
                 }}
@@ -52,18 +51,22 @@ export function SortableRecursive({
                         <div className=''>
                             {item?.children?.length > 0 ? (
                                 <SortableRecursive
-                                    onChange={(list, level) => {
-                                        setState(
-                                            state.map((r) => {
-                                                if (r.id === item.id) {
-                                                    return {
-                                                        ...item,
-                                                        children: list,
+                                    onChange={(list, lvl) => {
+                                        //
+                                        //
+                                        if (level === lvl - 1) {
+                                            setState(
+                                                state.map((r) => {
+                                                    if (r.id === item.id) {
+                                                        return {
+                                                            ...item,
+                                                            children: list,
+                                                        }
                                                     }
-                                                }
-                                                return r
-                                            }),
-                                        )
+                                                    return r
+                                                }),
+                                            )
+                                        }
                                     }}
                                     level={level + 1}
                                     list={item?.children}
