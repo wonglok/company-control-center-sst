@@ -1,5 +1,7 @@
+import md5 from 'md5'
 import { useEffect, useState } from 'react'
 import { ReactSortable } from 'react-sortablejs'
+import { v4 } from 'uuid'
 
 //
 
@@ -26,18 +28,25 @@ export function SortableRecursive({
 
     //
 
+    //
+
     return (
-        <div className='border-l-4 border-t-4 pl-4 pt-4 mb-4 h-full min-w-36 inline-block bg-blue-500 bg-opacity-20'>
+        <div className='border-l-4 border-t-4 pl-4 pt-4 mb-4 h-full min-w-52 inline-block bg-blue-500 bg-opacity-20'>
             <ReactSortable
                 setList={(newState: ItemType[]) => {
-                    setState(newState)
+                    setState(
+                        newState.map((r) => {
+                            return r
+                        }),
+                    )
                 }}
                 animation={400}
                 group='shared'
                 list={state}
             >
+                {/*  */}
                 {state.map((item) => (
-                    <div className='h-full w-full  text-black bg-opacity-20' key={item.id}>
+                    <div className='h-full w-full text-black bg-opacity-20' key={item.id}>
                         <div className=' text-blue-800 mb-4'>{item.name}</div>
 
                         <div className=''>
@@ -65,6 +74,7 @@ export function SortableRecursive({
                         </div>
                     </div>
                 ))}
+                {/*  */}
             </ReactSortable>
         </div>
     )
