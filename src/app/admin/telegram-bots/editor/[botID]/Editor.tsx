@@ -1,6 +1,15 @@
 import { useFlow } from './useFlow'
-import { addEdge, applyEdgeChanges, applyNodeChanges, Background, Controls, OnNodeDrag, ReactFlow } from '@xyflow/react'
-import { useCallback, useEffect } from 'react'
+import {
+    addEdge,
+    applyEdgeChanges,
+    applyNodeChanges,
+    Background,
+    Controls,
+    OnNodeDrag,
+    ReactFlow,
+    useViewport,
+} from '@xyflow/react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { edgeTypes } from '../_ui/CustomEdges'
 import { nodeTypes } from '../_ui/CustomNodes'
 import { v4 } from 'uuid'
@@ -10,6 +19,21 @@ import { putTelegramBot } from '@/actions/telegram/putTelegramBot'
 import { toast } from 'sonner'
 import { getTelegramBot } from '@/actions/telegram/getTelegramBot'
 import { useParams } from 'next/navigation'
+
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+    Sheet,
+    SheetClose,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from '@/components/ui/sheet'
+import { Plus } from 'lucide-react'
 
 export const Editor = () => {
     let nodes = useFlow((r) => r.nodes)
@@ -24,6 +48,7 @@ export const Editor = () => {
         }
         useFlow.setState({ nodes: func })
     }
+
     let setEdges = (func: any) => {
         if (typeof func === 'function') {
             let value = func(useFlow.getState().edges)
@@ -35,6 +60,7 @@ export const Editor = () => {
     }
 
     const onNodesChange = useCallback((changes: any) => setNodes((nds: any) => applyNodeChanges(changes, nds)), [])
+
     const onEdgesChange = useCallback((changes: any) => setEdges((eds: any) => applyEdgeChanges(changes, eds)), [])
 
     const onConnect = useCallback(
@@ -52,24 +78,6 @@ export const Editor = () => {
         })
     }
 
-    const onAddWorkNode = () => {
-        //
-        setNodes((nodes: any) => [
-            ...nodes,
-            {
-                id: `${md5(v4())}`,
-                type: 'WorkNode',
-                position: {
-                    x: 0,
-                    y: 0,
-                },
-                data: {},
-            },
-        ])
-
-        //
-    }
-
     let save = useCallback(({ bot }: any) => {
         return putTelegramBot({
             item: {
@@ -78,7 +86,7 @@ export const Editor = () => {
             },
         })
             .then(() => {
-                toast.success('Successfully Updated')
+                toast.success('Updates are successfully saved')
             })
             .catch((r) => {
                 console.error(r)
@@ -135,12 +143,15 @@ export const Editor = () => {
                 onConnect={onConnect}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
+                onNodeDrag={onNodeDrag}
+                //
+
                 nodes={nodes}
                 edges={edges}
+                //
                 minZoom={0.05}
                 maxZoom={10}
                 fitView={false}
-                onNodeDrag={onNodeDrag}
                 fitViewOptions={{
                     padding: 0.25,
                 }}
@@ -149,12 +160,90 @@ export const Editor = () => {
             >
                 <Background />
                 <Controls />
+                <Add setNodes={setNodes}></Add>
             </ReactFlow>
-            <div className=' absolute bottom-36  left-[30px]'>
-                <button onClick={onAddWorkNode} className='bg-blue-500 text-white border rounded-lg  px-2 py-3'>
-                    +
-                </button>
+        </>
+    )
+}
+
+function Add({ setNodes = () => {} }: any) {
+    return (
+        <>
+            <div className=' absolute top-[12px] right-[12px] z-[100]'>
+                <SheetDemo setNodes={setNodes}></SheetDemo>
             </div>
         </>
+    )
+}
+
+export function SheetDemo({ setNodes }: any) {
+    const { x, y, zoom } = useViewport()
+    const addNode = ({ type = 'WorkNode', dragHandle = undefined }: any) => {
+        setNodes((nodes: any) => [
+            ...nodes,
+            {
+                id: `${md5(v4())}`,
+                type: type,
+                position: {
+                    x: -x + zoom * 150,
+                    y: -y + zoom * 150,
+                },
+                data: {
+                    //
+                },
+                dragHandle: dragHandle,
+            },
+        ])
+    }
+    let [open, setOpen] = useState(false)
+    return (
+        <Sheet
+            open={open}
+            onOpenChange={(v) => {
+                console.log(v)
+                if (!v) {
+                    setOpen(false)
+                }
+            }}
+        >
+            <SheetTrigger asChild>
+                <button
+                    onClick={() => {
+                        setOpen(!open)
+                    }}
+                    className='bg-blue-500 text-white border rounded-full p-3 '
+                >
+                    <Plus></Plus>
+                </button>
+            </SheetTrigger>
+            <SheetContent>
+                <SheetHeader>
+                    <SheetTitle>Add Nodes</SheetTitle>
+                    <SheetDescription>Workflow Node</SheetDescription>
+                </SheetHeader>
+                <div className='grid gap-4 py-4'>
+                    <div className='space-x-4 space-y-4'>
+                        <Button
+                            onClick={() => {
+                                setOpen(false)
+                                addNode({ type: 'WorkNode' })
+                            }}
+                        >
+                            Work Node
+                        </Button>
+                        {/* dragHandle */}
+                        <Button
+                            onClick={() => {
+                                //
+                                setOpen(false)
+                                addNode({ type: 'ProcedureNode', dragHandle: '.dragHandle' })
+                            }}
+                        >
+                            Procedure Node
+                        </Button>
+                    </div>
+                </div>
+            </SheetContent>
+        </Sheet>
     )
 }

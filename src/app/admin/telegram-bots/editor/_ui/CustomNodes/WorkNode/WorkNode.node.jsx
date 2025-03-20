@@ -1,14 +1,17 @@
 
 import { useCallback } from 'react';
 import { Handle, Position } from '@xyflow/react';
+import { useRemoveUI } from '../../../[botID]/removeBtn';
 
 const handleStyle = { left: 10 };
 
-
 export function WorkNode({ id, data }) {
+    let { remove } = useRemoveUI({ id })
+
     const onChange = useCallback((evt) => {
         console.log(evt.target.value);
     }, []);
+
 
     return <>
         <div className='bg-white w-full h-full p-2 rounded-lg  border border-gray-500 '>
@@ -24,6 +27,8 @@ export function WorkNode({ id, data }) {
                 id="b"
                 style={handleStyle}
             />
+
+            {remove}
         </div>
     </>
 }

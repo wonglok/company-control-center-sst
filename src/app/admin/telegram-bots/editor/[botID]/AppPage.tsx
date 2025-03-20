@@ -6,14 +6,14 @@ import { useEffect } from 'react'
 import { getTelegramBot } from '@/actions/telegram/getTelegramBot'
 import { BotType } from '../../_ui/ManageBots/ManageBots'
 import Link from 'next/link'
-import { Editor } from './Editor'
-import { SidebarRight } from '@/components/sidebar-right'
+// import { Editor } from './Editor'
+// import { SidebarRight } from '@/components/sidebar-right'
 
 // import { ConnectedSockets } from '@/app/app/_ui/ConnectedSockets/ConnectedSockets'
 // import { Suspense } from 'react'
 // import { Skeleton } from '@/components/ui/skeleton'
 import { DndContext } from '@dnd-kit/core'
-import { DragAndDrop } from '../_ui/DragAndDrop/DragAndDrop'
+import { SortableUI } from '../_ui/CustomNodes/DragAndDrop/SortableUI/SortableUI'
 
 export function AppPage({
     botID,
@@ -49,9 +49,9 @@ export function AppPage({
                 title2={<>{`Editor`}</>}
                 // sidebar={<SidebarRight side='right' />}
             >
-                {/* <Editor></Editor> */}
                 <div className='w-full h-full bg-gray-200 rounded-xl  relative'>
-                    <DragAndDrop></DragAndDrop>
+                    <SortableUI></SortableUI>
+                    {/* <Editor></Editor> */}
                 </div>
             </Dashboard>
         </>
