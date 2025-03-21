@@ -11,16 +11,7 @@ export const useSort = create<{
 }>(() => {
     return {
         //
-        recycle: [
-            // {
-            //     id: `__${v4()}`,
-            //     type: 'disabled',
-            //     name: '',
-            //     result: '',
-            //     template: '',
-            //     disabled: true,
-            // },
-        ],
+        recycle: [],
         examples: [
             {
                 //
@@ -36,93 +27,15 @@ export const useSort = create<{
                 type: 'funcCall',
                 name: 'loadDB',
                 result: 'var001',
-                template: 'let {{ result }} = await {{name}}();',
-            },
-            {
-                id: `__${v4()}`,
-                type: 'asyncFunc',
-                name: 'loadRoutes',
-                args: ``,
-
-                template: `let {{name}} = async ({{args}}) => {
-{{body}}
-}`,
-                children: [
-                    {
-                        id: `__${v4()}`,
-                        let: 'let',
-                        type: 'funcCall',
-                        name: 'loadDB',
-                        result: 'var001',
-                        template: 'let {{ result }} = await {{name}}();',
-                    },
-                ],
+                let: '',
+                template: '{{let}} {{ result }} = await {{name}}();',
             },
         ],
 
-        template: [
-            // {
-            //     id: `__${v4()}`,
-            //     type: 'disabled',
-            //     name: '',
-            //     result: '',
-            //     template: '',
-            //     disabled: true,
-            //     children: [],
-            // },
-        ],
+        template: [],
 
         list: [
             //
         ],
     }
 })
-
-// let temp = [
-//
-//     { id: 'sort3', type: 'variable', name: 'variable2', template: 'let {{ name }};', children: [] },
-//     { id: 'sort4', type: 'variable', name: 'variable3', template: 'let {{ name }};', children: [] },
-//     {
-//         id: 'sort1',
-//         type: 'asyncFunc',
-//         name: 'myFunction',
-//         args: ``,
-//         template: `let {{name}} = async ({{args}}) => {
-// {{body}}
-// }`,
-//         children: [
-//             {
-//                 id: 'sort41',
-//                 type: 'funcCall',
-//                 name: 'method1A',
-//                 result: '',
-//                 template: 'let {{ result }} = await {{name}}();',
-//                 children: [],
-//             },
-//             {
-//                 id: 'sort42',
-//                 type: 'funcCall',
-//                 name: 'method2A',
-//                 result: '',
-//                 template: 'let {{ result }} = await {{name}}();',
-//                 children: [],
-//             },
-//             {
-//                 id: 'sort43',
-//                 type: 'funcCall',
-//                 name: 'method3A',
-//                 result: '',
-//                 template: 'let {{ result }} = await {{name}}();',
-//                 children: [],
-//             },
-//         ],
-//     },
-//     {
-//         id: 'sort17',
-//         type: 'funcCall',
-//         name: 'myFunction',
-//         result: 'output',
-//         template: 'let {{ result }} = await {{name}}();',
-//         children: [],
-//     },
-// ]

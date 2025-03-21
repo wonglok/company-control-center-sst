@@ -31,7 +31,6 @@ export function ProcedureNode({ id, data }) {
 
     let [show, setShow] = useState(false)
 
-    console.log(id, data)
     useEffect(() => {
         //
 

@@ -40,6 +40,7 @@ export const SortableUI = ({ id, data }: any) => {
 
     return (
         <>
+            <div className=' whitespace-pre-wrap w-full p-4'>{codeGen(list) || ''}</div>
             <div className='p-2 '>
                 <div className='w-full ' style={{ minHeight: `100px` }}>
                     <div>
@@ -59,7 +60,7 @@ export const SortableUI = ({ id, data }: any) => {
                         <SortableRecursive
                             mode={'recycle'}
                             key={recycle.map((r) => JSON.stringify(r)).join('')}
-                            onChange={(list, level) => {}}
+                            onChange={(list: any, level: any) => {}}
                             level={0}
                             list={recycle}
                         ></SortableRecursive>
@@ -70,7 +71,7 @@ export const SortableUI = ({ id, data }: any) => {
                     <div className='w-1/2 '>
                         <SortableRecursive
                             mode={'clone'}
-                            onChange={(list, level) => {}}
+                            onChange={(list: any, level: any) => {}}
                             level={0}
                             list={examples}
                         ></SortableRecursive>
@@ -83,15 +84,14 @@ export const SortableUI = ({ id, data }: any) => {
                                     <SortableRecursive
                                         key={list.map((r) => r.id).join('_')}
                                         mode={'work'}
-                                        onChange={(list, level) => {
-                                            if (level === 0) {
-                                                console.log(list, level)
+                                        level={0}
+                                        onChange={(lst: any, lvl: any) => {
+                                            if (lvl === 0) {
                                                 useSort.setState({
-                                                    list: JSON.parse(JSON.stringify(list)),
+                                                    list: [...lst],
                                                 })
                                             }
                                         }}
-                                        level={0}
                                         list={[...list]}
                                     ></SortableRecursive>
                                 </div>
@@ -99,7 +99,6 @@ export const SortableUI = ({ id, data }: any) => {
                         </>
                     )}
                 </div>
-                <div className=' whitespace-pre-wrap w-full p-4'>{codeGen(list) || ''}</div>
             </div>
         </>
     )

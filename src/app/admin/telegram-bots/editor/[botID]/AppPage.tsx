@@ -13,7 +13,7 @@ import { Editor } from './Editor'
 // import { Suspense } from 'react'
 // import { Skeleton } from '@/components/ui/skeleton'
 // import { DndContext } from '@dnd-kit/core'
-import { SortableUI } from '../_ui/SortableUI/SortableUI'
+// import { SortableUI } from '../_ui/SortableUI/SortableUI'
 
 import tunnel from 'tunnel-rat'
 

@@ -15,21 +15,36 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useEffect, useMemo, useState } from 'react'
 import { ReactSortable } from 'react-sortablejs'
 import { useSort } from './useSort'
-import md5 from 'md5'
 import { v4 } from 'uuid'
+// import md5 from 'md5'
+// import { v4 } from 'uuid'
+
+// let insert = (arr: any, insert: any) => {
+//     arr.forEach((it: any, idx: any, nn: any) => {
+//         if (it.id === insert.id) {
+//             nn[idx] = insert
+//         }
+
+//         if (arr.children) {
+//             insert(arr.children, insert)
+//         }
+//     })
+// }
 
 export function SortableRecursive({
     mode = 'work',
     list = [],
     level = 0,
-    onChange = (list: any, level: number) => {},
+    onChange = () => {},
 }: {
+    onChange: any
     mode: string
-    onChange: (list: any, level: number) => void
     list: any[]
     level: number
 }) {
-    const [state, setState] = useState<any[]>([...list])
+    let setState = (v: any) => {
+        onChange(v, level)
+    }
 
     useEffect(() => {
         if (mode === 'recycle') {
@@ -51,41 +66,28 @@ export function SortableRecursive({
         }
     }
 
-    let attr = {
-        clone: (v: any) => v,
-    }
-
-    if (mode === 'clone') {
-        attr.clone = (currentItem: any) => {
-            return { ...currentItem, id: `__${v4()}` }
-        }
-    }
     return (
         <div className='h-full w-full min-w-52 inline-block'>
             <ReactSortable
-                {...attr}
+                clone={(item) => {
+                    return {
+                        ...item,
+                        id: `__${v4()}`,
+                    }
+                }}
                 filter={'.filtered'}
                 setList={(newState: any[]) => {
-                    setState(
-                        newState.map((r) => {
-                            return {
-                                ...r,
-                            }
-                        }),
-                    )
-                    onChange(newState, level)
+                    onChange([...newState], level)
                 }}
-                //
-                //
                 animation={300}
                 group={{
                     name: 'shared',
                     ...ext,
                 }}
-                list={state}
-                className='min-h-[100px]  bg-gradient-to-tr from-white to-gray-200'
+                list={list}
+                className={'min-h-[12] pb-12 bg-gradient-to-tr from-white to-gray-200 ' + ``}
             >
-                {state.map((item) => {
+                {list.map((item) => {
                     return (
                         <EachItem
                             list={list}
@@ -93,21 +95,18 @@ export function SortableRecursive({
                             key={item.id}
                             item={item}
                             mode={mode}
-                            onChange={onChange}
                             onSaveItem={(key: string, val: any) => {
-                                setState((state) => {
-                                    return [
-                                        ...state.map((r) => {
-                                            if (item.id === r.id) {
-                                                return {
-                                                    ...r,
-                                                    [key]: val,
-                                                }
+                                setState(
+                                    list.map((r) => {
+                                        if (item.id === r.id) {
+                                            return {
+                                                ...r,
+                                                [key]: val,
                                             }
-                                            return r
-                                        }),
-                                    ]
-                                })
+                                        }
+                                        return { ...r }
+                                    }),
+                                )
                             }}
                         ></EachItem>
                     )
@@ -119,8 +118,11 @@ export function SortableRecursive({
     )
 }
 
-function EachItem({ list, item, onSaveItem, level, onChange, clone, mode }: any) {
+function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
+    //
+
     let listRoot = useSort((r) => r.list)
+
     let linearList = useMemo(() => {
         let arr: any = []
 
@@ -170,7 +172,18 @@ function EachItem({ list, item, onSaveItem, level, onChange, clone, mode }: any)
                     {item.type === 'funcCall' && (
                         <div className='py-1 flex items-center text-blue-800 text-sm'>
                             <FontAwesomeIcon icon={faTerminal} className='mx-1 h-3 '></FontAwesomeIcon>
-                            {`let `}
+                            <select
+                                name='let'
+                                className='mx-2 text-xs'
+                                value={item.let}
+                                onChange={(ev) => {
+                                    onSaveItem('let', ev.target.value.trim())
+                                }}
+                            >
+                                <option value={`let`}>let</option>
+                                <option value={`   `}> </option>
+                            </select>
+
                             <select
                                 name='result'
                                 className='mx-2 text-xs'
@@ -251,7 +264,7 @@ function EachItem({ list, item, onSaveItem, level, onChange, clone, mode }: any)
                             mode={mode}
                             level={level + 1}
                             list={item?.children}
-                            onChange={onChange}
+                            onChange={() => {}}
                         ></SortableRecursive>
                     )}
                 </div>
