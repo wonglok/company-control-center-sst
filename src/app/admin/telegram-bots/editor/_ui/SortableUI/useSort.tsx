@@ -17,7 +17,7 @@ export const useSort = create<{
                 //
                 id: `__${v4()}`,
                 type: 'variable',
-                name: 'vari001',
+                name: 'happy001',
                 initVal: 'null',
                 let: 'let',
                 template: '{{let}} {{ name }} = {{ initVal }};',
@@ -28,7 +28,8 @@ export const useSort = create<{
                 name: 'loadDB',
                 result: 'var001',
                 let: '',
-                template: '{{let}} {{ result }} = await {{name}}();',
+                args: '',
+                template: '{{ let }} {{ result }} = await {{name}}({{args}});',
             },
         ],
 

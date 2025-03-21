@@ -145,7 +145,7 @@ function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
             {/* {item.disabled && list.length <= 1 && <div className='h-[30px] w-full bg-white opacity-25 filtered'></div>} */}
             {!item.disabled && (
                 <div className={`px-2 bg-blue-500 border-4 h-full w-full text-black bg-opacity-20 overflow-hidden`}>
-                    {item.type === 'asyncFunc' && (
+                    {/* {item.type === 'asyncFunc' && (
                         <div className='py-1 flex items-center text-blue-800 text-sm'>
                             <FontAwesomeIcon icon={faCode} className='mx-1 h-3 '></FontAwesomeIcon>
                             <input
@@ -167,7 +167,7 @@ function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
                             ></input>
                             {`)`}
                         </div>
-                    )}
+                    )} */}
 
                     {item.type === 'funcCall' && (
                         <div className='py-1 flex items-center text-blue-800 text-sm'>
@@ -223,7 +223,7 @@ function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
 
                             {`(`}
                             <input
-                                className='inline-block w-6 appearance-none bg-transparent outline-none border-b-2 focus:outline-none'
+                                className='inline-block w-20 appearance-none bg-transparent outline-none border-b-2 focus:outline-none'
                                 type='text'
                                 value={item.args || ''}
                                 onChange={(ev) => {
