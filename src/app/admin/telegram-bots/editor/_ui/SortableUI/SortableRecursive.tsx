@@ -177,7 +177,7 @@ function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
                                 className='mx-2 text-xs'
                                 value={item.let}
                                 onChange={(ev) => {
-                                    onSaveItem('let', ev.target.value.trim())
+                                    onSaveItem('let', ev.target.value)
                                 }}
                             >
                                 <option value={`let`}>let</option>

@@ -96,22 +96,6 @@ export function ProcedureNode({ id, data }) {
                 </div>
             </BotEditorIn>}
 
-            {/* <DndContext
-                onDragEnd={(ev) => {
-                    console.log('end', ev)
-                }}
-                onDragStart={(ev) => {
-                    console.log('start', ev)
-                }}
-            >
-                <Droppable item={{ _id: 'droppable-01' }}>Dropable 01</Droppable>
-                <Droppable item={{ _id: 'droppable-02' }}>Dropable 02</Droppable>
-
-                <Draggable item={{ _id: `drag1` }}>Dragable 01</Draggable>
-                <Draggable item={{ _id: `drag2` }}>Dragable 02</Draggable>
-            </DndContext> */}
-
-
         </div>
     </>
 }

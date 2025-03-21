@@ -20,8 +20,6 @@ export const SortableUI = ({ id, data }: any) => {
     let nodes = useFlow((r) => r.nodes)
     let node = nodes.find((r: any) => r.id === id)
 
-    // console.log(node)
-
     useEffect(() => {
         useSort.setState({
             list: node.data.list || [],
@@ -86,11 +84,9 @@ export const SortableUI = ({ id, data }: any) => {
                                         mode={'work'}
                                         level={0}
                                         onChange={(lst: any, lvl: any) => {
-                                            if (lvl === 0) {
-                                                useSort.setState({
-                                                    list: [...lst],
-                                                })
-                                            }
+                                            useSort.setState({
+                                                list: [...lst],
+                                            })
                                         }}
                                         list={[...list]}
                                     ></SortableRecursive>
