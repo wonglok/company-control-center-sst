@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { SortableUI } from '../../SortableUI/SortableUI';
 import { SortableRecursive } from '../../SortableUI/SortableRecursive';
 import { useSort } from '../../SortableUI/useSort';
+import { codeGen } from '../../SortableUI/codeGen';
 // import TileList from './ListDnD/TileList';
 // import { HorizontalList } from './ListDnD/HorizontalList';
 // import { HorizontalList } from './ListDnD/HorizontalList';
@@ -76,7 +77,10 @@ export function ProcedureNode({ id, data }) {
 
                 {remove}
 
-                <SortableRecursive
+                <pre className='  whitespace-pre-wrap p-3 text-sm'>
+                    {codeGen(data.list)}
+                </pre>
+                {/* <SortableRecursive
                     key={JSON.stringify([data, show])}
                     mode={'clone'}
                     onChange={(list, level) => {
@@ -84,7 +88,7 @@ export function ProcedureNode({ id, data }) {
                     }}
                     level={0}
                     list={data.list || []}
-                ></SortableRecursive>
+                ></SortableRecursive> */}
             </div>
 
             {show && <BotEditorIn>

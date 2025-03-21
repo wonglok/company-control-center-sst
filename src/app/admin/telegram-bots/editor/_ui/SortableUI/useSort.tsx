@@ -20,7 +20,7 @@ export const useSort = create<{
                 name: 'happy001',
                 initVal: 'null',
                 let: 'let',
-                template: '{{let}} {{ name }} = {{ initVal }};',
+                template: '{{ let }} {{ name }} = {{ initVal }};',
             },
             {
                 id: `__${v4()}`,

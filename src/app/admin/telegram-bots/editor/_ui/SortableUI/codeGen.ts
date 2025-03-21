@@ -63,7 +63,8 @@ export const codeGen = (listRaw: any[]): string => {
         })
     }
     genAll(list || [], 0)
-    let output = ` ${str}  `
+
+    let output = `${str}`
 
     return output
 }
