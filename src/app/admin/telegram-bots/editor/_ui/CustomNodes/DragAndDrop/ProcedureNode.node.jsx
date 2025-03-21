@@ -37,7 +37,6 @@ export function ProcedureNode({ id, data }) {
         let hh = (ev) => {
             if (ev.key === 'Escape') {
                 setShow(false)
-
             }
         }
 
