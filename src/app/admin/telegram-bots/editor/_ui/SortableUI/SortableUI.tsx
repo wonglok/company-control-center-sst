@@ -27,21 +27,22 @@ export const SortableUI = ({}) => {
 
     return (
         <>
-            <div>
+            <div className='p-2 '>
                 <div className='w-full ' style={{ minHeight: `100px` }}>
                     <div>
                         <button
+                            className='text-xs p-2 bg-blue-500 text-white'
                             onClick={() => {
                                 useSort.setState({
                                     recycle: recycle.filter((r) => r.type === 'disabled'),
                                 })
                             }}
                         >
-                            Empty
+                            Empty Recycle Bin
                         </button>
                     </div>
 
-                    <div>
+                    <div className=''>
                         <SortableRecursive
                             mode={'recycle'}
                             key={recycle.map((r) => JSON.stringify(r)).join('')}
@@ -62,7 +63,7 @@ export const SortableUI = ({}) => {
                         ></SortableRecursive>
                     </div>
 
-                    {list && list.length && (
+                    {list && (
                         <>
                             <div className='w-1/2'>
                                 <div className='bg-white bg-opacity-40 w-full'>

@@ -54,7 +54,7 @@ export const codeGen = (listRaw: any[]): string => {
                 {},
                 {
                     escape: (v) => {
-                        return v
+                        return `${v}`
                     },
                 },
             )}\n`
@@ -63,6 +63,7 @@ export const codeGen = (listRaw: any[]): string => {
         })
     }
     genAll(list || [], 0)
+    let output = ` ${str}  `
 
-    return `${str}`
+    return output
 }

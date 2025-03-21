@@ -12,17 +12,16 @@ export const useSort = create<{
     return {
         //
         recycle: [
-            {
-                id: `__${v4()}`,
-                type: 'disabled',
-                name: '',
-                result: '',
-                template: '',
-                disabled: true,
-            },
+            // {
+            //     id: `__${v4()}`,
+            //     type: 'disabled',
+            //     name: '',
+            //     result: '',
+            //     template: '',
+            //     disabled: true,
+            // },
         ],
         examples: [
-            //
             {
                 id: `__${v4()}`,
                 type: 'funcCall',
@@ -33,15 +32,15 @@ export const useSort = create<{
         ],
 
         template: [
-            {
-                id: `__${v4()}`,
-                type: 'disabled',
-                name: '',
-                result: '',
-                template: '',
-                disabled: true,
-                children: [],
-            },
+            // {
+            //     id: `__${v4()}`,
+            //     type: 'disabled',
+            //     name: '',
+            //     result: '',
+            //     template: '',
+            //     disabled: true,
+            //     children: [],
+            // },
         ],
 
         list: [

@@ -64,7 +64,7 @@ export function SortableRecursive({
         }
     }
     return (
-        <div className='h-full w-full min-w-52 inline-block  pb-4'>
+        <div className='h-full w-full min-w-52 inline-block'>
             <ReactSortable
                 {...attr}
                 filter={'.filtered'}
@@ -94,6 +94,7 @@ export function SortableRecursive({
                     ...ext,
                 }}
                 list={state}
+                className='min-h-24  bg-gradient-to-tr from-white to-gray-200'
             >
                 {state.map((item) => {
                     return (
@@ -154,9 +155,9 @@ function EachItem({ list, item, onSaveItem, level, onChange, clone, mode }: any)
 
     return (
         <>
-            {item.disabled && list.length <= 1 && <div className='h-[30px] w-full bg-white opacity-25 filtered'></div>}
+            {/* {item.disabled && list.length <= 1 && <div className='h-[30px] w-full bg-white opacity-25 filtered'></div>} */}
             {!item.disabled && (
-                <div className={`px-2 bg-blue-500 border-4 h-full w-full text-black bg-opacity-20  mb-1 `}>
+                <div className={`px-2 bg-blue-500 border-4 h-full w-full text-black bg-opacity-20 `}>
                     {item.type === 'asyncFunc' && (
                         <div className='py-1 pb-5 flex items-center text-blue-800 text-sm'>
                             <FontAwesomeIcon icon={faTerminal} className='mx-1 '></FontAwesomeIcon>
