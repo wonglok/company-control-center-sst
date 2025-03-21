@@ -38,7 +38,6 @@ export const SortableUI = ({ id, data }: any) => {
 
     return (
         <>
-            <div className=' whitespace-pre-wrap w-full p-4'>{codeGen(list) || ''}</div>
             <div className='p-2 '>
                 <div className='w-full ' style={{ minHeight: `100px` }}>
                     <div>
@@ -95,6 +94,11 @@ export const SortableUI = ({ id, data }: any) => {
                         </>
                     )}
                 </div>
+            </div>
+            <div className='w-full px-2'>
+                <pre className=' max-w-full whitespace-pre-wrap w-full py-4 bg-white rounded-2xl'>
+                    {codeGen(list) || ''}
+                </pre>
             </div>
         </>
     )
