@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import { getTelegramBot } from '@/actions/telegram/getTelegramBot'
 import { BotType } from '../../_ui/ManageBots/ManageBots'
 import Link from 'next/link'
-// import { Editor } from './Editor'
+import { Editor } from './Editor'
 // import { SidebarRight } from '@/components/sidebar-right'
 
 // import { ConnectedSockets } from '@/app/app/_ui/ConnectedSockets/ConnectedSockets'
@@ -14,6 +14,13 @@ import Link from 'next/link'
 // import { Skeleton } from '@/components/ui/skeleton'
 // import { DndContext } from '@dnd-kit/core'
 import { SortableUI } from '../_ui/SortableUI/SortableUI'
+
+import tunnel from 'tunnel-rat'
+
+const tn = tunnel()
+export const BotEditorIn = ({ children }: any) => {
+    return <tn.In>{children}</tn.In>
+}
 
 export function AppPage({
     botID,
@@ -50,8 +57,9 @@ export function AppPage({
                 // sidebar={<SidebarRight side='right' />}
             >
                 <div className='w-full h-full bg-gray-200 rounded-xl  relative'>
-                    <SortableUI></SortableUI>
-                    {/* <Editor></Editor> */}
+                    {/* <SortableUI></SortableUI> */}
+                    <Editor></Editor>
+                    <tn.Out></tn.Out>
                 </div>
             </Dashboard>
         </>

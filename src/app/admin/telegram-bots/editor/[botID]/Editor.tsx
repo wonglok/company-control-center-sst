@@ -21,18 +21,7 @@ import { getTelegramBot } from '@/actions/telegram/getTelegramBot'
 import { useParams } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-    Sheet,
-    SheetClose,
-    SheetContent,
-    SheetDescription,
-    SheetFooter,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Plus } from 'lucide-react'
 
 export const Editor = () => {
@@ -95,6 +84,7 @@ export const Editor = () => {
     }, [])
 
     let params = useParams()
+
     useEffect(() => {
         if (!params.botID) {
             return
@@ -231,6 +221,7 @@ export function SheetDemo({ setNodes }: any) {
                         >
                             Work Node
                         </Button>
+                        {/* dragHandle */}
                         {/* dragHandle */}
                         <Button
                             onClick={() => {

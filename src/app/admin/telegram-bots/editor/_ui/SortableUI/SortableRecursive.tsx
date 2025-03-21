@@ -37,10 +37,6 @@ export function SortableRecursive({
         }
     }, [mode, list])
 
-    useEffect(() => {
-        onChange(state, level)
-    }, [state])
-
     let ext = {}
 
     if (mode === 'clone') {
@@ -74,17 +70,10 @@ export function SortableRecursive({
                         newState.map((r) => {
                             return {
                                 ...r,
-                                id: r.id,
                             }
                         }),
-                        // .sort((a, b) => {
-                        //     if (a.disabled) {
-                        //         return -1111111
-                        //     } else {
-                        //         return 0
-                        //     }
-                        // }),
                     )
+                    onChange(newState, level)
                 }}
                 //
                 //
@@ -149,10 +138,6 @@ function EachItem({ list, item, onSaveItem, level, onChange, clone, mode }: any)
         return arr
     }, [listRoot])
 
-    useEffect(() => {
-        onChange(list, level)
-    }, [item])
-
     return (
         <>
             {/* {item.disabled && list.length <= 1 && <div className='h-[30px] w-full bg-white opacity-25 filtered'></div>} */}
@@ -160,7 +145,7 @@ function EachItem({ list, item, onSaveItem, level, onChange, clone, mode }: any)
                 <div className={`px-2 bg-blue-500 border-4 h-full w-full text-black bg-opacity-20 overflow-hidden`}>
                     {item.type === 'asyncFunc' && (
                         <div className='py-1 flex items-center text-blue-800 text-sm'>
-                            <FontAwesomeIcon icon={faCode} className='mx-1 '></FontAwesomeIcon>
+                            <FontAwesomeIcon icon={faCode} className='mx-1 h-3 '></FontAwesomeIcon>
                             <input
                                 className='inline-block w-24 appearance-none bg-transparent ml-2 outline-none border-b-2 focus:outline-none'
                                 type='text'
@@ -184,7 +169,7 @@ function EachItem({ list, item, onSaveItem, level, onChange, clone, mode }: any)
 
                     {item.type === 'funcCall' && (
                         <div className='py-1 flex items-center text-blue-800 text-sm'>
-                            <FontAwesomeIcon icon={faTerminal} className='mx-1 '></FontAwesomeIcon>
+                            <FontAwesomeIcon icon={faTerminal} className='mx-1 h-3 '></FontAwesomeIcon>
                             {`let `}
                             <select
                                 name='result'
@@ -238,7 +223,7 @@ function EachItem({ list, item, onSaveItem, level, onChange, clone, mode }: any)
 
                     {item.type === 'variable' && (
                         <div className='py-1 flex items-center text-blue-800 text-sm'>
-                            <FontAwesomeIcon icon={faLightbulb} className='mx-1 '></FontAwesomeIcon>
+                            <FontAwesomeIcon icon={faLightbulb} className='mx-1 h-3 '></FontAwesomeIcon>
                             {`let `}
                             <input
                                 className='inline-block w-24 appearance-none bg-transparent outline-none ml-2 border-b-2 focus:outline-none'
@@ -248,6 +233,16 @@ function EachItem({ list, item, onSaveItem, level, onChange, clone, mode }: any)
                                     onSaveItem('name', ev.target.value)
                                 }}
                             ></input>
+                            {` = `}
+                            <input
+                                className='inline-block w-20 appearance-none bg-transparent ml-2 outline-none border-b-2 focus:outline-none'
+                                type='text'
+                                value={item.initVal || ''}
+                                onChange={(ev) => {
+                                    onSaveItem('initVal', ev.target.value)
+                                }}
+                            ></input>
+                            {`;`}
                         </div>
                     )}
 

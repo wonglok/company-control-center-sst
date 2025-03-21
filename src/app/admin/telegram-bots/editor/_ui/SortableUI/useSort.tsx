@@ -27,7 +27,9 @@ export const useSort = create<{
                 id: `__${v4()}`,
                 type: 'variable',
                 name: 'vari001',
-                template: 'let {{ name }};',
+                initVal: 'null',
+                let: 'let',
+                template: '{{let}} {{ name }} = {{ initVal }};',
             },
             {
                 id: `__${v4()}`,
@@ -41,12 +43,14 @@ export const useSort = create<{
                 type: 'asyncFunc',
                 name: 'loadRoutes',
                 args: ``,
+
                 template: `let {{name}} = async ({{args}}) => {
 {{body}}
 }`,
                 children: [
                     {
                         id: `__${v4()}`,
+                        let: 'let',
                         type: 'funcCall',
                         name: 'loadDB',
                         result: 'var001',

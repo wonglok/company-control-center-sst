@@ -6,24 +6,37 @@ import { SortableRecursive } from './SortableRecursive'
 import { useSort } from './useSort'
 import { codeGen } from './codeGen'
 import { useEffect } from 'react'
-import { getTelegramBot } from '@/actions/telegram/getTelegramBot'
-import { useParams } from 'next/navigation'
-import { ReactSortable } from 'react-sortablejs'
-import { ItemArchive } from './ItemArchive'
+import { useFlow } from '../../[botID]/useFlow'
+// import { getTelegramBot } from '@/actions/telegram/getTelegramBot'
+// import { useParams } from 'next/navigation'
+// import { ReactSortable } from 'react-sortablejs'
+// import { ItemArchive } from './ItemArchive'
 
-export const SortableUI = ({}) => {
+export const SortableUI = ({ id, data }: any) => {
     let recycle = useSort((r) => r.recycle)
     let list = useSort((r) => r.list)
     let examples = useSort((r) => r.examples)
 
-    let params = useParams()
+    let nodes = useFlow((r) => r.nodes)
+    let node = nodes.find((r: any) => r.id === id)
+
+    // console.log(node)
+
     useEffect(() => {
-        getTelegramBot({ item: { itemID: params.botID } }).then((data: any) => {
-            useSort.setState({
-                list: data.procedure || useSort.getState().template,
-            })
+        useSort.setState({
+            list: node.data.list || [],
         })
-    }, [])
+
+        return useSort.subscribe((now, before) => {
+            if (now.list && before.list) {
+                node.data.list = now.list
+
+                useFlow.setState({
+                    nodes: [...useFlow.getState().nodes],
+                })
+            }
+        })
+    }, [node])
 
     return (
         <>
@@ -68,7 +81,7 @@ export const SortableUI = ({}) => {
                             <div className='w-1/2'>
                                 <div className='bg-white bg-opacity-40 w-full'>
                                     <SortableRecursive
-                                        key={list.map((r) => r.id).join('___')}
+                                        key={list.map((r) => r.id).join('_')}
                                         mode={'work'}
                                         onChange={(list, level) => {
                                             if (level === 0) {

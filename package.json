@@ -98,6 +98,7 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",
     "telegraf": "^4.16.3",
+    "tunnel-rat": "^0.1.2",
     "unified": "^11.0.5",
     "url-loader": "^4.1.1",
     "uuid": "^11.0.5",

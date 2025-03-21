@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button"
 import { useFlow } from "./useFlow"
 
 
@@ -5,7 +6,7 @@ export function useRemoveUI({ id }) {
     let nodes = useFlow(r => r.nodes)
     let edges = useFlow(r => r.edges)
 
-    let remove = <button onClick={() => {
+    let remove = <Button variant={'outline'} onClick={() => {
 
         let removeEdgeList = edges.filter(r => r.source === id || r.target === id)
 
@@ -18,7 +19,7 @@ export function useRemoveUI({ id }) {
             edges: newEdges
         })
 
-    }}>Remove</button>
+    }}>Remove</Button>
 
     return { remove }
 }
