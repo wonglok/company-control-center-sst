@@ -167,7 +167,10 @@ function Add({ setNodes = () => {} }: any) {
 }
 
 export function SheetDemo({ setNodes }: any) {
+    //
+
     const { x, y, zoom } = useViewport()
+
     const addNode = ({ type = 'WorkNode', dragHandle = undefined }: any) => {
         setNodes((nodes: any) => [
             ...nodes,
@@ -185,7 +188,9 @@ export function SheetDemo({ setNodes }: any) {
             },
         ])
     }
+
     let [open, setOpen] = useState(false)
+
     return (
         <Sheet
             open={open}
@@ -221,8 +226,6 @@ export function SheetDemo({ setNodes }: any) {
                         >
                             Work Node
                         </Button>
-                        {/* dragHandle */}
-                        {/* dragHandle */}
                         <Button
                             onClick={() => {
                                 //
