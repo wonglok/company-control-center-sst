@@ -193,7 +193,6 @@ function EachItem({ list, item, onSaveItem, level, onChange, clone, mode }: any)
                                     onSaveItem('result', ev.target.value)
                                 }}
                             >
-                                <option value={`__${md5(item)}`}>default variable</option>
                                 <option value={`v0`}>custom variable</option>
                                 {linearList
                                     .filter((r: any) => r.type === 'variable')

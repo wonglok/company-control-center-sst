@@ -53,7 +53,7 @@ export const SortableUI = ({}) => {
                     </div>
                 </div>
 
-                <div className='w-full flex' style={{ height: `calc(100% - 100px)` }}>
+                <div className='w-full flex' style={{ minHeight: `calc(100px)` }}>
                     <div className='w-1/2'>
                         <SortableRecursive
                             mode={'clone'}
@@ -82,12 +82,11 @@ export const SortableUI = ({}) => {
                                         list={[...list]}
                                     ></SortableRecursive>
                                 </div>
-
-                                <div className=' whitespace-pre-wrap w-full'>{codeGen(list) || ''}</div>
                             </div>
                         </>
                     )}
                 </div>
+                <div className=' whitespace-pre-wrap w-full p-4'>{codeGen(list) || ''}</div>
             </div>
         </>
     )
