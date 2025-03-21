@@ -1,33 +1,58 @@
+'use client'
+
 import { create } from 'zustand'
-import { ItemType } from './SortableRecursive'
 
 export const useSort = create<{
-    list: ItemType[]
+    list: any[]
 }>(() => {
     return {
         list: [
+            { id: 'sort2', type: 'let', name: 'variable1', template: 'let {{ name }};', children: [] },
+            { id: 'sort3', type: 'let', name: 'variable2', template: 'let {{ name }};', children: [] },
+            { id: 'sort4', type: 'let', name: 'variable3', template: 'let {{ name }};', children: [] },
             {
                 id: 'sort1',
-                name: 'shrek1',
+                type: 'asyncFunc',
+                name: 'myFunction',
+                args: ``,
+                template: `let {{name}} = async ({{args}}) => {
+{{body}} 
+}`,
                 children: [
                     {
-                        id: 'sort31',
-                        name: 'shrek31',
-                        children: [
-                            { id: 'sort22', name: 'shrek2', children: [] },
-                            { id: 'sort32', name: 'shrek3', children: [] },
-                            { id: 'sort42', name: 'shrek4', children: [] },
-                            { id: 'sort52', name: 'fiona5', children: [] },
-                        ],
+                        id: 'sort41',
+                        type: 'funcCall',
+                        name: 'method1A',
+                        result: '',
+                        template: 'let {{ result }} = await {{name}}();',
+                        children: [],
                     },
-                    { id: 'sort41', name: 'shrek41', children: [] },
-                    { id: 'sort51', name: 'fiona51', children: [] },
+                    {
+                        id: 'sort42',
+                        type: 'funcCall',
+                        name: 'method2A',
+                        result: '',
+                        template: 'let {{ result }} = await {{name}}();',
+                        children: [],
+                    },
+                    {
+                        id: 'sort43',
+                        type: 'funcCall',
+                        name: 'method3A',
+                        result: '',
+                        template: 'let {{ result }} = await {{name}}();',
+                        children: [],
+                    },
                 ],
             },
-            { id: 'sort2', name: 'shrek2', children: [] },
-            { id: 'sort3', name: 'shrek3', children: [] },
-            { id: 'sort4', name: 'shrek4', children: [] },
-            { id: 'sort5', name: 'fiona5', children: [] },
+            {
+                id: 'sort17',
+                type: 'funcCall',
+                name: 'myFunction',
+                result: 'output',
+                template: 'let {{ result }} = await {{name}}();',
+                children: [],
+            },
         ],
     }
 })

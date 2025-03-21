@@ -1,16 +1,18 @@
+'use client'
 //https://github.com/SortableJS/react-sortablejs
 
 import React, { useState } from 'react'
 // import { ReactSortable } from 'react-sortablejs'
-import { ItemType, SortableRecursive } from './SortableRecursive'
+import { SortableRecursive } from './SortableRecursive'
 import { useSort } from './useSort'
+import { codeGen } from './codeGen'
 
 export const SortableUI = ({}) => {
     let list = useSort((r) => r.list)
 
     return (
         <>
-            <div>
+            <div className='p-2'>
                 <SortableRecursive
                     onChange={(list, level) => {
                         console.log(list, level)
@@ -25,6 +27,8 @@ export const SortableUI = ({}) => {
                     list={list}
                 ></SortableRecursive>
             </div>
+
+            <div className=' whitespace-pre-wrap'>{codeGen(list)}</div>
         </>
     )
 }

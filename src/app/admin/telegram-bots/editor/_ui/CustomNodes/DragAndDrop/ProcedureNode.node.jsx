@@ -6,13 +6,15 @@ import { Droppable } from './Droppable'
 import { Suspense, useCallback } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { useRemoveUI } from '../../../[botID]/removeBtn';
-import { SortableUI } from './SortableUI/SortableUI';
+import dynamic from 'next/dynamic';
 // import TileList from './ListDnD/TileList';
 // import { HorizontalList } from './ListDnD/HorizontalList';
 // import { HorizontalList } from './ListDnD/HorizontalList';
 
 const handleStyle = { left: 10 };
 
+
+let SortableUI = dynamic(() => import('./SortableUI/SortableUI').then(r => r.SortableUI), { ssr: false })
 
 export function ProcedureNode({ id, data }) {
 

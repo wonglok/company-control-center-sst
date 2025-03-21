@@ -1,13 +1,14 @@
-import md5 from 'md5'
 import { useEffect, useState } from 'react'
 import { ReactSortable } from 'react-sortablejs'
-import { v4 } from 'uuid'
 
+//
 //
 
 export interface ItemType {
     id: string
+    type: string
     name: string
+    template: string
     children: ItemType[]
 }
 
@@ -20,14 +21,14 @@ export function SortableRecursive({
     list: ItemType[]
     level: number
 }) {
-    const [state, setState] = useState<ItemType[]>(list)
+    const [state, setState] = useState<ItemType[]>([...list])
 
     useEffect(() => {
         onChange(state, level)
     }, [state])
 
     return (
-        <div className='border-4 px-4 pt-4 mb-4 h-full min-w-52 inline-block bg-blue-500 bg-opacity-20'>
+        <div className='border-4 border-white px-2 pt-2 mb-2 h-full min-w-52 inline-block bg-blue-500 bg-opacity-20'>
             <ReactSortable
                 setList={(newState: ItemType[]) => {
                     setState(
@@ -45,7 +46,7 @@ export function SortableRecursive({
             >
                 {/*  */}
                 {state.map((item) => (
-                    <div className='h-full w-full text-black bg-opacity-20' key={item.id}>
+                    <div className='p-1 h-full w-full text-black bg-opacity-20' key={item.id}>
                         <div className=' text-blue-800 mb-4'>{item.name}</div>
 
                         <div className=''>
