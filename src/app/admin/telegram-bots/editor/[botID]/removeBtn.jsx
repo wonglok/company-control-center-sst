@@ -7,18 +7,20 @@ export function useRemoveUI({ id }) {
     let edges = useFlow(r => r.edges)
 
     let remove = <Button variant={'outline'} onClick={() => {
+        if (window.confirm('remove node?')) {
 
-        let removeEdgeList = edges.filter(r => r.source === id || r.target === id)
 
-        let newEdges = edges.filter(ed => {
-            return !removeEdgeList.some(r => r.id === ed.id)
-        })
+            let removeEdgeList = edges.filter(r => r.source === id || r.target === id)
 
-        useFlow.setState({
-            nodes: nodes.filter(r => r.id !== id),
-            edges: newEdges
-        })
+            let newEdges = edges.filter(ed => {
+                return !removeEdgeList.some(r => r.id === ed.id)
+            })
 
+            useFlow.setState({
+                nodes: nodes.filter(r => r.id !== id),
+                edges: newEdges
+            })
+        }
     }}>Remove</Button>
 
     return { remove }
