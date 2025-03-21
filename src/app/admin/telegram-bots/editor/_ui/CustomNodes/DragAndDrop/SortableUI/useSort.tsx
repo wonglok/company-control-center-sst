@@ -7,9 +7,9 @@ export const useSort = create<{
 }>(() => {
     return {
         list: [
-            { id: 'sort2', type: 'let', name: 'variable1', template: 'let {{ name }};', children: [] },
-            { id: 'sort3', type: 'let', name: 'variable2', template: 'let {{ name }};', children: [] },
-            { id: 'sort4', type: 'let', name: 'variable3', template: 'let {{ name }};', children: [] },
+            { id: 'sort2', type: 'variable', name: 'variable1', template: 'let {{ name }};', children: [] },
+            { id: 'sort3', type: 'variable', name: 'variable2', template: 'let {{ name }};', children: [] },
+            { id: 'sort4', type: 'variable', name: 'variable3', template: 'let {{ name }};', children: [] },
             {
                 id: 'sort1',
                 type: 'asyncFunc',

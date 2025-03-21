@@ -1,3 +1,13 @@
+import {
+    faArrowRight,
+    faCaretDown,
+    faCloud,
+    faCode,
+    faGear,
+    faLightbulb,
+    faMultiply,
+} from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useEffect, useState } from 'react'
 import { ReactSortable } from 'react-sortablejs'
 
@@ -29,7 +39,7 @@ export function SortableRecursive({
     }, [state])
 
     return (
-        <div className='border-4 border-white px-2 pt-2 mb-2 h-full min-w-52 inline-block bg-blue-500 bg-opacity-20'>
+        <div className='h-full min-w-52 inline-block  pb-4'>
             <ReactSortable
                 setList={(newState: ItemType[]) => {
                     setState(
@@ -41,16 +51,133 @@ export function SortableRecursive({
                         }),
                     )
                 }}
-                animation={400}
+                //
+                animation={300}
                 group='shared'
                 list={state}
             >
-                {/*  */}
                 {state.map((item) => (
-                    <div className='p-1 h-full w-full text-black bg-opacity-20' key={item.id}>
-                        <div className=' text-blue-800 mb-4'>
-                            {item.type}: {item.name} {item.args || ''}
-                        </div>
+                    <div
+                        className='px-2 bg-blue-500 border-4 h-full w-full text-black bg-opacity-20  mb-1'
+                        key={item.id}
+                    >
+                        {item.type === 'asyncFunc' && (
+                            <div className='py-1 pb-5 flex items-center text-blue-800 text-sm'>
+                                <FontAwesomeIcon icon={faCode} className='mr-2'></FontAwesomeIcon>{' '}
+                                <input
+                                    className='inline-block w-24 appearance-none bg-transparent outline-none ml-2 border-b-2 focus:outline-none'
+                                    type='text'
+                                    value={item.name}
+                                    onChange={(ev) => {
+                                        setState((state) => {
+                                            return [
+                                                ...state.map((r) => {
+                                                    if (item.id === r.id) {
+                                                        return {
+                                                            ...r,
+                                                            name: ev.target.value,
+                                                        }
+                                                    }
+                                                    return r
+                                                }),
+                                            ]
+                                        })
+                                    }}
+                                ></input>{' '}
+                                <input
+                                    className='inline-block w-24 appearance-none bg-transparent outline-none ml-2 border-b-2 focus:outline-none'
+                                    type='text'
+                                    value={item.args}
+                                    onChange={(ev) => {
+                                        setState((state) => {
+                                            return [
+                                                ...state.map((r) => {
+                                                    if (item.id === r.id) {
+                                                        return {
+                                                            ...r,
+                                                            args: ev.target.value,
+                                                        }
+                                                    }
+                                                    return r
+                                                }),
+                                            ]
+                                        })
+                                    }}
+                                ></input>
+                            </div>
+                        )}
+
+                        {item.type === 'funcCall' && (
+                            <div className='py-1 flex items-center text-blue-800 text-sm'>
+                                <FontAwesomeIcon icon={faGear} className='mr-2'></FontAwesomeIcon>{' '}
+                                <input
+                                    className='inline-block w-24 appearance-none bg-transparent outline-none ml-2 border-b-2 focus:outline-none'
+                                    type='text'
+                                    value={item.name}
+                                    onChange={(ev) => {
+                                        setState((state) => {
+                                            return [
+                                                ...state.map((r) => {
+                                                    if (item.id === r.id) {
+                                                        return {
+                                                            ...r,
+                                                            name: ev.target.value,
+                                                        }
+                                                    }
+                                                    return r
+                                                }),
+                                            ]
+                                        })
+                                    }}
+                                ></input>
+                                <input
+                                    className='inline-block w-24 appearance-none bg-transparent outline-none ml-2 border-b-2 focus:outline-none'
+                                    type='text'
+                                    value={item.args}
+                                    onChange={(ev) => {
+                                        setState((state) => {
+                                            return [
+                                                ...state.map((r) => {
+                                                    if (item.id === r.id) {
+                                                        return {
+                                                            ...r,
+                                                            args: ev.target.value,
+                                                        }
+                                                    }
+                                                    return r
+                                                }),
+                                            ]
+                                        })
+                                    }}
+                                ></input>
+                            </div>
+                        )}
+
+                        {item.type === 'variable' && (
+                            <div className='py-1 flex items-center text-blue-800 text-sm'>
+                                <FontAwesomeIcon icon={faLightbulb} className='mr-2'></FontAwesomeIcon>
+                                <input
+                                    className='inline-block w-24 appearance-none bg-transparent outline-none ml-2 border-b-2 focus:outline-none'
+                                    type='text'
+                                    value={item.name}
+                                    onChange={(ev) => {
+                                        setState((state) => {
+                                            return [
+                                                ...state.map((r) => {
+                                                    if (item.id === r.id) {
+                                                        return {
+                                                            ...r,
+                                                            name: ev.target.value,
+                                                        }
+                                                    }
+                                                    return r
+                                                }),
+                                            ]
+                                        })
+                                    }}
+                                ></input>
+                            </div>
+                        )}
 
                         <div className=''>
                             {item?.children?.length > 0 ? (

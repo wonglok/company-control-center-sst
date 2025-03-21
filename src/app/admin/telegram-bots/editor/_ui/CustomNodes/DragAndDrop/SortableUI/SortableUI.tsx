@@ -12,7 +12,7 @@ export const SortableUI = ({}) => {
 
     return (
         <>
-            <div className='p-2'>
+            <div className='bg-white bg-opacity-40'>
                 <SortableRecursive
                     onChange={(list, level) => {
                         console.log(list, level)
