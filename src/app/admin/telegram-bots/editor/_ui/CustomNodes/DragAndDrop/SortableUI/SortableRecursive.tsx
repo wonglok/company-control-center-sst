@@ -10,6 +10,7 @@ export interface ItemType {
     name: string
     template: string
     children: ItemType[]
+    args: string | undefined
 }
 
 export function SortableRecursive({
@@ -47,7 +48,9 @@ export function SortableRecursive({
                 {/*  */}
                 {state.map((item) => (
                     <div className='p-1 h-full w-full text-black bg-opacity-20' key={item.id}>
-                        <div className=' text-blue-800 mb-4'>{item.name}</div>
+                        <div className=' text-blue-800 mb-4'>
+                            {item.type}: {item.name} {item.args || ''}
+                        </div>
 
                         <div className=''>
                             {item?.children?.length > 0 ? (

@@ -8,7 +8,7 @@ export const codeGen = (listRaw: any[]): string => {
     let str = ``
 
     let getID = (orig: any) => {
-        return `__${`${md5(JSON.stringify(orig))}`.slice(2, 9)}`
+        return `__${`${md5(JSON.stringify(orig))}`}`
     }
 
     let genLocalCode = (arr: any[], level = 0) => {
