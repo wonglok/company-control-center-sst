@@ -12,8 +12,8 @@ import Link from 'next/link'
 // import { ConnectedSockets } from '@/app/app/_ui/ConnectedSockets/ConnectedSockets'
 // import { Suspense } from 'react'
 // import { Skeleton } from '@/components/ui/skeleton'
-import { DndContext } from '@dnd-kit/core'
-import { SortableUI } from '../_ui/CustomNodes/DragAndDrop/SortableUI/SortableUI'
+// import { DndContext } from '@dnd-kit/core'
+import { SortableUI } from '../_ui/SortableUI/SortableUI'
 
 export function AppPage({
     botID,

@@ -14,7 +14,7 @@ import dynamic from 'next/dynamic';
 const handleStyle = { left: 10 };
 
 
-let SortableUI = dynamic(() => import('./SortableUI/SortableUI').then(r => r.SortableUI), { ssr: false })
+let SortableUI = dynamic(() => import('../../SortableUI/SortableUI').then(r => r.SortableUI), { ssr: false })
 
 export function ProcedureNode({ id, data }) {
 
@@ -46,8 +46,6 @@ export function ProcedureNode({ id, data }) {
 
             <div className='w-full hfull relative'>
                 <SortableUI ></SortableUI>
-                {/* <ReactDnD></ReactDnD> */}
-
             </div>
 
             {/* <DndContext
