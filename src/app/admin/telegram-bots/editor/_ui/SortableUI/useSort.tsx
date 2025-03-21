@@ -23,11 +23,36 @@ export const useSort = create<{
         ],
         examples: [
             {
+                //
+                id: `__${v4()}`,
+                type: 'variable',
+                name: 'vari001',
+                template: 'let {{ name }};',
+            },
+            {
                 id: `__${v4()}`,
                 type: 'funcCall',
                 name: 'loadDB',
                 result: 'var001',
                 template: 'let {{ result }} = await {{name}}();',
+            },
+            {
+                id: `__${v4()}`,
+                type: 'asyncFunc',
+                name: 'loadRoutes',
+                args: ``,
+                template: `let {{name}} = async ({{args}}) => {
+{{body}}
+}`,
+                children: [
+                    {
+                        id: `__${v4()}`,
+                        type: 'funcCall',
+                        name: 'loadDB',
+                        result: 'var001',
+                        template: 'let {{ result }} = await {{name}}();',
+                    },
+                ],
             },
         ],
 
@@ -50,7 +75,7 @@ export const useSort = create<{
 })
 
 // let temp = [
-//     { id: 'var001', type: 'variable', name: 'variable1', template: 'let {{ name }};', children: [] },
+//
 //     { id: 'sort3', type: 'variable', name: 'variable2', template: 'let {{ name }};', children: [] },
 //     { id: 'sort4', type: 'variable', name: 'variable3', template: 'let {{ name }};', children: [] },
 //     {

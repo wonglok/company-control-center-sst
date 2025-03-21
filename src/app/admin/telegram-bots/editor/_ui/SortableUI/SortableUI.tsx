@@ -54,7 +54,7 @@ export const SortableUI = ({}) => {
                 </div>
 
                 <div className='w-full flex' style={{ minHeight: `calc(100px)` }}>
-                    <div className='w-1/2'>
+                    <div className='w-1/2 '>
                         <SortableRecursive
                             mode={'clone'}
                             onChange={(list, level) => {}}

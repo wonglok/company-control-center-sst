@@ -3,6 +3,7 @@ import {
     faCaretDown,
     faCloud,
     faCode,
+    faCodeBranch,
     faDotCircle,
     faFileCode,
     faGear,
@@ -70,20 +71,19 @@ export function SortableRecursive({
                 filter={'.filtered'}
                 setList={(newState: any[]) => {
                     setState(
-                        newState
-                            .map((r) => {
-                                return {
-                                    ...r,
-                                    id: r.id,
-                                }
-                            })
-                            .sort((a, b) => {
-                                if (a.disabled) {
-                                    return -1111111
-                                } else {
-                                    return 0
-                                }
-                            }),
+                        newState.map((r) => {
+                            return {
+                                ...r,
+                                id: r.id,
+                            }
+                        }),
+                        // .sort((a, b) => {
+                        //     if (a.disabled) {
+                        //         return -1111111
+                        //     } else {
+                        //         return 0
+                        //     }
+                        // }),
                     )
                 }}
                 //
@@ -94,7 +94,7 @@ export function SortableRecursive({
                     ...ext,
                 }}
                 list={state}
-                className='min-h-24  bg-gradient-to-tr from-white to-gray-200'
+                className='min-h-[100px]  bg-gradient-to-tr from-white to-gray-200'
             >
                 {state.map((item) => {
                     return (
@@ -157,10 +157,10 @@ function EachItem({ list, item, onSaveItem, level, onChange, clone, mode }: any)
         <>
             {/* {item.disabled && list.length <= 1 && <div className='h-[30px] w-full bg-white opacity-25 filtered'></div>} */}
             {!item.disabled && (
-                <div className={`px-2 bg-blue-500 border-4 h-full w-full text-black bg-opacity-20 `}>
+                <div className={`px-2 bg-blue-500 border-4 h-full w-full text-black bg-opacity-20 overflow-hidden`}>
                     {item.type === 'asyncFunc' && (
-                        <div className='py-1 pb-5 flex items-center text-blue-800 text-sm'>
-                            <FontAwesomeIcon icon={faTerminal} className='mx-1 '></FontAwesomeIcon>
+                        <div className='py-1 flex items-center text-blue-800 text-sm'>
+                            <FontAwesomeIcon icon={faCode} className='mx-1 '></FontAwesomeIcon>
                             <input
                                 className='inline-block w-24 appearance-none bg-transparent ml-2 outline-none border-b-2 focus:outline-none'
                                 type='text'
@@ -184,16 +184,17 @@ function EachItem({ list, item, onSaveItem, level, onChange, clone, mode }: any)
 
                     {item.type === 'funcCall' && (
                         <div className='py-1 flex items-center text-blue-800 text-sm'>
+                            <FontAwesomeIcon icon={faTerminal} className='mx-1 '></FontAwesomeIcon>
                             {`let `}
                             <select
                                 name='result'
-                                className='mx-2'
+                                className='mx-2 text-xs'
                                 value={item.result}
                                 onChange={(ev) => {
                                     onSaveItem('result', ev.target.value)
                                 }}
                             >
-                                <option value={`v0`}>custom variable</option>
+                                <option value={`v0`}>custom</option>
                                 {linearList
                                     .filter((r: any) => r.type === 'variable')
                                     .map((li: any) => {
@@ -238,6 +239,7 @@ function EachItem({ list, item, onSaveItem, level, onChange, clone, mode }: any)
                     {item.type === 'variable' && (
                         <div className='py-1 flex items-center text-blue-800 text-sm'>
                             <FontAwesomeIcon icon={faLightbulb} className='mx-1 '></FontAwesomeIcon>
+                            {`let `}
                             <input
                                 className='inline-block w-24 appearance-none bg-transparent outline-none ml-2 border-b-2 focus:outline-none'
                                 type='text'
