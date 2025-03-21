@@ -49,7 +49,7 @@ export function ProcedureNode({ id, data }) {
     }, [])
 
     return <>
-        <div className='bg-white w-[450px] h-full p-2 rounded-lg  border border-gray-500 ' onDragStartCapture={(ev) => {
+        <div className='bg-white min-w-[320px] h-full p-2 rounded-lg  border border-gray-500 ' onDragStartCapture={(ev) => {
             ev.stopPropagation()
         }}>
             <button className='dragHandle bg-sky-300 w-full h-8'></button>
@@ -87,10 +87,11 @@ export function ProcedureNode({ id, data }) {
 
             {show && <BotEditorIn>
                 <div className=' absolute z-[2000] top-0 left-0 w-full h-full bg-gray-200 rounded-xl '>
-                    <div className=' absolute top-0 right-0'>
-                        <Button variant={'destructive'} onClick={() => {
-                            setShow(false)
-                        }}>Close</Button>
+                    <div className=' absolute top-2 right-2'>
+                        <button className='text-xs p-2 bg-red-500 text-white'
+                            onClick={() => {
+                                setShow(false)
+                            }}>Close</button>
                     </div>
                     <SortableUI id={id} data={data}></SortableUI>
                 </div>

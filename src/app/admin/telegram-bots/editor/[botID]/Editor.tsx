@@ -117,7 +117,7 @@ export const Editor = () => {
                     )
 
                     save({ bot: now.bot })
-                }, 350)
+                }, 500)
                 //
             }
         })

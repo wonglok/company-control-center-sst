@@ -85,7 +85,10 @@ export function SortableRecursive({
                     ...ext,
                 }}
                 list={list}
-                className={'min-h-[12] pb-12 bg-gradient-to-tr from-white to-gray-200 ' + ``}
+                className={
+                    'min-h-[100px] pb-12 ' +
+                    `${mode === 'recycle' ? `bg-gradient-to-tr from-sky-200 to-teal-500 ` : ` bg-gradient-to-tr from-white to-gray-200  `}`
+                }
             >
                 {list.map((item) => {
                     return (
@@ -186,7 +189,7 @@ function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
 
                             <select
                                 name='result'
-                                className='mx-2 text-xs'
+                                className='mx-2 text-xs w-14'
                                 value={item.result}
                                 onChange={(ev) => {
                                     onSaveItem('result', ev.target.value)

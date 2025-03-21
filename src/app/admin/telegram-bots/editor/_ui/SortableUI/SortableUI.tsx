@@ -66,6 +66,7 @@ export const SortableUI = ({ id, data }: any) => {
 
                 <div className='w-full flex' style={{ minHeight: `calc(100px)` }}>
                     <div className='w-1/2 '>
+                        <div>Toolbox</div>
                         <SortableRecursive
                             mode={'clone'}
                             onChange={(list: any, level: any) => {}}
@@ -77,6 +78,7 @@ export const SortableUI = ({ id, data }: any) => {
                     {list && (
                         <>
                             <div className='w-1/2'>
+                                <div>Program</div>
                                 <div className='bg-white bg-opacity-40 w-full'>
                                     <SortableRecursive
                                         key={list.map((r) => r.id).join('_')}
