@@ -42,16 +42,6 @@ export function SortableRecursive({
     list: any[]
     level: number
 }) {
-    let setState = (v: any) => {
-        onChange(v, level)
-    }
-
-    useEffect(() => {
-        if (mode === 'recycle') {
-            setState(list)
-        }
-    }, [mode, list])
-
     let ext = {}
 
     if (mode === 'clone') {
@@ -61,15 +51,37 @@ export function SortableRecursive({
         }
     }
     if (mode === 'recycle') {
-        ext = {
-            put: true,
+        ext = {}
+    }
+
+    let clone: any = (v: any) => v
+
+    if (mode === 'clone') {
+        clone = (raw: any) => {
+            let item = JSON.parse(JSON.stringify(raw))
+            item.id = `__${v4()}`
+
+            let walk = (list: any) => {
+                list.forEach((it: any) => {
+                    it.id = `__${v4()}`
+                    if (it.children) {
+                        walk(it.children)
+                    }
+                })
+            }
+
+            if (item.children) {
+                walk(item.children)
+            }
+            return item
         }
     }
 
     return (
         <div className='h-full w-full min-w-52 inline-block'>
             <ReactSortable
-                clone={(item) => {
+                id={`__${v4()}`}
+                clone={(item: any) => {
                     return {
                         ...item,
                         id: `__${v4()}`,
@@ -77,7 +89,7 @@ export function SortableRecursive({
                 }}
                 filter={'.filtered'}
                 setList={(newState: any[]) => {
-                    onChange([...newState], level)
+                    onChange(newState, level)
                 }}
                 animation={300}
                 group={{
@@ -99,7 +111,7 @@ export function SortableRecursive({
                             item={item}
                             mode={mode}
                             onSaveItem={(key: string, val: any) => {
-                                setState(
+                                onChange(
                                     list.map((r) => {
                                         if (item.id === r.id) {
                                             return {
@@ -109,6 +121,7 @@ export function SortableRecursive({
                                         }
                                         return { ...r }
                                     }),
+                                    level,
                                 )
                             }}
                         ></EachItem>
@@ -121,7 +134,7 @@ export function SortableRecursive({
     )
 }
 
-function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
+function EachItem({ item, onSaveItem, level, mode }: any) {
     //
 
     let listRoot = useSort((r) => r.list)
@@ -132,8 +145,8 @@ function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
         let walk = (list: any) => {
             list.forEach((it: any) => {
                 arr.push(it)
-                if (list.children) {
-                    walk(list.children)
+                if (it.children) {
+                    walk(it.children)
                 }
             })
         }
@@ -148,29 +161,44 @@ function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
             {/* {item.disabled && list.length <= 1 && <div className='h-[30px] w-full bg-white opacity-25 filtered'></div>} */}
             {!item.disabled && (
                 <div className={`px-2 bg-blue-500 border-4 h-full w-full text-black bg-opacity-20 overflow-hidden`}>
-                    {/* {item.type === 'asyncFunc' && (
-                        <div className='py-1 flex items-center text-blue-800 text-sm'>
-                            <FontAwesomeIcon icon={faCode} className='mx-1 h-3 '></FontAwesomeIcon>
-                            <input
-                                className='inline-block w-24 appearance-none bg-transparent ml-2 outline-none border-b-2 focus:outline-none'
-                                type='text'
-                                value={item.name}
-                                onChange={(ev) => {
-                                    onSaveItem('name', ev.target.value)
-                                }}
-                            ></input>
-                            {`(`}
-                            <input
-                                className='inline-block w-10 appearance-none bg-transparent outline-none ml-2 border-b-2 focus:outline-none'
-                                type='text'
-                                value={item.args}
-                                onChange={(ev) => {
-                                    onSaveItem('args', ev.target.value)
-                                }}
-                            ></input>
-                            {`)`}
-                        </div>
-                    )} */}
+                    {item.type === 'asyncFunc' && (
+                        <>
+                            <div className='py-1 flex items-center text-blue-800 text-sm'>
+                                <FontAwesomeIcon icon={faCode} className='mx-1 h-3 '></FontAwesomeIcon>
+                                <input
+                                    className='inline-block w-24 appearance-none bg-transparent ml-2 outline-none border-b-2 focus:outline-none'
+                                    type='text'
+                                    value={item.name}
+                                    onChange={(ev) => {
+                                        onSaveItem('name', ev.target.value)
+                                    }}
+                                ></input>
+                                {`(`}
+                                <input
+                                    className='inline-block w-10 appearance-none bg-transparent outline-none ml-2 border-b-2 focus:outline-none'
+                                    type='text'
+                                    value={item.args}
+                                    onChange={(ev) => {
+                                        onSaveItem('args', ev.target.value)
+                                    }}
+                                ></input>
+                                {`)`}
+                            </div>
+
+                            {/* {item.children && (
+                                <SortableRecursive
+                                    mode={mode}
+                                    level={level + 1}
+                                    list={item?.children}
+                                    onChange={(lst: any, lvl: any) => {
+                                        if (lvl === level) {
+                                            onSaveItem('children', lst)
+                                        }
+                                    }}
+                                ></SortableRecursive>
+                            )} */}
+                        </>
+                    )}
 
                     {item.type === 'funcCall' && (
                         <div className='py-1 flex items-center text-blue-800 text-sm'>
@@ -188,11 +216,11 @@ function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
                             </select>
 
                             <select
-                                name='result'
+                                name='varName'
                                 className='mx-2 text-xs w-14'
-                                value={item.result}
+                                value={item.varName}
                                 onChange={(ev) => {
-                                    onSaveItem('result', ev.target.value)
+                                    onSaveItem('varName', ev.target.value)
                                 }}
                             >
                                 <option value={`v0`}>custom</option>
@@ -200,8 +228,8 @@ function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
                                     .filter((r: any) => r.type === 'variable')
                                     .map((li: any) => {
                                         return (
-                                            <option key={li.id} value={li.name}>
-                                                {li.name}
+                                            <option key={li.id} value={li.varName}>
+                                                {li.varName}
                                             </option>
                                         )
                                     })}
@@ -209,18 +237,18 @@ function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
                             <input
                                 className='inline-block w-24 appearance-none bg-transparent outline-none ml-2 border-b-2 focus:outline-none'
                                 type='text'
-                                value={item.result || ``}
+                                value={item.varName || ``}
                                 onChange={(ev) => {
-                                    onSaveItem('result', ev.target.value)
+                                    onSaveItem('varName', ev.target.value)
                                 }}
                             ></input>
                             {`=`}
                             <input
                                 className='inline-block w-24 appearance-none bg-transparent outline-none ml-2 border-b-2 focus:outline-none'
                                 type='text'
-                                value={item.name}
+                                value={item.methodName}
                                 onChange={(ev) => {
-                                    onSaveItem('name', ev.target.value)
+                                    onSaveItem('methodName', ev.target.value)
                                 }}
                             ></input>
 
@@ -228,9 +256,9 @@ function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
                             <input
                                 className='inline-block w-20 appearance-none bg-transparent outline-none border-b-2 focus:outline-none'
                                 type='text'
-                                value={item.args || ''}
+                                value={item.methodArgs || ''}
                                 onChange={(ev) => {
-                                    onSaveItem('args', ev.target.value)
+                                    onSaveItem('methodArgs', ev.target.value)
                                 }}
                             ></input>
                             {`)`}
@@ -244,9 +272,9 @@ function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
                             <input
                                 className='inline-block w-24 appearance-none bg-transparent outline-none ml-2 border-b-2 focus:outline-none'
                                 type='text'
-                                value={item.name}
+                                value={item.varName}
                                 onChange={(ev) => {
-                                    onSaveItem('name', ev.target.value)
+                                    onSaveItem('varName', ev.target.value)
                                 }}
                             ></input>
                             {` = `}
@@ -260,15 +288,6 @@ function EachItem({ list, item, onSaveItem, level, clone, mode }: any) {
                             ></input>
                             {`;`}
                         </div>
-                    )}
-
-                    {item.children && (
-                        <SortableRecursive
-                            mode={mode}
-                            level={level + 1}
-                            list={item?.children}
-                            onChange={() => {}}
-                        ></SortableRecursive>
                     )}
                 </div>
             )}

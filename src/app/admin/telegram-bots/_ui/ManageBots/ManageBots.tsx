@@ -75,6 +75,7 @@ export function ManageBots({ config, jwt }: any) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
+                        {/*  */}
                         {bots.map((bot: BotType) => (
                             <TableRow key={bot.itemID}>
                                 <TableCell className='text-left'>

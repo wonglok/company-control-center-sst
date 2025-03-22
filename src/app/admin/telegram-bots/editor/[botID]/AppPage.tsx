@@ -59,6 +59,8 @@ export function AppPage({
                 <div className='w-full h-full bg-gray-200 rounded-xl  relative'>
                     {/* <SortableUI></SortableUI> */}
                     <Editor></Editor>
+
+                    {/*  */}
                     <tn.Out></tn.Out>
                 </div>
             </Dashboard>

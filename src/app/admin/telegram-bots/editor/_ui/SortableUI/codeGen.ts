@@ -3,7 +3,7 @@
 import md5 from 'md5'
 import mustache from 'mustache'
 
-export const codeGen = (listRaw: any[]): string => {
+export const codeGen = (listRaw: any[] = []): string => {
     let list = JSON.parse(JSON.stringify(listRaw))
 
     let str = ``
@@ -12,7 +12,7 @@ export const codeGen = (listRaw: any[]): string => {
         return `__${`${md5(JSON.stringify(orig))}`}`
     }
 
-    let genLocalCode = (arr: any[], level = 0) => {
+    let genLocalCode = (arr: any[] = [], level = 0) => {
         return (arr || []).map((li: any) => {
             //
 
@@ -58,6 +58,10 @@ export const codeGen = (listRaw: any[]): string => {
                     },
                 },
             )}\n`
+
+            if (li.children) {
+                genAll(li.children || [], level + 1)
+            }
 
             return li
         })

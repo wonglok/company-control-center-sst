@@ -5,38 +5,34 @@ import { create } from 'zustand'
 
 export const useSort = create<{
     list: any[]
-    template: any[]
     examples: any[]
     recycle: any[]
 }>(() => {
     return {
         //
         recycle: [],
+
         examples: [
             {
                 //
                 id: `__${v4()}`,
                 type: 'variable',
-                name: 'happy001',
+                varName: 'peter',
                 initVal: 'null',
                 let: 'let',
-                template: '{{ let }} {{ name }} = {{ initVal }};',
+                template: '{{ let }} {{ varName }} = {{ initVal }};',
             },
             {
                 id: `__${v4()}`,
                 type: 'funcCall',
-                name: 'loadDB',
-                result: 'var001',
                 let: '',
-                args: '',
-                template: '{{ let }} {{ result }} = await {{name}}({{args}});',
+                varName: 'var001',
+                methodName: 'loadDB',
+                methodArgs: '',
+                template: '{{ let }} {{ varName }} = await {{methodName}}({{methodArgs}});',
             },
         ],
 
-        template: [],
-
-        list: [
-            //
-        ],
+        list: [],
     }
 })

@@ -7,6 +7,7 @@ import { useSort } from './useSort'
 import { codeGen } from './codeGen'
 import { useEffect } from 'react'
 import { useFlow } from '../../[botID]/useFlow'
+import { v4 } from 'uuid'
 // import { getTelegramBot } from '@/actions/telegram/getTelegramBot'
 // import { useParams } from 'next/navigation'
 // import { ReactSortable } from 'react-sortablejs'
@@ -57,7 +58,11 @@ export const SortableUI = ({ id, data }: any) => {
                         <SortableRecursive
                             mode={'recycle'}
                             key={recycle.map((r) => JSON.stringify(r)).join('')}
-                            onChange={(list: any, level: any) => {}}
+                            onChange={(list: any, level: any) => {
+                                useSort.setState({
+                                    recycle: list,
+                                })
+                            }}
                             level={0}
                             list={recycle}
                         ></SortableRecursive>
@@ -75,6 +80,7 @@ export const SortableUI = ({ id, data }: any) => {
                         ></SortableRecursive>
                     </div>
 
+                    {/*  */}
                     {list && (
                         <>
                             <div className='w-1/2'>
@@ -86,7 +92,7 @@ export const SortableUI = ({ id, data }: any) => {
                                         level={0}
                                         onChange={(lst: any, lvl: any) => {
                                             useSort.setState({
-                                                list: [...lst],
+                                                list: lst,
                                             })
                                         }}
                                         list={[...list]}
@@ -98,7 +104,7 @@ export const SortableUI = ({ id, data }: any) => {
                 </div>
             </div>
             <div className='w-full px-2'>
-                <pre className=' max-w-full whitespace-pre-wrap w-full py-4 bg-white rounded-2xl'>
+                <pre className=' max-w-full whitespace-pre-wrap w-full py-4 px-4 bg-white rounded-2xl text-sm'>
                     {codeGen(list) || ''}
                 </pre>
             </div>

@@ -5,7 +5,6 @@ import 'codemirror/lib/codemirror.css'
 import 'codemirror/addon/hint/show-hint.css'
 
 import { create } from 'zustand'
-import { useBot } from '../../schema/[botID]/useBot'
 import nlp from 'compromise'
 import plg from 'compromise-dates'
 nlp.plugin(plg)
@@ -27,8 +26,6 @@ const useMirror = create<any>(() => {
         //
     }
 })
-
-//
 
 // let getID = () => {
 //     return `_` + (Math.random() * 1000000000).toFixed(0)
@@ -105,7 +102,7 @@ const procFQL = ({ query }: any) => {
                         .filter((r: string) => r)
                         .map((text) => {
                             return {
-                                cmd: text,
+                                line: text,
                             }
                         }),
                 }
@@ -153,7 +150,7 @@ const procSentence = ({ command, highlight, globals, group }: { command: string 
     }
 
     nlp(command)
-        .match(`provide * user database (called|*) [.]`)
+        .match(` user database (called|*) [.]`)
         .not('the')
         .not('and')
         .out('tags')
@@ -166,7 +163,7 @@ const procSentence = ({ command, highlight, globals, group }: { command: string 
         })
 
     nlp(command)
-        .match(`provide * system database (called|*) [.]`)
+        .match(` system database (called|*) [.]`)
         .not('the')
         .not('and')
         .out('tags')
@@ -312,9 +309,7 @@ const procSentence = ({ command, highlight, globals, group }: { command: string 
     // }
 }
 
-export function CodeMirrorCompo({ autoSave }: any) {
-    let bot = useBot((r) => r.bot)
-
+export function CodeMirrorNodeEditor({ autoSave, bot }: any) {
     let [ready, setReady] = useState<false | true>(false)
 
     useEffect(() => {
@@ -456,7 +451,7 @@ export function CodeMirrorCompo({ autoSave }: any) {
 
         let highlight: any = result.highlight
 
-        console.log(highlight)
+        // console.log(highlight)
 
         let highlightKNs = Object.keys(highlight)
 
@@ -494,8 +489,6 @@ export function CodeMirrorCompo({ autoSave }: any) {
         if (saveToDB) {
             autoSave({ bot: newBot })
         }
-
-        useBot.setState({ bot: newBot })
     }
 
     let value = useMirror((r) => r.value)
