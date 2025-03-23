@@ -43,8 +43,6 @@ export function ProcedureNode({ id, data }) {
         }        //
     }, [])
 
-    //
-
     return <>
         <div className='bg-white min-w-[320px] h-full p-2 rounded-lg  border border-gray-500  cursor-auto' onDragStartCapture={(ev) => {
             ev.stopPropagation()
@@ -120,6 +118,18 @@ function CodeMirrorAdapter({ id, data }) {
 
     let [askBot, setSendData] = useState(false)
 
+
+    let [rawData, setRawData] = useState(false)
+
+    useEffect(() => {
+        if (rawData && data) {
+            data.struc = rawData?.answer?.sections
+            useFlow.setState({ nodes: [...(useFlow.getState()?.nodes || [])] })
+        }
+    }, [rawData, data])
+
+    //
+
     useEffect(() => {
 
         console.log(botID)
@@ -154,8 +164,9 @@ function CodeMirrorAdapter({ id, data }) {
 
                 if (rawData.execID === execID) {
                     if (rawData.route === 'response') {
-
                         console.log('response arrived')
+
+                        setRawData(rawData)
                     }
                 }
             }
@@ -223,6 +234,7 @@ function CodeMirrorAdapter({ id, data }) {
 
             <div className='w-1/2 h-full text-xs overflow-y-scroll'>
                 {askBot && <pre className=' whitespace-pre-wrap p-4'>{JSON.stringify(data?.bot?.json, null, 2)}</pre>}
+                {askBot && <pre className=' whitespace-pre-wrap p-4'>{JSON.stringify(data?.struc, null, 2)}</pre>}
             </div>
         </div>
     </>

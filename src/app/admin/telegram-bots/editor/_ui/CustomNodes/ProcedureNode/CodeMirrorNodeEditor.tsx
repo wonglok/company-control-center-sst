@@ -5,6 +5,13 @@ import 'codemirror/lib/codemirror.css'
 import 'codemirror/addon/hint/show-hint.css'
 
 import { create } from 'zustand'
+import md5 from 'md5'
+
+import remarkParse from 'remark-parse'
+import { unified } from 'unified'
+import { removePosition } from 'unist-util-remove-position'
+
+//
 // import nlp from 'compromise'
 // import plg from 'compromise-dates'
 // nlp.plugin(plg)
@@ -63,7 +70,7 @@ const css = /* css */ `
 }
 `
 
-const procFQL = ({ query }: any) => {
+const procFQL = async ({ query }: any) => {
     // Context
     let globals: { [key: string]: any } = {}
     let highlight = {}
@@ -83,36 +90,55 @@ const procFQL = ({ query }: any) => {
         })
         .filter((r: string) => r)
 
+    //
+
     let allStr = query
     titles.forEach((title: string) => {
         allStr = allStr.replace(title, '____SPLITTER____' + title + '____IDX____')
     })
 
-    let sections: string[] = allStr
-        .split('____SPLITTER____')
-        .filter((r: string) => r)
-        .map((r: string) => {
-            let arr = r.split('____IDX____')
+    let getCodes = async (str: string) => {
+        const processor = unified().use(remarkParse)
 
-            if (arr[0] && arr[1]) {
-                return {
-                    title: arr[0].trim(),
-                    text: arr[1].trim(),
-                    // lines: arr[1]
-                    //     .trim()
-                    //     .split('\n')
-                    //     .filter((r: string) => r)
-                    //     .map((text) => {
-                    //         return {
-                    //             line: text,
-                    //         }
-                    //     }),
-                }
-            } else {
-                return false
+        const value = str
+        const parseTree = processor.parse(value)
+        const tree = await processor.run(parseTree)
+
+        removePosition(tree, { force: true })
+
+        let codes: any[] = []
+
+        let walk = (tree: any) => {
+            if (tree.type === 'code') {
+                codes.push(tree)
             }
-        })
-        .filter((r: any) => r)
+            if (tree.children) {
+                tree.children.forEach((kid: any) => {
+                    walk(kid)
+                })
+            }
+        }
+        walk(tree)
+
+        return codes
+    }
+
+    let sections: string[] = allStr.split('____SPLITTER____').filter((r: string) => r)
+
+    let out = []
+    for (let section of sections) {
+        let r = section
+        let arr = r.split('____IDX____')
+
+        if (arr[0] && arr[1]) {
+            out.push({
+                id: `${md5(arr[0].trim())}`,
+                title: arr[0].trim(),
+                text: arr[1].trim(),
+                codes: await getCodes(arr[1]),
+            })
+        }
+    }
 
     //
     // groups.forEach((group: any) => {
@@ -123,7 +149,7 @@ const procFQL = ({ query }: any) => {
     // })
     //
 
-    globals.sections = sections
+    globals.sections = out.filter((r: any) => r)
 
     return JSON.parse(
         JSON.stringify({
@@ -458,8 +484,8 @@ export function CodeMirrorNodeEditor({ autoSave, bot }: any) {
         return () => {}
     }, [])
 
-    let onChangeBot = ({ value, saveToDB = false }: any) => {
-        let result = procFQL({ query: value })
+    let onChangeBot = async ({ value, saveToDB = false }: any) => {
+        let result = await procFQL({ query: value })
 
         let suggestions: any = [
             //
