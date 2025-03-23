@@ -72,7 +72,6 @@ const css = /* css */ `
 
 const procFQL = async ({ query }: any) => {
     // Context
-    let globals: { [key: string]: any } = {}
     let highlight = {}
 
     // nlp.plugin({
@@ -90,12 +89,12 @@ const procFQL = async ({ query }: any) => {
         })
         .filter((r: string) => r)
 
-    //
-
     let allStr = query
     titles.forEach((title: string) => {
         allStr = allStr.replace(title, '____SPLITTER____' + title + '____IDX____')
     })
+
+    let codeBlocks: any[] = []
 
     let getCodes = async (str: string) => {
         const processor = unified().use(remarkParse)
@@ -106,11 +105,15 @@ const procFQL = async ({ query }: any) => {
 
         removePosition(tree, { force: true })
 
-        let codes: any[] = []
-
         let walk = (tree: any) => {
             if (tree.type === 'code') {
-                codes.push(tree)
+                tree.value = tree.value.trim()
+                codeBlocks.push({
+                    element: tree.type,
+                    type: tree.lang,
+                    meta: tree.meta,
+                    value: tree.value,
+                })
             }
             if (tree.children) {
                 tree.children.forEach((kid: any) => {
@@ -119,26 +122,27 @@ const procFQL = async ({ query }: any) => {
             }
         }
         walk(tree)
-
-        return codes
     }
 
     let sections: string[] = allStr.split('____SPLITTER____').filter((r: string) => r)
 
-    let out = []
+    let processedSections = []
     for (let section of sections) {
         let r = section
         let arr = r.split('____IDX____')
 
         if (arr[0] && arr[1]) {
-            out.push({
+            await getCodes(arr[1])
+
+            processedSections.push({
                 id: `${md5(arr[0].trim())}`,
-                title: arr[0].trim(),
+                title: arr[0].trim().replace('### ', '').replace('## ', '').replace('# ', ''),
                 text: arr[1].trim(),
-                codes: await getCodes(arr[1]),
             })
         }
     }
+
+    //
 
     //
     // groups.forEach((group: any) => {
@@ -149,11 +153,10 @@ const procFQL = async ({ query }: any) => {
     // })
     //
 
-    globals.sections = out.filter((r: any) => r)
-
     return JSON.parse(
         JSON.stringify({
-            globals,
+            sections: processedSections.filter((r: any) => r),
+            codeBlocks,
             highlight,
         }),
     )

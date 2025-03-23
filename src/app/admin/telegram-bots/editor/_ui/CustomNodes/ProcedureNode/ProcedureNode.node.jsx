@@ -12,6 +12,7 @@ import { useParams } from 'next/navigation';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { getTelegramBot } from '@/actions/telegram/getTelegramBot';
 import md5 from 'md5';
+import { toast } from 'sonner';
 
 const handleStyle = { left: 10 };
 
@@ -123,7 +124,8 @@ function CodeMirrorAdapter({ id, data }) {
 
     useEffect(() => {
         if (rawData && data) {
-            data.struc = rawData?.answer?.sections
+            data.procedure = rawData?.answer?.sections
+            data.codeBlocks = rawData?.answer?.codeBlocks
             useFlow.setState({ nodes: [...(useFlow.getState()?.nodes || [])] })
         }
     }, [rawData, data])
@@ -157,6 +159,8 @@ function CodeMirrorAdapter({ id, data }) {
                     }
                 })
 
+            //
+
             let webSocket = new ReconnectingWebSocket(wsURL)
             webSocket.onmessage = (event) => {
                 let rawData = JSON.parse(event.data)
@@ -165,6 +169,7 @@ function CodeMirrorAdapter({ id, data }) {
                 if (rawData.execID === execID) {
                     if (rawData.route === 'response') {
                         console.log('response arrived')
+                        toast(`AI Response arrived`)
 
                         setRawData(rawData)
                     }
@@ -181,7 +186,7 @@ function CodeMirrorAdapter({ id, data }) {
                         clearTimeout(timer)
                         timer = setTimeout(() => {
                             webSocket.send(JSON.stringify(v))
-                        }, 500)
+                        }, 800)
                     }
                 })
             }
@@ -213,6 +218,8 @@ function CodeMirrorAdapter({ id, data }) {
         }
     }, [askBot, data.bot])
 
+    //
+
     return <>
         <div className='w-full h-full flex'>
             <div className='w-1/2 h-full'>
@@ -227,14 +234,18 @@ function CodeMirrorAdapter({ id, data }) {
 
                         botID: `${botID}`,
                         execID: execID,
-                        question: data.bot,
+                        question: bot,
                     })
                 }}></CodeMirrorNodeEditor>}
             </div>
 
             <div className='w-1/2 h-full text-xs overflow-y-scroll'>
-                {askBot && <pre className=' whitespace-pre-wrap p-4'>{JSON.stringify(data?.bot?.json, null, 2)}</pre>}
-                {askBot && <pre className=' whitespace-pre-wrap p-4'>{JSON.stringify(data?.struc, null, 2)}</pre>}
+                {!askBot && <><div className='w-full h-full flex items-center justify-center'>Loading...</div></>}
+                {/* {askBot && <pre className=' whitespace-pre-wrap p-4'>{JSON.stringify(data?.bot?.json, null, 2)}</pre>} */}
+                {askBot && <pre className=' whitespace-pre-wrap p-4'>{JSON.stringify(data?.procedure, null, 2)}</pre>}
+                {askBot && <pre className=' whitespace-pre-wrap p-4'>{JSON.stringify(data?.codeBlocks, null, 2)}</pre>}
+
+                {/*  */}
             </div>
         </div>
     </>
