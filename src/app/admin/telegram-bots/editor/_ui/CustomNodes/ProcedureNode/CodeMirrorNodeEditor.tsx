@@ -5,9 +5,9 @@ import 'codemirror/lib/codemirror.css'
 import 'codemirror/addon/hint/show-hint.css'
 
 import { create } from 'zustand'
-import nlp from 'compromise'
-import plg from 'compromise-dates'
-nlp.plugin(plg)
+// import nlp from 'compromise'
+// import plg from 'compromise-dates'
+// nlp.plugin(plg)
 
 // @ts-ignore
 // import md2json from 'md-2-json'
@@ -16,16 +16,18 @@ nlp.plugin(plg)
 // import extractURLs from 'extract-urls'
 // import { StringMap } from 'aws-lambda/trigger/cognito-user-pool-trigger/_common'
 
-const useMirror = create<any>(() => {
-    return {
-        //
-        value: '',
-        highlight: {},
-        reload: () => {},
-        suggestion: {},
-        //
-    }
-})
+// const useMirror = create<any>(() => {
+//     return {
+//         //
+//         value: '',
+//         highlight: {},
+//         reload: () => {},
+//         suggestion: {},
+//         //
+//     }
+// })
+
+//
 
 // let getID = () => {
 //     return `_` + (Math.random() * 1000000000).toFixed(0)
@@ -33,23 +35,23 @@ const useMirror = create<any>(() => {
 
 const css = /* css */ `
 .cm-URLToken{
-  border-bottom: rgb(31, 202, 173) solid 2px;
+    border-bottom: rgb(31, 202, 173) solid 2px;
 }
 .cm-TableToken{
-  font-weight: bold;
-  border-bottom: rgb(31, 202, 173) solid 2px;
+    font-weight: bold;
+    border-bottom: rgb(31, 202, 173) solid 2px;
 }
 .cm-HolderToken{
-  font-weight: bold;
-  border-bottom: rgb(202, 108, 31) dashed 2px;
+    font-weight: bold;
+    border-bottom: rgb(202, 108, 31) dashed 2px;
 }
 .cm-ResultInstnace{
-  font-weight: bold;
-  border-bottom: rgb(202, 31, 165) dashed 2px;
+    font-weight: bold;
+    border-bottom: rgb(202, 31, 165) dashed 2px;
 }
 .cm-FieldToken{
-  font-weight: bold;
-  border-bottom: rgb(202, 122, 31) dashed 2px;
+    font-weight: bold;
+    border-bottom: rgb(202, 122, 31) dashed 2px;
 }
 .cm-OrderToken{
   font-weight: bold;
@@ -66,13 +68,13 @@ const procFQL = ({ query }: any) => {
     let globals: { [key: string]: any } = {}
     let highlight = {}
 
-    nlp.plugin({
-        tags: {},
-        words: highlight,
-        patterns: {},
-        regex: {},
-        plurals: {},
-    })
+    // nlp.plugin({
+    //     tags: {},
+    //     words: highlight,
+    //     patterns: {},
+    //     regex: {},
+    //     plurals: {},
+    // })
 
     let titles = query
         .split('\n')
@@ -86,7 +88,7 @@ const procFQL = ({ query }: any) => {
         allStr = allStr.replace(title, '____SPLITTER____' + title + '____IDX____')
     })
 
-    let groups: string[] = allStr
+    let sections: string[] = allStr
         .split('____SPLITTER____')
         .filter((r: string) => r)
         .map((r: string) => {
@@ -96,15 +98,15 @@ const procFQL = ({ query }: any) => {
                 return {
                     title: arr[0].trim(),
                     text: arr[1].trim(),
-                    steps: arr[1]
-                        .trim()
-                        .split('\n')
-                        .filter((r: string) => r)
-                        .map((text) => {
-                            return {
-                                line: text,
-                            }
-                        }),
+                    // lines: arr[1]
+                    //     .trim()
+                    //     .split('\n')
+                    //     .filter((r: string) => r)
+                    //     .map((text) => {
+                    //         return {
+                    //             line: text,
+                    //         }
+                    //     }),
                 }
             } else {
                 return false
@@ -112,14 +114,16 @@ const procFQL = ({ query }: any) => {
         })
         .filter((r: any) => r)
 
-    groups.forEach((group: any) => {
-        group.steps.map((step: any) => {
-            procSentence({ title: group.title, command: step.cmd, highlight, globals, step, group })
-            return step
-        })
-    })
+    //
+    // groups.forEach((group: any) => {
+    //     group.lines.map((step: any) => {
+    //         // procSentence({ title: group.title, command: step.cmd, highlight, globals, step, group })
+    //         return step
+    //     })
+    // })
+    //
 
-    globals.groups = groups
+    globals.sections = sections
 
     return JSON.parse(
         JSON.stringify({
@@ -129,188 +133,201 @@ const procFQL = ({ query }: any) => {
     )
 }
 
-const procSentence = ({ command, highlight, globals, group }: { command: string } | any) => {
-    let cleanID = (text: string) => {
-        const match = `${text || ''}`.match(/\w+/)
-        return match ? match[0] : null
-    }
+// const procSentence = ({ command, highlight, globals, group }: { command: string } | any) => {
+//     let cleanID = (text: string) => {
+//         const match = `${text || ''}`.match(/\w+/)
+//         return match ? match[0] : null
+//     }
 
-    let tagsToLexicon = ({ lexicon, keyname, tagsToAdd }: any) => {
-        let lexArr = (lexicon[keyname] = lexicon[keyname] || [])
-        tagsToAdd.forEach((tag: any) => {
-            if (!lexArr.includes(tag)) {
-                lexArr.unshift(tag)
-            }
-        })
-    }
+//     let tagsToLexicon = ({ lexicon, keyname, tagsToAdd }: any) => {
+//         let lexArr = (lexicon[keyname] = lexicon[keyname] || [])
+//         tagsToAdd.forEach((tag: any) => {
+//             if (!lexArr.includes(tag)) {
+//                 lexArr.unshift(tag)
+//             }
+//         })
+//     }
 
-    let holder: any = {
-        type: 'database',
-        id: '',
-    }
+//     let holder: any = {
+//         type: 'database',
+//         id: '',
+//     }
 
-    nlp(command)
-        .match(` user database (called|*) [.]`)
-        .not('the')
-        .not('and')
-        .out('tags')
-        .forEach((entry: any, idx: number) => {
-            holder.type = 'userDB'
-            holder.id = cleanID(entry.text)
-            tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
-            group.database = group.database || []
-            group.database.push(holder)
-        })
+//     nlp(command)
+//         .match(` user database (called|*) [.]`)
+//         .not('the')
+//         .not('and')
+//         .out('tags')
+//         .forEach((entry: any, idx: number) => {
+//             holder.type = 'userDB'
+//             holder.id = cleanID(entry.text)
+//             tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
+//             group.database = group.database || []
+//             group.database.push(holder)
+//         })
 
-    nlp(command)
-        .match(` system database (called|*) [.]`)
-        .not('the')
-        .not('and')
-        .out('tags')
-        .forEach((entry: any) => {
-            holder.type = 'systemDB'
-            holder.id = cleanID(entry.text)
-            tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
-            group.database = group.database || []
-            group.database.push(holder)
-        })
+//     nlp(command)
+//         .match(` system database (called|*) [.]`)
+//         .not('the')
+//         .not('and')
+//         .out('tags')
+//         .forEach((entry: any) => {
+//             holder.type = 'systemDB'
+//             holder.id = cleanID(entry.text)
+//             tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
+//             group.database = group.database || []
+//             group.database.push(holder)
+//         })
 
-    nlp(command)
-        .match(`fetch data from [.] * save to [.]`)
-        .not('the')
-        .not('and')
-        .out('tags')
-        .forEach((entry: any, idx: number) => {
-            if (idx === 0) {
-                let urls = nlp(command).urls().out('array')
+//     nlp(command)
+//         .match(`fetch data from [.] * save to [.]`)
+//         .not('the')
+//         .not('and')
+//         .out('tags')
+//         .forEach((entry: any, idx: number) => {
+//             if (idx === 0) {
+//                 let urls = nlp(command).urls().out('array')
 
-                urls.forEach((url: string) => {
-                    console.log(url)
-                })
+//                 urls.forEach((url: string) => {
+//                     console.log(url)
+//                 })
 
-                //
-            }
+//                 //
+//             }
 
-            // holder.type = 'systemDB'
-            // holder.id = cleanID(entry.text)
-            // tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
-            // section.db = section.db || []
-            // section.db.push(holder)
-        })
+//             // holder.type = 'systemDB'
+//             // holder.id = cleanID(entry.text)
+//             // tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['HolderToken'] })
+//             // section.db = section.db || []
+//             // section.db.push(holder)
+//         })
 
-    // command
-    //     .split('\n')
-    //     .filter((r: string) => r.trim())
-    //     .forEach((subCommand: string) => {
-    //         if (subCommand) {
-    //             let urls = nlp(subCommand).urls().out('array')
+//     // command
+//     //     .split('\n')
+//     //     .filter((r: string) => r.trim())
+//     //     .forEach((subCommand: string) => {
+//     //         if (subCommand) {
+//     //             let urls = nlp(subCommand).urls().out('array')
 
-    //             let targetDB = nlp(command).match(`add to [.]`).not('the').not('and').out('array')[0]
+//     //             let targetDB = nlp(command).match(`add to [.]`).not('the').not('and').out('array')[0]
 
-    //             section.urls = urls
-    //             section.target = targetDB
+//     //             section.urls = urls
+//     //             section.target = targetDB
 
-    //             tagsToLexicon({ lexicon: highlight, keyname: targetDB, tagsToAdd: ['HolderToken'] })
-    //             tagsToLexicon({ lexicon: highlight, keyname: urls[0], tagsToAdd: ['URLToken'] })
-    //         }
+//     //             tagsToLexicon({ lexicon: highlight, keyname: targetDB, tagsToAdd: ['HolderToken'] })
+//     //             tagsToLexicon({ lexicon: highlight, keyname: urls[0], tagsToAdd: ['URLToken'] })
+//     //         }
 
-    //         //
-    //     })
+//     //         //
+//     //     })
 
-    // nlp(command)
-    //     .match(`fetch data from [*]`)
-    //     .not('the')
-    //     .not('and')
-    //     .out('tags')
-    //     .forEach((entry: any) => {
-    //         query.table = cleanID(entry.text)
-    //         addQuery({ query })
-    //         tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['TableToken'] })
-    //     })
+//     // nlp(command)
+//     //     .match(`fetch data from [*]`)
+//     //     .not('the')
+//     //     .not('and')
+//     //     .out('tags')
+//     //     .forEach((entry: any) => {
+//     //         query.table = cleanID(entry.text)
+//     //         addQuery({ query })
+//     //         tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['TableToken'] })
+//     //     })
 
-    // if (command.toLowerCase().indexOf('go get some data') !== -1) {
+//     // if (command.toLowerCase().indexOf('go get some data') !== -1) {
 
-    //     // , just skip [.] items and get the first [.]
-    //     nlp(command)
-    //         .match(`store results in [.] and`)
-    //         .not('the')
-    //         .not('and')
-    //         .out('tags')
-    //         .forEach((entry) => {
-    //             query.bucket = cleanID(entry.text)
-    //         })
+//     //     // , just skip [.] items and get the first [.]
+//     //     nlp(command)
+//     //         .match(`store results in [.] and`)
+//     //         .not('the')
+//     //         .not('and')
+//     //         .out('tags')
+//     //         .forEach((entry) => {
+//     //             query.bucket = cleanID(entry.text)
+//     //         })
 
-    //     nlp(command)
-    //         .match(`#HolderToken? and name it with [.] label`)
-    //         .not('the')
-    //         .not('and')
-    //         .out('tags')
-    //         .forEach((entry, idx) => {
-    //             if (idx === 0) {
-    //                 query.id = cleanID(entry.text)
-    //                 tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['ResultInstnace'] })
-    //             }
-    //         })
+//     //     nlp(command)
+//     //         .match(`#HolderToken? and name it with [.] label`)
+//     //         .not('the')
+//     //         .not('and')
+//     //         .out('tags')
+//     //         .forEach((entry, idx) => {
+//     //             if (idx === 0) {
+//     //                 query.id = cleanID(entry.text)
+//     //                 tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['ResultInstnace'] })
+//     //             }
+//     //         })
 
-    //     nlp(command)
-    //         .match(`#HolderToken? look for [.] with ID [.] in it?`)
-    //         .not('the')
-    //         .not('and')
-    //         .out('tags')
-    //         .forEach((entry, idx) => {
-    //             if (idx === 0) {
-    //                 query.lookForField = cleanID(entry.text)
-    //                 tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['FieldToken'] })
-    //             } else if (idx === 1) {
-    //                 query.lookForID = Number(cleanID(entry.text))
-    //                 tagsToLexicon({ lexicon: highlight, keyname: 'ID ' + cleanID(entry.text), tagsToAdd: ['IDToken'] })
-    //             }
-    //         })
+//     //     nlp(command)
+//     //         .match(`#HolderToken? look for [.] with ID [.] in it?`)
+//     //         .not('the')
+//     //         .not('and')
+//     //         .out('tags')
+//     //         .forEach((entry, idx) => {
+//     //             if (idx === 0) {
+//     //                 query.lookForField = cleanID(entry.text)
+//     //                 tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['FieldToken'] })
+//     //             } else if (idx === 1) {
+//     //                 query.lookForID = Number(cleanID(entry.text))
+//     //                 tagsToLexicon({ lexicon: highlight, keyname: 'ID ' + cleanID(entry.text), tagsToAdd: ['IDToken'] })
+//     //             }
+//     //         })
 
-    //     // nlp(command)
-    //     //   .match(`skip [*] items and get the first [*]`)
-    //     //   .not('the')
-    //     //   .not('and')
-    //     //   .out('tags')
-    //     //   .forEach((entry, idx) => {
-    //     //     if (idx === 0) {
-    //     //       query.skip = cleanID(entry.text)
-    //     //     } else if (idx === 1) {
-    //     //       query.limit = Number(cleanID(entry.text))
-    //     //     }
-    //     //   })
+//     //     // nlp(command)
+//     //     //   .match(`skip [*] items and get the first [*]`)
+//     //     //   .not('the')
+//     //     //   .not('and')
+//     //     //   .out('tags')
+//     //     //   .forEach((entry, idx) => {
+//     //     //     if (idx === 0) {
+//     //     //       query.skip = cleanID(entry.text)
+//     //     //     } else if (idx === 1) {
+//     //     //       query.limit = Number(cleanID(entry.text))
+//     //     //     }
+//     //     //   })
 
-    //     nlp(command)
-    //         .match(`sort with [.] order`)
-    //         .not('the')
-    //         .not('and')
-    //         .out('tags')
-    //         .forEach((entry, idx) => {
-    //             if (idx === 0) {
-    //                 query.sort = cleanID(entry.text).toUpperCase()
-    //                 tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['OrderToken'] })
-    //             }
-    //         })
+//     //     nlp(command)
+//     //         .match(`sort with [.] order`)
+//     //         .not('the')
+//     //         .not('and')
+//     //         .out('tags')
+//     //         .forEach((entry, idx) => {
+//     //             if (idx === 0) {
+//     //                 query.sort = cleanID(entry.text).toUpperCase()
+//     //                 tagsToLexicon({ lexicon: highlight, keyname: cleanID(entry.text), tagsToAdd: ['OrderToken'] })
+//     //             }
+//     //         })
 
-    //     nlp(command)
-    //         .match(`skip [.] items and get the first [.] items`)
-    //         .not('the')
-    //         .not('and')
-    //         .out('tags')
-    //         .forEach((entry, idx) => {
-    //             if (idx === 0) {
-    //                 query.skip = cleanID(entry.text).toUpperCase()
-    //                 tagsToLexicon({ lexicon: highlight, keyname: 'skip ' + cleanID(entry.text), tagsToAdd: ['NumberToken'] })
-    //             } else if (idx === 1) {
-    //                 query.limit = cleanID(entry.text).toUpperCase()
-    //                 tagsToLexicon({ lexicon: highlight, keyname: 'first ' + cleanID(entry.text), tagsToAdd: ['NumberToken'] })
-    //             }
-    //         })
-    // }
-}
+//     //     nlp(command)
+//     //         .match(`skip [.] items and get the first [.] items`)
+//     //         .not('the')
+//     //         .not('and')
+//     //         .out('tags')
+//     //         .forEach((entry, idx) => {
+//     //             if (idx === 0) {
+//     //                 query.skip = cleanID(entry.text).toUpperCase()
+//     //                 tagsToLexicon({ lexicon: highlight, keyname: 'skip ' + cleanID(entry.text), tagsToAdd: ['NumberToken'] })
+//     //             } else if (idx === 1) {
+//     //                 query.limit = cleanID(entry.text).toUpperCase()
+//     //                 tagsToLexicon({ lexicon: highlight, keyname: 'first ' + cleanID(entry.text), tagsToAdd: ['NumberToken'] })
+//     //             }
+//     //         })
+//     // }
+// }
 
 export function CodeMirrorNodeEditor({ autoSave, bot }: any) {
     let [ready, setReady] = useState<false | true>(false)
+
+    let useMirror = useMemo(() => {
+        return create<any>(() => {
+            return {
+                //
+                value: '',
+                highlight: {},
+                reload: () => {},
+                suggestion: {},
+                CodeMirror: false,
+            }
+        })
+    }, [])
 
     useEffect(() => {
         import('codemirror')
@@ -447,6 +464,7 @@ export function CodeMirrorNodeEditor({ autoSave, bot }: any) {
         let suggestions: any = [
             //
             // ['posts', 'comments', 'settings'],
+            //
         ]
 
         let highlight: any = result.highlight

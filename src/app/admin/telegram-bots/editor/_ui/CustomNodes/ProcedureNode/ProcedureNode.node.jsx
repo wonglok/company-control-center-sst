@@ -1,5 +1,5 @@
 'use client'
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { useRemoveUI } from '../../../[botID]/removeBtn';
 import { BotEditorIn } from '../../../[botID]/AppPage';
@@ -7,6 +7,11 @@ import { Button } from '@/components/ui/button';
 import { MenuIcon } from 'lucide-react';
 import { useFlow } from '../../../[botID]/useFlow';
 import { CodeMirrorNodeEditor } from './CodeMirrorNodeEditor';
+import { v4 } from 'uuid';
+import { useParams } from 'next/navigation';
+import ReconnectingWebSocket from 'reconnecting-websocket';
+import { getTelegramBot } from '@/actions/telegram/getTelegramBot';
+import md5 from 'md5';
 
 const handleStyle = { left: 10 };
 
@@ -38,12 +43,14 @@ export function ProcedureNode({ id, data }) {
         }        //
     }, [])
 
+    //
+
     return <>
         <div className='bg-white min-w-[320px] h-full p-2 rounded-lg  border border-gray-500  cursor-auto' onDragStartCapture={(ev) => {
             ev.stopPropagation()
         }}>
-            <button className='dragHandle bg-sky-300 w-full h-8 cursor-grab rounded-lg'>
-                <MenuIcon className='ml-2'></MenuIcon>
+            <button className='dragHandle bg-sky-200 w-full h-8 cursor-grab rounded-lg'>
+                <MenuIcon className='ml-2 size-4'></MenuIcon>
             </button>
 
             <Handle type="target" position={Position.Top} id="b" />
@@ -105,17 +112,120 @@ function CodeMirrorAdapter({ id, data }) {
         json: {}
     }
 
+    const execID = useMemo(() => {
+        return `_${v4()}`
+    }, [])
+
+    let { botID } = useParams()
+
+    let [askBot, setSendData] = useState(false)
+
+    useEffect(() => {
+
+        console.log(botID)
+        if (!botID) {
+            return
+        }
+
+        let clean = () => { }
+
+        let run = async () => {
+
+            console.log('setup-webhook')
+            let telegram = await getTelegramBot({
+                item: { itemID: botID }
+            })
+            let clientID = telegram.itemID
+            let verify = `${md5(telegram.botToken)}`
+
+            let { wsURL, httpURL } = await fetch(`/api/services`, { mode: 'cors', method: 'GET' })
+                .then((r) => r.json())
+                .then((r) => {
+                    return {
+                        httpURL: r.httpURL,
+                        wsURL: `${r.socketURL}?clientID=${encodeURIComponent(clientID)}&verify=${encodeURIComponent(verify)}&clientType=client`,
+                    }
+                })
+
+            let webSocket = new ReconnectingWebSocket(wsURL)
+            webSocket.onmessage = (event) => {
+                let rawData = JSON.parse(event.data)
+                console.log('socket-data', rawData)
+
+                if (rawData.execID === execID) {
+                    if (rawData.route === 'response') {
+
+                        console.log('response arrived')
+                    }
+                }
+            }
+
+            let timer = -1
+
+            webSocket.onopen = () => {
+                console.log('socket-open')
+
+                setSendData(() => {
+                    return (v) => {
+                        clearTimeout(timer)
+                        timer = setTimeout(() => {
+                            webSocket.send(JSON.stringify(v))
+                        }, 500)
+                    }
+                })
+            }
+
+            clean = () => {
+                webSocket.close()
+                console.log('cleand')
+            }
+        }
+        run()
+
+        return () => {
+            clean()
+            setSendData(false)
+        }
+    }, [botID])
+
+    useEffect(() => {
+        if (askBot) {
+            askBot({
+                route: 'request',
+                type: 'parse_logic_request',
+                clientID: botID,
+
+                botID: `${botID}`,
+                execID: execID,
+                question: data.bot,
+            })
+        }
+    }, [askBot, data.bot])
+
     return <>
         <div className='w-full h-full flex'>
             <div className='w-1/2 h-full'>
-                <CodeMirrorNodeEditor bot={data.bot} autoSave={({ bot }) => {
+                {!askBot && <><div className='w-full h-full flex items-center justify-center'>Loading...</div></>}
+                {askBot && <CodeMirrorNodeEditor bot={data.bot} autoSave={({ bot }) => {
                     data.bot = bot
-                    useFlow.setState({ nodes: [...useFlow.getState().nodes] })
-                }}></CodeMirrorNodeEditor>
+                    useFlow.setState({ nodes: [...(useFlow.getState()?.nodes || [])] })
+                    askBot({
+                        route: 'request',
+                        type: 'parse_logic_request',
+                        clientID: botID,
+
+                        botID: `${botID}`,
+                        execID: execID,
+                        question: data.bot,
+                    })
+                }}></CodeMirrorNodeEditor>}
             </div>
+
             <div className='w-1/2 h-full text-xs overflow-y-scroll'>
-                <pre className=' whitespace-pre-wrap p-4'>{JSON.stringify(data?.bot?.json, null, 2)}</pre>
+                {askBot && <pre className=' whitespace-pre-wrap p-4'>{JSON.stringify(data?.bot?.json, null, 2)}</pre>}
             </div>
         </div>
     </>
 }
+
+//

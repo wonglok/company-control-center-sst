@@ -37,8 +37,9 @@ export function EditBot({ bot }: { bot: BotType }) {
 
         putTelegramBot({
             item: {
-                itemID: bot.itemID,
+                ...bot,
                 ...data,
+                itemID: bot.itemID,
             },
         })
             .then(() => {
@@ -127,6 +128,22 @@ export function EditBot({ bot }: { bot: BotType }) {
                         </FormItem>
                     )}
                 />
+
+                <FormField
+                    control={form.control}
+                    name='deepseekToken'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Deep Seek Token</FormLabel>
+                            <FormControl>
+                                <Input placeholder='Deepseek Token' {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                {/*  */}
 
                 {/*
             console.log(aiDevices)

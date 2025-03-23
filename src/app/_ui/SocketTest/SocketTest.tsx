@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 // import copy from 'copy-to-clipboard';
 import WebSocket from 'reconnecting-websocket'
 import { TextQueryImage } from './TextQueryImage'
-import { useSearchParams } from 'next/navigation'
+// import { useSearchParams } from 'next/navigation'
 
 export function SocketTest({ socketURL = '', clientID = '' }) {
     let [status, setStatus] = useState('loading')

@@ -270,9 +270,16 @@ export const platformHook = async (event: LambdaFunctionURLEvent, context: any) 
                                     type: 'telegram_message',
                                     payload: {
                                         //
+
+                                        //
+                                        userID: ctx.message.from.id,
+                                        chatID: ctx.chat.id,
                                         botID: botData.itemID,
                                         message: ctx.message,
-                                        botSchema: botData.botSchema || '',
+
+                                        //
+
+                                        // botSchema: botData.botSchema || '',
                                     },
                                 }),
                             }),

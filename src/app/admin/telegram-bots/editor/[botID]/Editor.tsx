@@ -90,6 +90,7 @@ export const Editor = () => {
             return
         }
         getTelegramBot({ item: { itemID: params.botID } }).then((bot: any) => {
+            bot.graph = bot.graph || {}
             useFlow.setState({ bot: bot, ready: true, edges: bot.graph.edges, nodes: bot.graph.nodes })
         })
     }, [])
@@ -172,7 +173,7 @@ export function SheetDemo({ setNodes }: any) {
     const { x, y, zoom } = useViewport()
 
     const addNode = ({ type = 'WorkNode', dragHandle = undefined }: any) => {
-        setNodes((nodes: any) => [
+        setNodes((nodes: any = []) => [
             ...nodes,
             {
                 id: `${md5(v4())}`,

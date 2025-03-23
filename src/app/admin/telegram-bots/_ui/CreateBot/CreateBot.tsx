@@ -36,6 +36,7 @@ export const FormSchema = z.object({
         required_error: 'Your Chat Number ID is required.',
     }),
     botSchema: z.string(),
+    deepseekToken: z.string(),
 })
 
 export function CreateBot() {

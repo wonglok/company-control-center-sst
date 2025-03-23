@@ -6,6 +6,9 @@ export function useRemoveUI({ id }) {
     let nodes = useFlow(r => r.nodes)
     let edges = useFlow(r => r.edges)
 
+    nodes = nodes || []
+    edges = edges || []
+
     let remove = <Button variant={'destructive'} onClick={() => {
         if (window.confirm('remove node?')) {
 
