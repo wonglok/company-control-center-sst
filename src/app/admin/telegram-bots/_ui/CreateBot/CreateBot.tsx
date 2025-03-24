@@ -167,7 +167,7 @@ export function CreateBot() {
                     )}
                 />
 
-                <FormField
+                {/*             <FormField
                     control={form.control}
                     name='botSchema'
                     render={({ field }) => (
@@ -182,12 +182,14 @@ export function CreateBot() {
                                         field.onChange({ target: { value } })
                                     }}
                                 ></Editor>
-                                {/* <Textarea placeholder='Logic' {...field} /> */}
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
+                */}
+
+                {/* <Textarea placeholder='Logic' {...field} /> */}
 
                 {/*
 

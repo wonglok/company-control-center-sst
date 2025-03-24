@@ -129,7 +129,7 @@ export function EditBot({ bot }: { bot: BotType }) {
                     )}
                 />
 
-                <FormField
+                {/* <FormField
                     control={form.control}
                     name='deepseekToken'
                     render={({ field }) => (
@@ -141,7 +141,7 @@ export function EditBot({ bot }: { bot: BotType }) {
                             <FormMessage />
                         </FormItem>
                     )}
-                />
+                /> */}
 
                 {/*  */}
 
